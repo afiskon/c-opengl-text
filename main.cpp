@@ -4,6 +4,10 @@
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 
+void setWindowSizeCallback(GLFWwindow* window, int width, int height) {
+  glViewport(0, 0, width, height);
+}
+
 int main() {
   if(!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -22,6 +26,9 @@ int main() {
 
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
+
+  glfwSetWindowSizeCallback(window, setWindowSizeCallback);
+
   glfwShowWindow(window);
 
   glEnable(GL_DEPTH_TEST | GL_DOUBLEBUFFER);
