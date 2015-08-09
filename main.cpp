@@ -1,12 +1,10 @@
-#define GLEW_STATIC // required for Windows, see http://stackoverflow.com/a/18477835
-#include <GL/glew.h>
-
+#include <GLXW/glxw.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform.hpp>
-
+//#include <glm/gtx/transform.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
+//#include <GL/gl.h>
 
 void setWindowSizeCallback(GLFWwindow*, int width, int height) {
   glViewport(0, 0, width, height);
@@ -20,6 +18,10 @@ int main() {
 
   glfwDefaultWindowHints();
 
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
   GLFWwindow* window = glfwCreateWindow(300, 300, "VAO and Shaders",
                                         nullptr, nullptr);
   if(window == nullptr) {
@@ -30,10 +32,11 @@ int main() {
 
   glfwMakeContextCurrent(window);
 
-  if(glewInit() != GLEW_OK) {
-    std::cerr << "Failed to initialize GLEW" << std::endl;
+  if(glxwInit()) {
+    std::cerr << "Failed to init GLXW" << std::endl;
+    glfwDestroyWindow(window);
     glfwTerminate();
-    return -1;
+    return 1;
   }
 
   glfwSwapInterval(1);
@@ -47,24 +50,24 @@ int main() {
 
   glClearColor(0, 0, 0, 1);
 
-  glm::mat4 m = glm::perspective(45.0f, 4.0f / 3.0f, 1.0f, 100.0f);
-  glMatrixMode(GL_PROJECTION);
-  glLoadMatrixf(glm::value_ptr(m));
+//  glm::mat4 m = glm::perspective(45.0f, 4.0f / 3.0f, 1.0f, 100.0f);
+//  glMatrixMode(GL_PROJECTION);
+//  glLoadMatrixf(glm::value_ptr(m));
 
-  GLuint VertexArrayID;
-  glGenVertexArrays(1, &VertexArrayID);
-  glBindVertexArray(VertexArrayID);
+//  GLuint VertexArrayID;
+//  glGenVertexArrays(1, &VertexArrayID);
+//  glBindVertexArray(VertexArrayID);
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /* */
-    glColor4f(1, 0, 0, 1);
-    glBegin(GL_TRIANGLES);
-    glVertex3f( 0,  0.5, -5);
-    glVertex3f( 0.5, -0.5, -5);
-    glVertex3f(-0.5, -0.5, -5);
-    glEnd();
+//    glColor4f(1, 0, 0, 1);
+//    glBegin(GL_TRIANGLES);
+//    glVertex3f( 0,  0.5, -5);
+//    glVertex3f( 0.5, -0.5, -5);
+//    glVertex3f(-0.5, -0.5, -5);
+//    glEnd();
     /* */
 
     glfwSwapBuffers(window);
