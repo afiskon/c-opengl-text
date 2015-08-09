@@ -1,15 +1,18 @@
+#include <GL/glew.h>
+
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+
+#include <GLFW/glfw3.h>
 #include <iostream>
 
-void setWindowSizeCallback(GLFWwindow* window, int width, int height) {
+void setWindowSizeCallback(GLFWwindow*, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
 int main() {
-  if(!glfwInit()) {
+  if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
   }
@@ -25,6 +28,12 @@ int main() {
   }
 
   glfwMakeContextCurrent(window);
+
+  if(glewInit() != GLEW_OK) {
+    std::cerr << "Failed to initialize GLEW" << std::endl;
+    return -1;
+  }
+
   glfwSwapInterval(1);
 
   glfwSetWindowSizeCallback(window, setWindowSizeCallback);
@@ -40,14 +49,21 @@ int main() {
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixf(glm::value_ptr(m));
 
+  GLuint VertexArrayID;
+  glGenVertexArrays(1, &VertexArrayID);
+  glBindVertexArray(VertexArrayID);
+
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    /* */
     glColor4f(1, 0, 0, 1);
     glBegin(GL_TRIANGLES);
     glVertex3f( 0,  0.5, -5);
     glVertex3f( 0.5, -0.5, -5);
     glVertex3f(-0.5, -0.5, -5);
     glEnd();
+    /* */
 
     glfwSwapBuffers(window);
     glfwPollEvents();

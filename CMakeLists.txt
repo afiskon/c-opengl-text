@@ -4,7 +4,9 @@ project(vao_and_shaders)
 find_package(OpenGL REQUIRED)
 
 add_subdirectory(glfw)
+add_subdirectory(glew)
 
+include_directories(glew/include)
 include_directories(glfw/include)
 include_directories(glm)
 
@@ -14,4 +16,4 @@ set(SOURCE_FILES main.cpp)
 add_executable(vao_and_shaders ${SOURCE_FILES})
 
 target_link_libraries(vao_and_shaders
-  glfw ${GLFW_LIBRARIES} ${OPENGL_LIBRARY})
+  glfw libglew_static ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARY})
