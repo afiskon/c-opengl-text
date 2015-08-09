@@ -31,6 +31,7 @@ int main() {
 
   if(glewInit() != GLEW_OK) {
     std::cerr << "Failed to initialize GLEW" << std::endl;
+    glfwTerminate();
     return -1;
   }
 
