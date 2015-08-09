@@ -16,4 +16,4 @@ set(SOURCE_FILES main.cpp)
 add_executable(vao_and_shaders ${SOURCE_FILES})
 
 target_link_libraries(vao_and_shaders
-  glfw libglew_static ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARY})
+  glfw libglew_static ${GLFW_LIBRARIES} ${OPENGL_LIBRARY})
