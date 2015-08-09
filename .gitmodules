@@ -4,9 +4,6 @@
 [submodule "glm"]
 	path = glm
 	url = https://github.com/Groovounet/glm
-[submodule "glew"]
-	path = glew
-	url = https://github.com/Perlmint/glew-cmake
 [submodule "glxw"]
 	path = glxw
-	url = https://github.com/rikusalminen/glxw
+	url = https://github.com/afiskon/glxw-static
