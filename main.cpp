@@ -1,3 +1,4 @@
+#define GLEW_STATIC // required for Windows, see http://stackoverflow.com/a/18477835
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
