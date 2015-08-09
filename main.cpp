@@ -5,18 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
-//#include <GL/gl.h>
 
-
-static const GLfloat g_vertex_buffer_data[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
+static const GLfloat globVertexBufferData[] = {
+  -1.0f, -1.0f,  0.0f,
+   1.0f, -1.0f,  0.0f,
+   0.0f,  1.0f,  0.0f,
 };
-
-void setWindowSizeCallback(GLFWwindow*, int width, int height) {
-  glViewport(0, 0, width, height);
-}
 
 bool checkShaderCompileStatus(GLuint obj) {
   GLint status;
@@ -86,8 +80,8 @@ GLuint prepareProgram(bool *errorFlagPtr) {
   *errorFlagPtr = checkProgramLinkStatus(programId);
   if(*errorFlagPtr) return 0;
 
-//  glDeleteShader(vertexShaderId);
-//  glDeleteShader(fragmentShaderId);
+  glDeleteShader(vertexShaderId);
+  glDeleteShader(fragmentShaderId);
 
   return programId;
 }
@@ -140,10 +134,6 @@ int main() {
 //  glMatrixMode(GL_PROJECTION);
 //  glLoadMatrixf(glm::value_ptr(m));
 
-//  GLuint VertexArrayID;
-//  glGenVertexArrays(1, &VertexArrayID);
-//  glBindVertexArray(VertexArrayID);
-
   bool errorFlag;
   GLuint programId = prepareProgram(&errorFlag);
   if(errorFlag) {
@@ -152,25 +142,19 @@ int main() {
     return -1;
   }
 
-  GLuint vbo; // vertexbuffer
+  GLuint vbo;
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
 
-
-  // vao and vbo handle
   GLuint vao;
-
-  // generate and bind the vao
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
-
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programId);
-
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -181,7 +165,7 @@ int main() {
             GL_FLOAT,           // type
             GL_FALSE,           // normalized?
             0,                  // stride
-            (void*)0            // array buffer offset
+            nullptr             // array buffer offset
     );
 
     // Draw the triangle !
@@ -192,6 +176,16 @@ int main() {
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+
+//  glDetachShader(shader_program, vertex_shader);
+//  glDetachShader(shader_program, fragment_shader);
+//  glDeleteShader(vertex_shader);
+//  glDeleteShader(fragment_shader);
+
+  glDeleteProgram(programId);
 
   glfwDestroyWindow(window);
   glfwTerminate();
