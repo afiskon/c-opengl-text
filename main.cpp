@@ -52,7 +52,7 @@ GLuint prepareProgram(bool *errorFlagPtr) {
           "}";
 
   GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-  char const * vertexShaderSourcePtr = vertexShaderSource.c_str();
+  const GLchar * const vertexShaderSourcePtr = vertexShaderSource.c_str();
   glShaderSource(vertexShaderId, 1, &vertexShaderSourcePtr, nullptr);
   glCompileShader(vertexShaderId);
 
@@ -65,7 +65,7 @@ GLuint prepareProgram(bool *errorFlagPtr) {
           "void main() { color = vec3(1,0,0); }\n";
 
   GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-  char const * fragmentShaderSourcePtr = fragmentShaderSource.c_str();
+  const GLchar * const fragmentShaderSourcePtr = fragmentShaderSource.c_str();
   glShaderSource(fragmentShaderId, 1, &fragmentShaderSourcePtr, nullptr);
   glCompileShader(fragmentShaderId);
 
@@ -179,12 +179,6 @@ int main() {
 
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
-
-//  glDetachShader(shader_program, vertex_shader);
-//  glDetachShader(shader_program, fragment_shader);
-//  glDeleteShader(vertex_shader);
-//  glDeleteShader(fragment_shader);
-
   glDeleteProgram(programId);
 
   glfwDestroyWindow(window);
