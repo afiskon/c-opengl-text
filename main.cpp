@@ -158,7 +158,7 @@ int main() {
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo); // TODO: check if is needed, see https://github.com/progschj/OpenGL-Examples/blob/master/01shader_vbo1.cpp and red book
     glVertexAttribPointer(
             0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
             3,                  // size
