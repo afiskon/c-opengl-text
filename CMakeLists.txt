@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(vao_and_shaders)
+project(red_triangle)
 
 find_package(OpenGL REQUIRED)
 
@@ -14,6 +14,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Werror -std=c++11")
 SET(LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 
 set(SOURCE_FILES main.cpp)
-add_executable(vao_and_shaders ${SOURCE_FILES})
+add_executable(red_triangle ${SOURCE_FILES})
 
-target_link_libraries(vao_and_shaders ${LIBRARIES})
+target_link_libraries(red_triangle ${LIBRARIES})
