@@ -44,9 +44,9 @@ GLuint prepareProgram(bool *errorFlagPtr) {
 
   std::string vertexShaderSource = ""
           "#version 330 core\n"
-          "layout(location = 0) in vec3 vertexPosition_modelspace;\n"
+          "layout(location = 0) in vec3 vertexPos;\n"
           "void main(){\n"
-          "  gl_Position.xyz = vertexPosition_modelspace;\n"
+          "  gl_Position.xyz = vertexPos;\n"
           "  gl_Position.w = 1.0;\n"
           "}";
 
@@ -61,7 +61,7 @@ GLuint prepareProgram(bool *errorFlagPtr) {
   std::string fragmentShaderSource = ""
           "#version 330 core\n"
           "out vec3 color;\n"
-          "void main() { color = vec3(1,0,0); }\n";
+          "void main() { color = vec3(0,0,1); }\n";
 
   GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
   const GLchar * const fragmentShaderSourcePtr = fragmentShaderSource.c_str();
