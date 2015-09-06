@@ -1,7 +1,6 @@
 #include <GLXW/glxw.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-//#include <glm/gtx/transform.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
@@ -130,10 +129,6 @@ int main() {
 
   glClearColor(0, 0, 0, 1);
 
-//  glm::mat4 m = glm::perspective(45.0f, 4.0f / 3.0f, 1.0f, 100.0f);
-//  glMatrixMode(GL_PROJECTION);
-//  glLoadMatrixf(glm::value_ptr(m));
-
   bool errorFlag;
   GLuint programId = prepareProgram(&errorFlag);
   if(errorFlag) {
@@ -149,28 +144,21 @@ int main() {
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
+
   glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+  glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
+  glBindVertexArray(0); // unbind VAO
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programId);
 
-    // 1rst attribute buffer : vertices
+    glBindVertexArray(vao);
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo); // TODO: check if is needed, see https://github.com/progschj/OpenGL-Examples/blob/master/01shader_vbo1.cpp and red book
-    glVertexAttribPointer(
-            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,                  // size
-            GL_FLOAT,           // type
-            GL_FALSE,           // normalized?
-            0,                  // stride
-            nullptr             // array buffer offset
-    );
-
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
-
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glDisableVertexAttribArray(0);
     
     glfwSwapBuffers(window);
