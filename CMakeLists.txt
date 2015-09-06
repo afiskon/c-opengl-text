@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(red_triangle)
+project(triangle)
 
 find_package(OpenGL REQUIRED)
 
@@ -14,6 +14,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Werror -std=c++11")
 SET(LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 
 set(SOURCE_FILES main.cpp)
-add_executable(red_triangle ${SOURCE_FILES})
+add_executable(triangle ${SOURCE_FILES})
 
-target_link_libraries(red_triangle ${LIBRARIES})
+target_link_libraries(triangle ${LIBRARIES})

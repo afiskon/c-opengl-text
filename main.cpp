@@ -101,7 +101,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-  GLFWwindow* window = glfwCreateWindow(300, 300, "VAO and Shaders",
+  GLFWwindow* window = glfwCreateWindow(200, 300, "Triangle",
                                         nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
