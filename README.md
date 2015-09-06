@@ -1,1 +1,1 @@
-# cpp-opengl-red-triangle
+# cpp-opengl-vbo-vao-shaders
