@@ -2,12 +2,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <vector>
 #include <iostream>
 #include <sstream>
 #include <fstream>
-
-// TODO: move shaders to seperate files
 
 bool checkShaderCompileStatus(GLuint obj) {
   GLint status;
@@ -50,7 +47,10 @@ GLuint loadShader(const char* fileName, GLenum shaderType, bool *errorFlagPtr) {
   glCompileShader(shaderId);
 
   *errorFlagPtr = checkShaderCompileStatus(shaderId);
-  if(*errorFlagPtr) return 0;
+  if(*errorFlagPtr) {
+    glDeleteShader(shaderId);
+    return 0;
+  }
 
   return shaderId;
 }
@@ -65,7 +65,10 @@ GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr) {
   glLinkProgram(programId);
 
   *errorFlagPtr = checkProgramLinkStatus(programId);
-  if(*errorFlagPtr) return 0;
+  if(*errorFlagPtr) {
+    glDeleteProgram(programId);
+    return 0;
+  }
 
   return programId;
 }

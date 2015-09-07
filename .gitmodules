@@ -7,3 +7,6 @@
 [submodule "glxw"]
 	path = glxw
 	url = http://glxw.dav1d.de/glxw.git
+[submodule "deferxx"]
+	path = deferxx
+	url = https://github.com/lichray/deferxx

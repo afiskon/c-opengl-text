@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <defer.h>
 #include "utils/utils.h"
 
 static const GLfloat globVertexBufferData[] = {
@@ -21,6 +22,7 @@ int main() {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
   }
+  defer(std::cout << "Calling glfwTerminate()" << std::endl; glfwTerminate());
 
   glfwDefaultWindowHints();
 
@@ -31,17 +33,15 @@ int main() {
   GLFWwindow* window = glfwCreateWindow(300, 300, "Triangle", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
-    glfwTerminate();
     return -1;
   }
+  defer(std::cout << "Calling glfwDestroyWindow()" << std::endl; glfwDestroyWindow(window));
 
   glfwMakeContextCurrent(window);
 
   if(glxwInit()) {
     std::cerr << "Failed to init GLXW" << std::endl;
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 1;
+    return -1;
   }
 
   glfwSwapInterval(1);
@@ -60,8 +60,7 @@ int main() {
 
   GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", GL_VERTEX_SHADER, &errorFlag);
   if(errorFlag) {
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    std::cerr << "Failed to load vertex shader (invalid working directory?)" << std::endl;
     return -1;
   }
 
@@ -69,16 +68,14 @@ int main() {
 
   GLuint fragmentShaderId = loadShader("shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER, &errorFlag);
   if(errorFlag) {
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    std::cerr << "Failed to load fragment shader (invalid working directory?)" << std::endl;
     return -1;
   }
   shaders.push_back(fragmentShaderId);
 
   GLuint programId = prepareProgram(shaders, &errorFlag);
   if(errorFlag) {
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    std::cerr << "Failed to prepare program" << std::endl;
     return -1;
   }
   glDeleteShader(vertexShaderId);
@@ -116,7 +113,5 @@ int main() {
   glDeleteBuffers(1, &vbo);
   glDeleteProgram(programId);
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
   return 0;
 }
