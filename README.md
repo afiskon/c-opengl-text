@@ -1,1 +1,1 @@
-# cpp-opengl-vbo-vao-shaders
+# cpp-opengl-model-view-projection
