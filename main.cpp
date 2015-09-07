@@ -28,8 +28,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-  GLFWwindow* window = glfwCreateWindow(300, 300, "Triangle",
-                                        nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(300, 300, "Triangle", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     glfwTerminate();
@@ -56,13 +55,34 @@ int main() {
 
   glClearColor(0, 0, 0, 1);
 
-  bool errorFlag;
-  GLuint programId = prepareProgram(&errorFlag);
+  bool errorFlag = false;
+  std::vector<GLuint> shaders;
+
+  GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", GL_VERTEX_SHADER, &errorFlag);
   if(errorFlag) {
     glfwDestroyWindow(window);
     glfwTerminate();
     return -1;
   }
+
+  shaders.push_back(vertexShaderId);
+
+  GLuint fragmentShaderId = loadShader("shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER, &errorFlag);
+  if(errorFlag) {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return -1;
+  }
+  shaders.push_back(fragmentShaderId);
+
+  GLuint programId = prepareProgram(shaders, &errorFlag);
+  if(errorFlag) {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return -1;
+  }
+  glDeleteShader(vertexShaderId);
+  glDeleteShader(fragmentShaderId);
 
   GLuint vbo;
   glGenBuffers(1, &vbo);
