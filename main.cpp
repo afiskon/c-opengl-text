@@ -8,6 +8,7 @@
 #include <defer.h>
 #include <chrono>
 #include "utils/utils.h"
+#include "utils/camera.h"
 
 static const GLfloat globVertexBufferData[] = {
   -1.0f, -1.0f,  0.0f,
@@ -21,6 +22,7 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 
 // TODO: box instead of triangle
 // TODO: mouse, keyboard (camera.cpp / hpp ? )
+// TODO: rename project in CMakeList.txt
 
 int main() {
   if(glfwInit() == GL_FALSE) {
@@ -129,6 +131,11 @@ int main() {
     float rotationTimeMs = 3000.0f;
     float currentRotation = deltaTimeMs / rotationTimeMs;
     float angle = 360.0f*(currentRotation - (long)currentRotation);
+    Camera camera(
+        glm::vec3(0, 0, 5), // Camera is at (0, 0, 5)
+        3.14f, // horizontal angle : toward -Z
+        0.0f // vertical angle : 0, look at the horizon
+    );
 
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -179,6 +186,8 @@ int main() {
     glm::mat4 model = glm::rotate(angle, 0.0f, 1.0f, 0.0f);
     glm::mat4 mvp = projection * view * model; // Remember, matrix multiplication is the other way around
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+
+    camera.getViewMatrix(deltaTimeMs, &view);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
