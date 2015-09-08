@@ -121,8 +121,9 @@ int main() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     auto duration = currentTime - startTime;
     long ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    long rotationTimeMs = 3000;
-    float angle = (360.0f/rotationTimeMs) * ms;
+    float rotationTimeMs = 3000.0f;
+    float currentRotation = ms / rotationTimeMs;
+    float angle = 360.0f*(currentRotation - (long)currentRotation);
 
     glm::mat4 Model      = glm::rotate(angle, 0.0f, 1.0f, 0.0f);
     glm::mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
