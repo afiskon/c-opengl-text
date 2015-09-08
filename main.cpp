@@ -120,6 +120,8 @@ int main() {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
+
     auto currentTime = std::chrono::high_resolution_clock::now();
     auto duration = currentTime - startTime;
     float deltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
@@ -156,19 +158,19 @@ int main() {
     glm::vec3 up = glm::cross( right, direction );
 
     // Move forward
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
       position += direction * deltaTimeSec * speed;
     }
     // Move backward
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       position -= direction * deltaTimeSec * speed;
     }
     // Strafe left
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
       position -= right * deltaTimeSec * speed;
     }
     // Strafe right
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
       position += right * deltaTimeSec * speed;
     }
 
