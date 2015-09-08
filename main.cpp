@@ -19,6 +19,9 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
+// TODO: box instead of triangle
+// TODO: mouse, keyboard
+
 int main() {
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -107,13 +110,7 @@ int main() {
       glm::vec3(0, 0, 0), // and looks at the origin
       glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
   );
-  // Model matrix : an identity matrix (model will be at the origin)
-//  glm::mat4 Model      = glm::rotate(30.0f, 0.0f, 1.0f, 0.0f); // glm::mat4(1.0f);  // Changes for each model !
-  // Our ModelViewProjection : multiplication of our 3 matrices
-//  glm::mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
-  // Get a handle for our "MVP" uniform.
-  // Only at initialisation time.
   GLint matrixId = glGetUniformLocation(programId, "MVP");
 
   auto startTime = std::chrono::high_resolution_clock::now();
