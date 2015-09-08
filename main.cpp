@@ -100,27 +100,54 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
   glBindVertexArray(0); // unbind VAO
 
+  glm::vec3 right(1.0f, 0.0f, 0.0f);
+  glm::vec3 direction(0.0f, 0.0f, -1.0f);
+  float speed = 0.3f; // units / second
+  glm::vec3 position(0, 0, 5); // Camera is at (0, 0, 5), in World Space
 
-  // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 1.0f, 100.0f);
-  // Camera matrix
-  glm::mat4 View       = glm::lookAt(
-      //glm::vec3(4,3,3), // Camera is at (4,3,3), in World Space
-      glm::vec3(0, 0, 5),
-      glm::vec3(0, 0, 0), // and looks at the origin
-      glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-  );
+  glm::mat4 Projection = glm::perspective(100.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
 
   auto startTime = std::chrono::high_resolution_clock::now();
+
+
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     auto currentTime = std::chrono::high_resolution_clock::now();
     auto duration = currentTime - startTime;
-    long ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    float deltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    float deltaTimeSec = deltaTimeMs/1000.0f;
     float rotationTimeMs = 3000.0f;
-    float currentRotation = ms / rotationTimeMs;
+    float currentRotation = deltaTimeMs / rotationTimeMs;
     float angle = 360.0f*(currentRotation - (long)currentRotation);
+
+
+    // Move forward
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+      position += direction * deltaTimeSec * speed;
+    }
+    // Move backward
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+      position -= direction * deltaTimeSec * speed;
+    }
+    // Strafe left
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+      position -= right * deltaTimeSec * speed;
+    }
+    // Strafe right
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+      position += right * deltaTimeSec * speed;
+    }
+
+
+    glm::vec3 up = glm::cross( right, direction );
+
+    // Camera matrix
+    glm::mat4 View       = glm::lookAt(
+        position,
+        position + direction, // glm::vec3(0, 0, 0), // and looks at the origin
+        up // glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+    );
 
     glm::mat4 Model      = glm::rotate(angle, 0.0f, 1.0f, 0.0f);
     glm::mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
