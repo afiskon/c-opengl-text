@@ -11,10 +11,6 @@
 #include "utils/camera.h"
 
 static const GLfloat globVertexBufferData[] = {
-//  -1.0f, -1.0f,  0.0f,
-//   1.0f, -1.0f,  0.0f,
-//   0.0f,  1.0f,  0.0f,
-
     -1.0f,-1.0f,-1.0f, // triangle 1 : begin
     -1.0f,-1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f, // triangle 1 : end
@@ -96,7 +92,6 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-// TODO: box instead of triangle
 // TODO: rename project in CMakeList.txt
 
 int main() {
@@ -194,10 +189,10 @@ int main() {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   Camera camera(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
-  
-  glEnable(GL_DEPTH_TEST);
+
   glEnable(GL_DOUBLEBUFFER);
-  glEnable(GL_CULL_FACE); // describe!
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   glDepthFunc(GL_LESS);
 
   glClearColor(0, 0, 0, 1);
