@@ -20,7 +20,7 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 }
 
 // TODO: box instead of triangle
-// TODO: mouse, keyboard
+// TODO: mouse, keyboard (camera.cpp / hpp ? )
 
 int main() {
   if(glfwInit() == GL_FALSE) {
@@ -55,7 +55,7 @@ int main() {
 
   glfwShowWindow(window);
 
-  glEnable(GL_DEPTH_TEST | GL_DOUBLEBUFFER);
+  glEnable(GL_DEPTH_TEST | GL_DOUBLEBUFFER | GL_CULL_FACE); // TODO: describe GL_CULL_FACE!
   glDepthFunc(GL_LESS);
 
   glClearColor(0, 0, 0, 1);
