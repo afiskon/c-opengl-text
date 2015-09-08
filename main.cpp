@@ -10,6 +10,8 @@
 #include "utils/utils.h"
 #include "utils/camera.h"
 
+// TODO: 2nd cube rotating in other direction
+
 static const GLfloat globVertexBufferData[] = {
     1.0f, 1.0f, 1.0f, // front
     -1.0f, 1.0f, 1.0f,
