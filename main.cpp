@@ -103,8 +103,6 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-// TODO: rename project in CMakeList.txt
-
 int main() {
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
