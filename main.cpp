@@ -100,17 +100,21 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
   glBindVertexArray(0); // unbind VAO
 
-  float speed = 0.1f; // units per second
+  static const float speed = 0.1f; // units per second
   glm::vec3 position(0, 0, 5); // Camera is at (0, 0, 5)
   float horizontalAngleRad = 3.14f; // horizontal angle : toward -Z
   float verticalAngleRad = 0.0f; // vertical angle : 0, look at the horizon
-  float mouseSpeedRad = 0.0025f;
+  static const float mouseSpeedRad = 0.0025f;
 
   glm::mat4 projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
 
   auto startTime = std::chrono::high_resolution_clock::now();
+
+  // TODO: getViewMatrix
+  // in: float deltaTimeMs, context: { horizontalAngleRad, verticalAngleRad, position, ... }
+  // out: view metrix
 
   // hide cursor
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
