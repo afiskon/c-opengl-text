@@ -1,15 +1,60 @@
 #include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 #include "camera.h"
 
-Camera::Camera(const glm::vec3& position, float horizontalAngleRad, float verticalAngleRad):
-  m_position(position),
-  m_horizontalAngleRad(horizontalAngleRad),
-  m_verticalAngleRad(verticalAngleRad) { }
+static const float speed = 4.0f; // units per second
+static const float mouseSpeedRad = 0.05f;
+
+Camera::Camera(GLFWwindow* window, const glm::vec3& startPosition, float startHorizontalAngleRad, float startVerticalAngleRad):
+  window(window),
+  position(startPosition),
+  horizontalAngleRad(startHorizontalAngleRad),
+  verticalAngleRad(startVerticalAngleRad) { }
 
 void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
-  *pOutViewMatrix = glm::lookAt(
-    glm::vec3(0, 0, 5),
-    glm::vec3(0, 0, 0), // and looks at the origin
-    glm::vec3(0, deltaTimeMs > 0.0f? 1 : 1.1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+  float deltaTimeSec = deltaTimeMs/1000.0f;
+
+  int windowWidth, windowHeight;
+  glfwGetWindowSize(window, &windowWidth, &windowHeight);
+
+  double mouseX, mouseY;
+  glfwGetCursorPos(window, &mouseX, &mouseY);
+
+  horizontalAngleRad += mouseSpeedRad * deltaTimeSec * static_cast<float>(windowWidth/2 - mouseX);
+  verticalAngleRad += mouseSpeedRad * deltaTimeSec * static_cast<float>(windowHeight/2 - mouseY);
+
+  glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
+
+  glm::vec3 direction(
+    cos(verticalAngleRad) * sin(horizontalAngleRad),
+    sin(verticalAngleRad),
+    cos(verticalAngleRad) * cos(horizontalAngleRad)
   );
+
+  glm::vec3 right = glm::vec3(
+    sin(horizontalAngleRad - 3.14f/2.0f),
+    0,
+    cos(horizontalAngleRad - 3.14f/2.0f)
+  );
+
+  glm::vec3 up = glm::cross(right, direction);
+
+
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    position += direction * deltaTimeSec * speed;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    position -= direction * deltaTimeSec * speed;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    position -= right * deltaTimeSec * speed;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    position += right * deltaTimeSec * speed;
+  }
+
+  *pOutViewMatrix = glm::lookAt(position, position + direction, up);
 }

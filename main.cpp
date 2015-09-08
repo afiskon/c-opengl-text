@@ -21,7 +21,6 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 }
 
 // TODO: box instead of triangle
-// TODO: mouse, keyboard (camera.cpp / hpp ? )
 // TODO: rename project in CMakeList.txt
 
 int main() {
@@ -102,92 +101,36 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
   glBindVertexArray(0); // unbind VAO
 
-  static const float speed = 0.1f; // units per second
-  glm::vec3 position(0, 0, 5); // Camera is at (0, 0, 5)
-  float horizontalAngleRad = 3.14f; // horizontal angle : toward -Z
-  float verticalAngleRad = 0.0f; // vertical angle : 0, look at the horizon
-  static const float mouseSpeedRad = 0.0025f;
-
   glm::mat4 projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
 
   auto startTime = std::chrono::high_resolution_clock::now();
-
-  // TODO: getViewMatrix
-  // in: float deltaTimeMs, context: { horizontalAngleRad, verticalAngleRad, position, ... }
-  // out: view metrix
+  auto prevTime = startTime;
 
   // hide cursor
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+  Camera camera(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
+
   while(glfwWindowShouldClose(window) == GL_FALSE) {
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
     auto currentTime = std::chrono::high_resolution_clock::now();
-    auto duration = currentTime - startTime;
-    float deltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    float deltaTimeSec = deltaTimeMs/1000.0f;
+    float startDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count();
+    float prevDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - prevTime).count();
+    prevTime = currentTime;
+
     float rotationTimeMs = 3000.0f;
-    float currentRotation = deltaTimeMs / rotationTimeMs;
+    float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float angle = 360.0f*(currentRotation - (long)currentRotation);
-    Camera camera(
-        glm::vec3(0, 0, 5), // Camera is at (0, 0, 5)
-        3.14f, // horizontal angle : toward -Z
-        0.0f // vertical angle : 0, look at the horizon
-    );
 
-    int windowWidth, windowHeight;
-    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    glm::mat4 view;
+    camera.getViewMatrix(prevDeltaTimeMs, &view);
 
-    double mouseX, mouseY;
-    glfwGetCursorPos(window, &mouseX, &mouseY);
-
-    horizontalAngleRad += mouseSpeedRad * deltaTimeSec * static_cast<float>(windowWidth/2 - mouseX);
-    verticalAngleRad   += mouseSpeedRad * deltaTimeSec * static_cast<float>(windowHeight/2 - mouseY);
-
-    glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
-
-    // Direction : Spherical coordinates to Cartesian coordinates conversion
-    glm::vec3 direction(
-        cos(verticalAngleRad) * sin(horizontalAngleRad),
-        sin(verticalAngleRad),
-        cos(verticalAngleRad) * cos(horizontalAngleRad)
-    );
-
-    // Right vector
-    glm::vec3 right = glm::vec3(
-        sin(horizontalAngleRad - 3.14f/2.0f),
-        0,
-        cos(horizontalAngleRad - 3.14f/2.0f)
-    );
-
-    glm::vec3 up = glm::cross( right, direction );
-
-    // Move forward
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      position += direction * deltaTimeSec * speed;
-    }
-    // Move backward
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      position -= direction * deltaTimeSec * speed;
-    }
-    // Strafe left
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      position -= right * deltaTimeSec * speed;
-    }
-    // Strafe right
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      position += right * deltaTimeSec * speed;
-    }
-
-    // Camera matrix
-    glm::mat4 view = glm::lookAt(position, position + direction, up);
     glm::mat4 model = glm::rotate(angle, 0.0f, 1.0f, 0.0f);
-    glm::mat4 mvp = projection * view * model; // Remember, matrix multiplication is the other way around
+    glm::mat4 mvp = projection * view * model; // matrix multiplication is the other way around
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
-
-    camera.getViewMatrix(deltaTimeMs, &view);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
