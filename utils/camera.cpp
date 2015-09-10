@@ -3,7 +3,7 @@
 #include "camera.h"
 
 static const float speed = 4.0f; // units per second
-static const float mouseSpeedRad = 0.05f;
+static const float mouseSpeedRad = 0.0005f;
 
 Camera::Camera(GLFWwindow* window, const glm::vec3& startPosition, float startHorizontalAngleRad, float startVerticalAngleRad):
   window(window),
@@ -20,8 +20,8 @@ void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
   double mouseX, mouseY;
   glfwGetCursorPos(window, &mouseX, &mouseY);
 
-  horizontalAngleRad += mouseSpeedRad * deltaTimeSec * static_cast<float>(windowWidth/2 - mouseX);
-  verticalAngleRad += mouseSpeedRad * deltaTimeSec * static_cast<float>(windowHeight/2 - mouseY);
+  horizontalAngleRad += mouseSpeedRad * static_cast<float>(windowWidth/2 - mouseX);
+  verticalAngleRad += mouseSpeedRad * static_cast<float>(windowHeight/2 - mouseY);
 
   glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
 
@@ -38,8 +38,7 @@ void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
   );
 
   glm::vec3 up = glm::cross(right, direction);
-
-
+  
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     position += direction * deltaTimeSec * speed;
   }
