@@ -107,7 +107,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Triangle", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating cube", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;

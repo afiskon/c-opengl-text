@@ -38,20 +38,20 @@ void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
   );
 
   glm::vec3 up = glm::cross(right, direction);
-  
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+
+  if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     position += direction * deltaTimeSec * speed;
   }
 
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+  if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
     position -= direction * deltaTimeSec * speed;
   }
 
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+  if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
     position -= right * deltaTimeSec * speed;
   }
 
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+  if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     position += right * deltaTimeSec * speed;
   }
 
