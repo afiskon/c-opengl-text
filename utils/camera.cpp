@@ -20,8 +20,8 @@ void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
   double mouseX, mouseY;
   glfwGetCursorPos(window, &mouseX, &mouseY);
 
-  horizontalAngleRad += mouseSpeedRad * static_cast<float>(windowWidth/2 - mouseX);
-  verticalAngleRad += mouseSpeedRad * static_cast<float>(windowHeight/2 - mouseY);
+  horizontalAngleRad += mouseSpeedRad * (windowWidth/2 - mouseX);
+  verticalAngleRad += mouseSpeedRad * (windowHeight/2 - mouseY);
 
   glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
 
