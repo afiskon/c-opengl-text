@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(rotating_cube)
+project(rotating_box)
 
 find_package(OpenGL REQUIRED)
 
@@ -16,6 +16,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Werror -std=c++11")
 SET(LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 
 set(SOURCE_FILES main.cpp utils/camera.cpp utils/camera.h utils/utils.h utils/utils.cpp)
-add_executable(rotating_cube ${SOURCE_FILES})
+add_executable(rotating_box ${SOURCE_FILES})
 
-target_link_libraries(rotating_cube ${LIBRARIES})
+target_link_libraries(rotating_box ${LIBRARIES})

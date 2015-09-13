@@ -16,40 +16,53 @@
 #include "utils/camera.h"
 
 static const GLfloat globVertexBufferData[] = {
-    1.0f, 1.0f, 1.0f, // front
+//   X     Y     Z     U     V
+// front
+     1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f, // front, |_ part
+     1.0f,-1.0f, 1.0f,
+// front, |_ part
+    -1.0f, 1.0f, 1.0f,
     -1.0f,-1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f, // left, _| part
+     1.0f,-1.0f, 1.0f,
+// left, _| part
+    -1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f, // left
+// left
+    -1.0f,-1.0f,-1.0f,
     -1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f, // back
+// back
+     1.0f, 1.0f,-1.0f,
     -1.0f,-1.0f,-1.0f,
     -1.0f, 1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f, // back, |_ part
-    1.0f,-1.0f,-1.0f,
+// back, |_ part
+     1.0f, 1.0f,-1.0f,
+     1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f,-1.0f,
-    1.0f,-1.0f, 1.0f, // bottom, _| part
+// bottom, _| part
+     1.0f,-1.0f, 1.0f,
     -1.0f,-1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f,-1.0f, 1.0f, // bottom
+     1.0f,-1.0f,-1.0f,
+// bottom
+     1.0f,-1.0f, 1.0f,
     -1.0f,-1.0f, 1.0f,
     -1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f, 1.0f, // right
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f, // right, |_ part
-    1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, // top
-    1.0f, 1.0f,-1.0f,
+// right
+     1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,
+// right, |_ part
+     1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,
+// top
+     1.0f, 1.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,
     -1.0f, 1.0f,-1.0f,
-    1.0f, 1.0f, 1.0f, // top, |_ part
+// top, |_ part
+     1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f,-1.0f,
     -1.0f, 1.0f, 1.0f,
 };
@@ -156,7 +169,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating cube", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating box", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
