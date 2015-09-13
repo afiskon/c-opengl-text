@@ -41,22 +41,14 @@ static const GLfloat globVertexBufferData[] = {
      1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
      1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
     -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-// bottom, _| part
-     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
-    -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-     1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
-// bottom
-     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
-    -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
-    -1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
 // right
-     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
      1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-     1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,   1.0f, 1.0f,
 // right, |_ part
-     1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
-     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-     1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
+     1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
 // top
      1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
      1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
@@ -65,6 +57,14 @@ static const GLfloat globVertexBufferData[] = {
      1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
     -1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
     -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
+// bottom, _| part
+     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+     -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+     1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
+// bottom
+     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+     -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
+     -1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
