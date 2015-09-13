@@ -7,6 +7,11 @@
 #include <vector>
 #include <defer.h>
 #include <chrono>
+
+#define STBI_NO_GIF 1
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
 #include "utils/utils.h"
 #include "utils/camera.h"
 
@@ -49,43 +54,89 @@ static const GLfloat globVertexBufferData[] = {
     -1.0f, 1.0f, 1.0f,
 };
 
-static const GLfloat globColorBufferData[] = {
-    0.0f, 1.0f, 0.0f, // green
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, // green
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    1.0f, 0.0f, 0.0f, // red
-    1.0f, 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f, // red
-    1.0f, 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-    1.0f, 0.5f, 0.0f, // orange
-    1.0f, 0.5f, 0.0f,
-    1.0f, 0.5f, 0.0f,
-    1.0f, 0.5f, 0.0f, // orange
-    1.0f, 0.5f, 0.0f,
-    1.0f, 0.5f, 0.0f,
-    1.0f, 0.0f, 1.0f, // violet
-    1.0f, 0.0f, 1.0f,
-    1.0f, 0.0f, 1.0f,
-    1.0f, 0.0f, 1.0f, // violet
-    1.0f, 0.0f, 1.0f,
-    1.0f, 0.0f, 1.0f,
-    1.0f, 1.0f, 0.0f, // yellow
-    1.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f, // yellow
-    1.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, // blue
-    0.0f, 0.0f, 1.0f,
-    0.0f, 0.0f, 1.0f,
-    0.0f, 0.0f, 1.0f, // blue
-    0.0f, 0.0f, 1.0f,
-    0.0f, 0.0f, 1.0f,
+// TODO: use ONE VBO
+static const GLfloat globUVData[] = {
+//    0.0f, 1.0f, 0.0f, // green
+//    0.0f, 1.0f, 0.0f,
+//    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+
+//    0.0f, 1.0f, 0.0f, // green
+//    0.0f, 1.0f, 0.0f,
+//    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    1.0f, 0.0f, 0.0f, // red
+//    1.0f, 0.0f, 0.0f,
+//    1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    1.0f, 0.0f, 0.0f, // red
+//    1.0f, 0.0f, 0.0f,
+//    1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    1.0f, 0.5f, 0.0f, // orange
+//    1.0f, 0.5f, 0.0f,
+//    1.0f, 0.5f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    1.0f, 0.5f, 0.0f, // orange
+//    1.0f, 0.5f, 0.0f,
+//    1.0f, 0.5f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    1.0f, 0.0f, 1.0f, // violet
+//    1.0f, 0.0f, 1.0f,
+//    1.0f, 0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    1.0f, 0.0f, 1.0f, // violet
+//    1.0f, 0.0f, 1.0f,
+//    1.0f, 0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+//    1.0f, 1.0f, 0.0f, // yellow
+//    1.0f, 1.0f, 0.0f,
+//    1.0f, 1.0f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+//    1.0f, 1.0f, 0.0f, // yellow
+//    1.0f, 1.0f, 0.0f,
+//    1.0f, 1.0f, 0.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+//    0.0f, 0.0f, 1.0f, // blue
+//    0.0f, 0.0f, 1.0f,
+//    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
+
+//    0.0f, 0.0f, 1.0f, // blue
+//    0.0f, 0.0f, 1.0f,
+//    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f,
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -148,21 +199,55 @@ int main() {
     std::cerr << "Failed to prepare program" << std::endl;
     return -1;
   }
+  defer(glDeleteProgram(programId));
+
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
   GLuint vertexVBO;
   glGenBuffers(1, &vertexVBO);
+  defer(glDeleteBuffers(1, &vertexVBO));
+
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
 
-  GLuint colorVBO;
-  glGenBuffers(1, &colorVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(globColorBufferData), globColorBufferData, GL_STATIC_DRAW);
+  GLuint uvVBO;
+  glGenBuffers(1, &uvVBO);
+  defer(glDeleteBuffers(1, &uvVBO));
+
+  glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(globUVData), globUVData, GL_STATIC_DRAW);
+
+
+  // Create one OpenGL texture
+  GLuint texture;
+  glGenTextures(1, &texture);
+  defer(glDeleteTextures(1, &texture));
+
+// "Bind" the newly created texture : all future texture functions will modify this texture
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  int width, height, n;
+  unsigned char *textureData = stbi_load("textures/box.jpg", &width, &height, &n, 0);
+  if(textureData == nullptr) {
+    std::cout << "Failed to load a texture!" << std::endl;
+    return -1;
+  }
+  defer(stbi_image_free(textureData));
+
+  std::cout << "Texture loaded! Width = " << width << ", height = " << height << ", n = " << n << std::endl;
+
+  // Give the image to OpenGL
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // TODO: fix GL_NEAREST + how to process 1.5, 1.5 case
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  glBindTexture(GL_TEXTURE_2D, 0); // unbind
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
+  defer(glDeleteVertexArrays(1, &vao));
 
   glBindVertexArray(vao);
 
@@ -170,8 +255,8 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
 
-  glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+  glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
 
   glBindVertexArray(0); // unbind VAO
@@ -179,6 +264,7 @@ int main() {
   glm::mat4 projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
+  GLint textureId = glGetUniformLocation(programId, "textureSampler");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -222,6 +308,13 @@ int main() {
     glm::mat4 mvp = projection * view * model; // matrix multiplication is the other way around
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
 
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Set our "textureSampler" sampler to user Texture Unit 0
+    glUniform1i(textureId, 0);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programId);
@@ -236,10 +329,6 @@ int main() {
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-
-  glDeleteVertexArrays(1, &vao);
-  glDeleteBuffers(1, &vertexVBO);
-  glDeleteProgram(programId);
 
   return 0;
 }

@@ -10,3 +10,6 @@
 [submodule "deferxx"]
 	path = deferxx
 	url = https://github.com/lichray/deferxx
+[submodule "stb"]
+	path = stb
+	url = https://github.com/nothings/stb
