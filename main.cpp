@@ -10,8 +10,6 @@
 #include "utils/utils.h"
 #include "utils/camera.h"
 
-// TODO: 2nd cube rotating in other direction
-
 static const GLfloat globVertexBufferData[] = {
     1.0f, 1.0f, 1.0f, // front
     -1.0f, 1.0f, 1.0f,
@@ -178,7 +176,7 @@ int main() {
 
   glBindVertexArray(0); // unbind VAO
 
-  glm::mat4 projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.3f, 100.0f);
+  glm::mat4 projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
 
