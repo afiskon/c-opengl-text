@@ -1,1 +1,1 @@
-# cpp-opengl-model-view-projection
+# cpp-opengl-textures
