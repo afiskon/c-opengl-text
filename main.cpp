@@ -139,15 +139,7 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
 
-  // Create one OpenGL texture
-  GLuint texture;
-  glGenTextures(1, &texture);
-  defer(glDeleteTextures(1, &texture));
-
-// "Bind" the newly created texture : all future texture functions will modify this texture
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  // TODO: change box-debug.jpg to box.jpg
+  // Load texture data
   int width, height, n;
   unsigned char *textureData = stbi_load("textures/box.jpg", &width, &height, &n, 0);
   flipTexture(textureData, width, height, n);
@@ -158,7 +150,12 @@ int main() {
   }
   defer(stbi_image_free(textureData));
 
-  // Give the image to OpenGL
+  // Create an OpenGL texture
+  GLuint texture;
+  glGenTextures(1, &texture);
+  defer(glDeleteTextures(1, &texture));
+
+  glBindTexture(GL_TEXTURE_2D, texture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -233,11 +230,11 @@ int main() {
     glm::mat4 mvp = projection * view * model; // matrix multiplication is the other way around
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
 
-    // Bind our texture in Texture Unit 0
+    // Bind texture in texture unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    // Set our "textureSampler" sampler to user Texture Unit 0
+    // Set "textureSampler"to texture unit 0
     glUniform1i(textureId, 0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
