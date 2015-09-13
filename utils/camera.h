@@ -1,5 +1,5 @@
-#ifndef TRIANGLE_CAMERA_H
-#define TRIANGLE_CAMERA_H
+#ifndef AFISKON_OPENGL_CAMERA_H
+#define AFISKON_OPENGL_CAMERA_H
 
 #include <glm/core/type.hpp>
 
@@ -19,4 +19,4 @@ public:
   void operator=(Camera const &x) = delete;
 };
 
-#endif //TRIANGLE_CAMERA_H
+#endif // AFISKON_OPENGL_CAMERA_H
