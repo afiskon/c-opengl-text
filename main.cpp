@@ -16,140 +16,55 @@
 #include "utils/camera.h"
 
 static const GLfloat globVertexBufferData[] = {
-//   X     Y     Z     U     V
+//   X     Y     Z       U     V
 // front
-     1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
+     1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
 // front, |_ part
-    -1.0f, 1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+    -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
+     1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
 // left, _| part
-    -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
+    -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
 // left
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
+    -1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
 // back
-     1.0f, 1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,   0.0f, 0.0f,
+    -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+    -1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
 // back, |_ part
-     1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,   0.0f, 0.0f,
+     1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+    -1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
 // bottom, _| part
-     1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
+     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+    -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+     1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
 // bottom
-     1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
+     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+    -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
+    -1.0f,-1.0f,-1.0f,   0.0f, 1.0f,
 // right
-     1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+     1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+     1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
 // right, |_ part
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
+     1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
+     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
+     1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
 // top
-     1.0f, 1.0f, 1.0f,
-     1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+     1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
+    -1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
 // top, |_ part
-     1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-};
-
-// TODO: use ONE VBO
-static const GLfloat globUVData[] = {
-//    0.0f, 1.0f, 0.0f, // green
-//    0.0f, 1.0f, 0.0f,
-//    0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-
-//    0.0f, 1.0f, 0.0f, // green
-//    0.0f, 1.0f, 0.0f,
-//    0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    1.0f, 0.0f, 0.0f, // red
-//    1.0f, 0.0f, 0.0f,
-//    1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    1.0f, 0.0f, 0.0f, // red
-//    1.0f, 0.0f, 0.0f,
-//    1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    1.0f, 0.5f, 0.0f, // orange
-//    1.0f, 0.5f, 0.0f,
-//    1.0f, 0.5f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    1.0f, 0.5f, 0.0f, // orange
-//    1.0f, 0.5f, 0.0f,
-//    1.0f, 0.5f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    1.0f, 0.0f, 1.0f, // violet
-//    1.0f, 0.0f, 1.0f,
-//    1.0f, 0.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    1.0f, 0.0f, 1.0f, // violet
-//    1.0f, 0.0f, 1.0f,
-//    1.0f, 0.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-//    1.0f, 1.0f, 0.0f, // yellow
-//    1.0f, 1.0f, 0.0f,
-//    1.0f, 1.0f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-//    1.0f, 1.0f, 0.0f, // yellow
-//    1.0f, 1.0f, 0.0f,
-//    1.0f, 1.0f, 0.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-//    0.0f, 0.0f, 1.0f, // blue
-//    0.0f, 0.0f, 1.0f,
-//    0.0f, 0.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
-
-//    0.0f, 0.0f, 1.0f, // blue
-//    0.0f, 0.0f, 1.0f,
-//    0.0f, 0.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+    -1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -224,14 +139,6 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
 
-  GLuint uvVBO;
-  glGenBuffers(1, &uvVBO);
-  defer(glDeleteBuffers(1, &uvVBO));
-
-  glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(globUVData), globUVData, GL_STATIC_DRAW);
-
-
   // Create one OpenGL texture
   GLuint texture;
   glGenTextures(1, &texture);
@@ -265,11 +172,8 @@ int main() {
   glBindVertexArray(vao);
 
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-  glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
-
-  glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
 
   glBindVertexArray(0); // unbind VAO
