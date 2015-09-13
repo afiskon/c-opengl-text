@@ -6,6 +6,20 @@
 #include <sstream>
 #include <fstream>
 
+void flipTexture(unsigned char *textureData, int width, int height, int n) {
+  for(int h = 0; h < height/2; ++h) {
+    for(int w = 0; w < width; ++w) {
+      for(int i = 0; i < n; ++i) {
+        int offset1 = (h*width + w)*n + i;
+        int offset2 = ((height - h - 1)*width + w)*n + i;
+        unsigned char t = textureData[offset1];
+        textureData[offset1] = textureData[offset2];
+        textureData[offset2] = t;
+      }
+    }
+  }
+}
+
 bool checkShaderCompileStatus(GLuint obj) {
   GLint status;
   glGetShaderiv(obj, GL_COMPILE_STATUS, &status);

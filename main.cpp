@@ -18,13 +18,13 @@
 static const GLfloat globVertexBufferData[] = {
 //   X     Y     Z       U     V
 // front
-     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-    -1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-     1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
+     1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
 // front, |_ part
-    -1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
-    -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
-     1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+     1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
 // left, _| part
     -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
     -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
@@ -147,21 +147,24 @@ int main() {
 // "Bind" the newly created texture : all future texture functions will modify this texture
   glBindTexture(GL_TEXTURE_2D, texture);
 
+  // TODO: change box-debug.jpg to box.jpg
   int width, height, n;
-  unsigned char *textureData = stbi_load("textures/box.jpg", &width, &height, &n, 0);
+  unsigned char *textureData = stbi_load("textures/box-debug.jpg", &width, &height, &n, 0);
+  flipTexture(textureData, width, height, n);
+
   if(textureData == nullptr) {
     std::cout << "Failed to load a texture!" << std::endl;
     return -1;
   }
   defer(stbi_image_free(textureData));
 
-  std::cout << "Texture loaded! Width = " << width << ", height = " << height << ", n = " << n << std::endl;
-
   // Give the image to OpenGL
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // TODO: fix GL_NEAREST + how to process 1.5, 1.5 case
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
   glBindTexture(GL_TEXTURE_2D, 0); // unbind
 
@@ -216,7 +219,7 @@ int main() {
 
     float rotationTimeMs = 3000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
-    float angle = 360.0f*(currentRotation - (long)currentRotation);
+    float angle = 0*360.0f*(currentRotation - (long)currentRotation);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);
