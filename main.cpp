@@ -242,10 +242,10 @@ int main() {
     glUseProgram(programId);
 
     glBindVertexArray(vao);
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(0); // could be done once before while loop ... ->
     glEnableVertexAttribArray(1);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
-    glEnableVertexAttribArray(1);
+    glDisableVertexAttribArray(1); // -> ... in this cast remove these two lines
     glDisableVertexAttribArray(0);
     
     glfwSwapBuffers(window);
