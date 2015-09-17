@@ -140,36 +140,13 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
 
-  // Load texture data
-  int width, height, n;
-  unsigned char *textureData = stbi_load("textures/box.jpg", &width, &height, &n, 0);
-  flipTexture(textureData, width, height, n);
-
-  if(textureData == nullptr) {
-    std::cout << "Failed to load a texture!" << std::endl;
-    return -1;
-  }
-  defer(stbi_image_free(textureData));
-
-  // Create an OpenGL texture
-  GLuint texture;
-  glGenTextures(1, &texture);
+  GLuint texture; // TODO comment this and use only DDS
+  if(!loadCommonTexture("textures/box.jpg", &texture)) return -1;
   defer(glDeleteTextures(1, &texture));
 
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-  // Generate mipmaps
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  glBindTexture(GL_TEXTURE_2D, 0); // unbind
+  GLuint ddsTexture;
+  if(!loadDDSTexture("textures/box.jpg", &ddsTexture)) return -1;
+  defer(glDeleteTextures(1, &ddsTexture));
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
