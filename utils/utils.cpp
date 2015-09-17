@@ -31,6 +31,8 @@ bool loadCommonTexture(char const* fname, GLuint* texturePtr) {
 }
 
 bool loadCommonTextureExt(char const* fname, GLuint* texturePtr, bool flip) {
+  *texturePtr = 0;
+
   int width, height, n;
   unsigned char *textureData = stbi_load(fname, &width, &height, &n, 0);
   if(textureData == nullptr) {
@@ -42,7 +44,6 @@ bool loadCommonTextureExt(char const* fname, GLuint* texturePtr, bool flip) {
   if(flip) flipTexture(textureData, width, height, n);
 
   glGenTextures(1, texturePtr);
-
   glBindTexture(GL_TEXTURE_2D, *texturePtr);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 
@@ -86,8 +87,14 @@ bool loadDDSTexture(char const* fname, GLuint* texturePtr) {
 
   std::cout << "loadDDSTexture() - Success, fsize = " << fsize << std::endl;
 
-  // TODO under construction
+  // TODO parse DDS header
 
+
+  glGenTextures(1, texturePtr);
+  glBindTexture(GL_TEXTURE_2D, *texturePtr);
+
+
+  glBindTexture(GL_TEXTURE_2D, 0); // unbind
   return true;
 }
 

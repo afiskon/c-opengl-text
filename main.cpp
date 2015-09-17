@@ -9,7 +9,7 @@
 #include <chrono>
 
 #define STBI_NO_GIF 1
-#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION 1
 #include "stb/stb_image.h"
 
 #include "utils/utils.h"
