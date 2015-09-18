@@ -114,7 +114,7 @@ static const GLfloat globSkyboxVertexData[] = {
    -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
    -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
 
-    // top
+// top
 
     -1.0f,1.0f,1.0f, U(0.95f), V(0.99f),
     -1.0f, 1.0f,-1.0f, U(0.95f), V(0.95f),
@@ -122,9 +122,17 @@ static const GLfloat globSkyboxVertexData[] = {
 
     1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
     1.0f, 1.0f, 1.0f, U(0.99f), V(0.99f),
-   -1.0f, 1.0f, 1.0f, U(0.95f), V(0.99f)
+   -1.0f, 1.0f, 1.0f, U(0.95f), V(0.99f),
 
-    // bottom
+// bottom
+
+    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
+    -1.0f, -1.0f,-1.0f, U(0.01f), V(0.01f),
+    -1.0f,-1.0f,1.0f, U(0.01f), V(0.05f),
+
+    -1.0f,-1.0f, 1.0f, U(0.01f), V(0.05f),
+    1.0f, -1.0f, 1.0f, U(0.05f), V(0.05f),
+    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -337,7 +345,7 @@ int main() {
     glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * skyboxRotateScale;
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*10);
+    glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
