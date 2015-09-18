@@ -113,6 +113,18 @@ static const GLfloat globSkyboxVertexData[] = {
     1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
    -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
    -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+
+    // top
+
+    -1.0f,1.0f,1.0f, U(0.95f), V(0.99f),
+    -1.0f, 1.0f,-1.0f, U(0.95f), V(0.95f),
+    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
+
+    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
+    1.0f, 1.0f, 1.0f, U(0.99f), V(0.99f),
+   -1.0f, 1.0f, 1.0f, U(0.95f), V(0.99f)
+
+    // bottom
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -211,7 +223,7 @@ int main() {
 //  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
   if(!loadDDSTexture("textures/box-dxt1.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-  if(!loadDDSTexture("textures/skybox-side.dds", skyboxTexture)) return -1;
+  if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
 
   // === prepare VAOs ===
   GLuint vaoArray[3];
@@ -316,16 +328,16 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
     glUniform1i(samplerId, 0);
 
-    glBindVertexArray(skyboxVAO);
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
-
     glm::vec3 skyboxPos = cameraPos + glm::vec3(0.0f, 20.0f, 0.0f);
+    glm::mat4 skyboxRotateScale = glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(50.0f,50.0f,50.0f);
 
-    glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(50.0f,50.0f,50.0f);
+    glBindVertexArray(skyboxVAO);
+    glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * skyboxRotateScale;
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*8);
+    glDrawArrays(GL_TRIANGLES, 0, 3*10);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
