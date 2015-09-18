@@ -148,9 +148,7 @@ int main() {
   }
 
   glfwSwapInterval(1);
-
   glfwSetWindowSizeCallback(window, windowSizeCallback);
-
   glfwShowWindow(window);
 
   bool errorFlag = false;
@@ -206,17 +204,13 @@ int main() {
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
 
-  int boxTextureNum = 0;
-  GLuint boxTexture = textureArray[boxTextureNum];
+  GLuint boxTexture = textureArray[0];
+  GLuint grassTexture = textureArray[1];
+  GLuint skyboxTexture = textureArray[2];
+
 //  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
   if(!loadDDSTexture("textures/box-dxt1.dds", boxTexture)) return -1;
-
-  int grassTextureNum = 1;
-  GLuint grassTexture = textureArray[grassTextureNum];
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-
-  int skyboxTextureNum = 2;
-  GLuint skyboxTexture = textureArray[skyboxTextureNum];
   if(!loadDDSTexture("textures/skybox-side.dds", skyboxTexture)) return -1;
 
   // === prepare VAOs ===
@@ -312,17 +306,15 @@ int main() {
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
-    // glActiveTexture(GL_TEXTURE0 + grassTextureNum);
     glBindTexture(GL_TEXTURE_2D, grassTexture);
-    glUniform1i(samplerId, 0 /* grassTextureNum */);
+    glUniform1i(samplerId, 0);
 
     glBindVertexArray(grassVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*2);
 
-//    glActiveTexture(GL_TEXTURE0 + skyboxTextureNum);
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
-    glUniform1i(samplerId, 0 /* skyboxTextureNum */);
+    glUniform1i(samplerId, 0);
 
     glBindVertexArray(skyboxVAO);
     glm::vec3 cameraPos;
