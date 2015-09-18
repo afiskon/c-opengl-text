@@ -178,14 +178,22 @@ int main() {
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
 
-  GLuint boxTexture = textureArray[0];
-  GLuint grassTexture = textureArray[1];
-  GLuint skyboxTexture = textureArray[2];
-
+  int boxTextureNum = 0;
+  GLuint boxTexture = textureArray[boxTextureNum];
 //  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
   if(!loadDDSTexture("textures/box-dxt3.dds", boxTexture)) return -1;
+
+  int grassTextureNum = 1;
+  GLuint grassTexture = textureArray[grassTextureNum];
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, grassTexture);
+
+  int skyboxTextureNum = 2;
+  GLuint skyboxTexture = textureArray[skyboxTextureNum];
   if(!loadDDSTexture("textures/skybox-side.dds", skyboxTexture)) return -1;
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 
   // === prepare VAOs ===
   GLuint vaoArray[3];
@@ -267,32 +275,33 @@ int main() {
     camera.getViewMatrix(prevDeltaTimeMs, &view);
     glm::mat4 vp = projection * view;
 
-    // TODO: move above
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, boxTexture);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, grassTexture);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, skyboxTexture);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programId);
 
+    glActiveTexture(GL_TEXTURE0 + boxTextureNum);
+    glBindTexture(GL_TEXTURE_2D, boxTexture);
+    glUniform1i(samplerId, boxTextureNum);
+
     glBindVertexArray(boxVAO);
-    glUniform1i(samplerId, 0);
     glm::mat4 boxMatrix = glm::rotate(boxAngle, 0.0f, 1.0f, 0.0f);
     glm::mat4 boxMVP = vp * boxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
+    glActiveTexture(GL_TEXTURE0 + grassTextureNum);
+    glBindTexture(GL_TEXTURE_2D, grassTexture);
+    glUniform1i(samplerId, grassTextureNum);
+
     glBindVertexArray(grassVAO);
-    glUniform1i(samplerId, 1);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*2);
 
+    glActiveTexture(GL_TEXTURE0 + skyboxTextureNum);
+    glBindTexture(GL_TEXTURE_2D, skyboxTexture);
+    glUniform1i(samplerId, skyboxTextureNum);
+
     glBindVertexArray(skyboxVAO);
-    glUniform1i(samplerId, 2);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*1);
 
