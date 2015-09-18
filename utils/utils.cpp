@@ -90,7 +90,7 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
     return false;
   }
 
-  unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
+  unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
   if(dataPtr == MAP_FAILED) {
     std::cout << "ERROR: loadDDSTexture - mmap failed, fname = " << fname <<
       ", " << strerror(errno) << std::endl;
