@@ -27,13 +27,11 @@ void flipTexture(unsigned char *textureData, int width, int height, int n) {
   }
 }
 
-bool loadCommonTexture(char const* fname, GLuint* texturePtr) {
-  return loadCommonTextureExt(fname, texturePtr, false);
+bool loadCommonTexture(char const* fname, GLuint textureId) {
+  return loadCommonTextureExt(fname, textureId, false);
 }
 
-bool loadCommonTextureExt(char const* fname, GLuint* texturePtr, bool flip) {
-  // *texturePtr = 0;
-
+bool loadCommonTextureExt(char const* fname, GLuint textureId, bool flip) {
   int width, height, n;
   unsigned char *textureData = stbi_load(fname, &width, &height, &n, 0);
   if(textureData == nullptr) {
@@ -44,8 +42,7 @@ bool loadCommonTextureExt(char const* fname, GLuint* texturePtr, bool flip) {
 
   if(flip) flipTexture(textureData, width, height, n);
 
-  //glGenTextures(1, texturePtr);
-  glBindTexture(GL_TEXTURE_2D, *texturePtr);
+  glBindTexture(GL_TEXTURE_2D, textureId);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -68,9 +65,7 @@ bool loadCommonTextureExt(char const* fname, GLuint* texturePtr, bool flip) {
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
-bool loadDDSTexture(char const *fname, GLuint *texturePtr) {
-//  *texturePtr = 0;
-
+bool loadDDSTexture(char const *fname, GLuint textureId) {
   int fd = open(fname, O_RDONLY, 0);
   if(fd < 0) {
     std::cout << "ERROR: loadDDSTexture - open failed, fname =  " << fname <<
@@ -131,8 +126,7 @@ bool loadDDSTexture(char const *fname, GLuint *texturePtr) {
       return false;
   }
 
-//  glGenTextures(1, texturePtr);
-  glBindTexture(GL_TEXTURE_2D, *texturePtr);
+  glBindTexture(GL_TEXTURE_2D, textureId);
   glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 
   unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;

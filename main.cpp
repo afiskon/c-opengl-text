@@ -168,9 +168,9 @@ int main() {
   GLuint boxTexture = textureArray[0];
   GLuint grassTexture = textureArray[1];
 
-//  if(!loadCommonTexture("textures/box.jpg", &boxTexture)) return -1;
-  if(!loadDDSTexture("textures/box-dxt3.dds", &boxTexture)) return -1;
-  if(!loadDDSTexture("textures/grass.dds", &grassTexture)) return -1;
+//  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
+  if(!loadDDSTexture("textures/box-dxt3.dds", boxTexture)) return -1;
+  if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
 
   // === prepare VAOs ===
   GLuint vaoArray[2];
