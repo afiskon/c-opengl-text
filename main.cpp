@@ -233,6 +233,10 @@ int main() {
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
   if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
 
+  // see http://gamedev.stackexchange.com/a/11975
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
   // === prepare VAOs ===
   GLuint vaoArray[3];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
@@ -269,7 +273,7 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
-  glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 100.0f);
+  glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
   GLint samplerId = glGetUniformLocation(programId, "textureSampler");
@@ -338,8 +342,8 @@ int main() {
 
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
-    glm::vec3 skyboxPos = cameraPos + glm::vec3(0.0f, 20.0f, 0.0f);
-    glm::mat4 skyboxRotateScale = glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(50.0f,50.0f,50.0f);
+    glm::vec3 skyboxPos = cameraPos + glm::vec3(0.0f, 70.0f, 0.0f);
+    glm::mat4 skyboxRotateScale = glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(80.0f,80.0f,80.0f);
 
     glBindVertexArray(skyboxVAO);
     glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * skyboxRotateScale;
