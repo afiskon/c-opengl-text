@@ -275,9 +275,9 @@ int main() {
 
     glUseProgram(programId);
 
-    glActiveTexture(GL_TEXTURE0 + boxTextureNum);
+//    glActiveTexture(GL_TEXTURE0 + boxTextureNum);
     glBindTexture(GL_TEXTURE_2D, boxTexture);
-    glUniform1i(samplerId, boxTextureNum);
+    glUniform1i(samplerId, 0 /* boxTextureNum */);
 
     glBindVertexArray(boxVAO);
     glm::mat4 boxMatrix = glm::rotate(boxAngle, 0.0f, 1.0f, 0.0f);
@@ -285,17 +285,17 @@ int main() {
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
-    glActiveTexture(GL_TEXTURE0 + grassTextureNum);
+    // glActiveTexture(GL_TEXTURE0 + grassTextureNum);
     glBindTexture(GL_TEXTURE_2D, grassTexture);
-    glUniform1i(samplerId, grassTextureNum);
+    glUniform1i(samplerId, 0 /* grassTextureNum */);
 
     glBindVertexArray(grassVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*2);
 
-    glActiveTexture(GL_TEXTURE0 + skyboxTextureNum);
+//    glActiveTexture(GL_TEXTURE0 + skyboxTextureNum);
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
-    glUniform1i(samplerId, skyboxTextureNum);
+    glUniform1i(samplerId, 0 /* skyboxTextureNum */);
 
     glBindVertexArray(skyboxVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
