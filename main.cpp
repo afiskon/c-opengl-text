@@ -73,8 +73,11 @@ static const GLfloat globBoxVertexData[] = {
 static const GLfloat globGrassVertexData[] = {
 //   X     Y     Z        U         V
     10.0f,-1.0f,-10.0f,   U(10.0f), V(10.0f),
-   -10.0f,-1.0f,-10.0f,   U(10.0f), V(0.0f),
-   -10.0f,-1.0f, 10.0f,   U(0.0f),  V(0.0f),
+   -10.0f,-1.0f,-10.0f,   U(10.0f), V( 0.0f),
+   -10.0f,-1.0f, 10.0f,   U( 0.0f), V( 0.0f),
+    10.0f,-1.0f,-10.0f,   U(10.0f), V(10.0f),
+   -10.0f,-1.0f, 10.0f,   U( 0.0f), V( 0.0f),
+    10.0f,-1.0f, 10.0f,   U(10.0f), V( 0.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -95,7 +98,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating box", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(300, 300, "Rotating box", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
@@ -262,7 +265,7 @@ int main() {
     glBindVertexArray(grassVAO);
     glUniform1i(samplerId, 1);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*1);
+    glDrawArrays(GL_TRIANGLES, 0, 3*2);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
