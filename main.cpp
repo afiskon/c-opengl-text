@@ -140,13 +140,12 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
 
-  GLuint texture; // TODO comment this and use only DDS
-  if(!loadCommonTexture("textures/box.jpg", &texture)) return -1;
+  GLuint texture;
+//  if(!loadCommonTexture("textures/box.jpg", &texture)) return -1;
+//  defer(glDeleteTextures(1, &texture));
+  
+  if(!loadDDSTexture("textures/box-debug.dds", &texture)) return -1;
   defer(glDeleteTextures(1, &texture));
-
-  GLuint ddsTexture;
-  if(!loadDDSTexture("textures/box.jpg", &ddsTexture)) return -1;
-  defer(glDeleteTextures(1, &ddsTexture));
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
