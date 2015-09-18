@@ -16,7 +16,7 @@
 #include "utils/camera.h"
 
 #define U(x) (x)
-#define V(x) (1.0f - x)
+#define V(x) (1.0f - (x))
 
 static const GLfloat globBoxVertexData[] = {
 //   X     Y     Z       U        V
@@ -110,7 +110,13 @@ static const GLfloat globSkyboxVertexData[] = {
     -SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
     -SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(1.0f),
 
+    SKYBOX_SIZE,-SKYBOX_SIZE,SKYBOX_SIZE, U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE,SKYBOX_SIZE, U(0.0f), V(1.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE,SKYBOX_SIZE, U(1.0f), V(1.0f),
 
+    SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(1.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -330,7 +336,7 @@ int main() {
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*6);
+    glDrawArrays(GL_TRIANGLES, 0, 3*8);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
