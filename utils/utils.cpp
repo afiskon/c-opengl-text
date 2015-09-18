@@ -62,7 +62,7 @@ bool loadCommonTextureExt(char const* fname, GLuint textureId, bool flip) {
 bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, unsigned char* dataPtr) {
   if(fsize < DDS_HEADER_SIZE) {
     std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-    ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
+      ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
     return false;
   }
 
@@ -74,7 +74,7 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, uns
 
   if(signature != DDS_SIGNATURE) {
     std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-    "invalid signature: 0x" << std::hex << signature << std::endl;
+      "invalid signature: 0x" << std::hex << signature << std::endl;
     return false;
   }
 
@@ -92,7 +92,7 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, uns
       break;
     default:
       std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-      ", unknown formatCode: 0x" << std::hex << formatCode << std::endl;
+        ", unknown formatCode: 0x" << std::hex << formatCode << std::endl;
       return false;
   }
 
@@ -108,8 +108,8 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, uns
     unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
     if(fsize < offset + size) {
       std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-      ", fsize = " << fsize << ", level = " << level <<
-      ", offset = " << offset << ", size = " << size << std::endl;
+        ", fsize = " << fsize << ", level = " << level <<
+        ", offset = " << offset << ", size = " << size << std::endl;
       return false;
     }
     glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, dataPtr + offset);
