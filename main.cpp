@@ -81,39 +81,38 @@ static const GLfloat globGrassVertexData[] = {
 };
 
 static const GLfloat globSkyboxVertexData[] = {
-//   X     Y     Z       U        V
-
+//   X    Y     Z     U        V
     1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
    -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
     1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
 
-    -1.0f, 1.0f, -1.0f,   U(0.0f), V(1.0f),
-    -1.0f,-1.0f, -1.0f,   U(0.0f), V(0.0f),
-    1.0f,-1.0f, -1.0f,   U(1.0f), V(0.0f),
+   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
+   -1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
+    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
 
-    1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
-    1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
-    1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
+    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
+    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
 
-    1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
-    1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
-    1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
+    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
+    1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
 
-    -1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
-    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
-    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
+   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
 
-    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
-    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
-    -1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
+   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+   -1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
 
-    1.0f,-1.0f,1.0f, U(1.0f), V(0.0f),
-    -1.0f, 1.0f,1.0f, U(0.0f), V(1.0f),
-    1.0f, 1.0f,1.0f, U(1.0f), V(1.0f),
+    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
+   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
 
-    1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
-    -1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
-    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
+   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
+   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -328,8 +327,7 @@ int main() {
     glBindVertexArray(skyboxVAO);
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
-    
-    
+
     glm::vec3 skyboxPos = cameraPos + glm::vec3(0.0f, 20.0f, 0.0f);
 
     glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(50.0f,50.0f,50.0f);
