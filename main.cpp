@@ -15,56 +15,59 @@
 #include "utils/utils.h"
 #include "utils/camera.h"
 
+#define U(x) (x)
+#define V(x) (1.0f - x)
+
 static const GLfloat globVertexBufferData[] = {
-//   X     Y     Z       U     V
+//   X     Y     Z       U        V
 // front
-     1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
+     1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
+    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+     1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
 // front, |_ part
-    -1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
-     1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+    -1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
+     1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
 // left, _| part
-    -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
-    -1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
-    -1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+    -1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
+    -1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
 // left
-    -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
-    -1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+    -1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
+    -1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
 // back
-     1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-    -1.0f, 1.0f,-1.0f,   1.0f, 1.0f,
+     1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
+    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
+    -1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
 // back, |_ part
-     1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
-     1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
-    -1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+     1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
+     1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
 // right
-     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-     1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-     1.0f, 1.0f,-1.0f,   1.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+     1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
+     1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
 // right, |_ part
-     1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+     1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
+     1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+     1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
 // top
-     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-     1.0f, 1.0f,-1.0f,   1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
+     1.0f, 1.0f, 1.0f,   U(1.0f), V(0.0f),
+     1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
+    -1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
 // top, |_ part
-     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,
-    -1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,   0.0f, 0.0f,
+     1.0f, 1.0f, 1.0f,   U(1.0f), V(0.0f),
+    -1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
+    -1.0f, 1.0f, 1.0f,   U(0.0f), V(0.0f),
 // bottom, _| part
-     1.0f,-1.0f, 1.0f,   1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
-     1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+     1.0f,-1.0f, 1.0f,   U(1.0f), V(1.0f),
+    -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+     1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
 // bottom
-     1.0f,-1.0f, 1.0f,   1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
+     1.0f,-1.0f, 1.0f,   U(1.0f), V(1.0f),
+    -1.0f,-1.0f, 1.0f,   U(0.0f), V(1.0f),
+    -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -144,7 +147,7 @@ int main() {
 //  if(!loadCommonTexture("textures/box.jpg", &texture)) return -1;
 //  defer(glDeleteTextures(1, &texture));
 
-  if(!loadDDSTexture("textures/box-debug.dds", &texture)) return -1;
+  if(!loadDDSTexture("textures/box-dxt3.dds", &texture)) return -1;
   defer(glDeleteTextures(1, &texture));
 
   GLuint vao;
