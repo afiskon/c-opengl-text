@@ -1,4 +1,5 @@
 #include "utils.h"
+
 // <GL/glext.h> on Linux, <OpenGL/glext.h> on MacOS :(
 #include "../glfw/deps/GL/glext.h"
 
@@ -9,17 +10,10 @@
 #include <fstream>
 #include <fcntl.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <sys/mman.h>
-#endif
-
 #include <sys/stat.h>
 #include <defer.h>
 #include <unistd.h>
 #include <stb_image.h>
-
 
 void flipTexture(unsigned char *textureData, int width, int height, int n) {
   for(int h = 0; h < height/2; ++h) {
@@ -68,68 +62,12 @@ bool loadCommonTextureExt(char const* fname, GLuint textureId, bool flip) {
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
-bool loadDDSTexture(char const *fname, GLuint textureId) {
-//  int fd = open(fname, O_RDONLY, 0);
-//  if(fd < 0) {
-//    std::cout << "ERROR: loadDDSTexture - open failed, fname =  " << fname <<
-//      ", " << strerror(errno) << std::endl;
-//    return false;
-//  }
-//  defer(close(fd));
-
-  HANDLE hFile = CreateFile(fname, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-  if(hFile == INVALID_HANDLE_VALUE) {
-    // TODO: error message
-    return false;
-  }
-  defer(CloseHandle(hFile));
-
-
-
-//  struct stat st;
-//  if(fstat(fd, &st) < 0) {
-//    std::cout << "ERROR: loadDDSTexture - fstat failed, fname = " << fname <<
-//      ", " << strerror(errno) << std::endl;
-//    return false;
-//  }
-
-  DWORD dwFileSize = GetFileSize(hFile, nullptr);
-  if(dwFileSize == INVALID_FILE_SIZE) {
-    // TODO: error message
-    return false;
-  }
-
-//  size_t fsize = (size_t)st.st_size;
-
-  size_t fsize = (size_t)dwFileSize;
-
+bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, unsigned char* dataPtr) {
   if(fsize < DDS_HEADER_SIZE) {
     std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-      ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
+    ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
     return false;
   }
-
-//  unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
-//  if(dataPtr == MAP_FAILED) {
-//    std::cout << "ERROR: loadDDSTexture - mmap failed, fname = " << fname <<
-//      ", " << strerror(errno) << std::endl;
-//    return false;
-//  }
-//  defer(munmap(dataPtr, fsize));
-
-  HANDLE hMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
-  if(hMapping == nullptr) { // yes, NULL, not INVALID_HANDLE_VALUE, see MSDN
-    // TODO: report error
-    return false;
-  }
-  defer(CloseHandle(hMapping));
-
-  unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, dwFileSize);
-  if(dataPtr == nullptr) {
-    // TODO: report error
-    return false;
-  }
-  defer(UnmapViewOfFile(dataPtr));
 
   unsigned int signature    = *(unsigned int*)&(dataPtr[ 0]);
   unsigned int height       = *(unsigned int*)&(dataPtr[12]);
@@ -139,7 +77,7 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
 
   if(signature != DDS_SIGNATURE) {
     std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-      "invalid signature: 0x" << std::hex << signature << std::endl;
+    "invalid signature: 0x" << std::hex << signature << std::endl;
     return false;
   }
 
@@ -157,7 +95,7 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
       break;
     default:
       std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-        ", unknown formatCode: 0x" << std::hex << formatCode << std::endl;
+      ", unknown formatCode: 0x" << std::hex << formatCode << std::endl;
       return false;
   }
 
@@ -173,8 +111,8 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
     unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
     if(fsize < offset + size) {
       std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
-        ", fsize = " << fsize << ", level = " << level <<
-        ", offset = " << offset << ", size = " << size << std::endl;
+      ", fsize = " << fsize << ", level = " << level <<
+      ", offset = " << offset << ", size = " << size << std::endl;
       return false;
     }
     glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, dataPtr + offset);
@@ -184,9 +122,78 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
     offset += size;
   }
 
- // glBindTexture(GL_TEXTURE_2D, 0); // unbind
   return true;
 }
+
+#ifdef _WIN32
+
+#include <windows.h>
+
+bool loadDDSTexture(char const *fname, GLuint textureId) {
+  HANDLE hFile = CreateFile(fname, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+  if(hFile == INVALID_HANDLE_VALUE) {
+    std::cout << "ERROR: loadDDSTexture - CreateFile failed, fname =  " << fname << std::endl;
+    return false;
+  }
+  defer(CloseHandle(hFile));
+
+  DWORD dwFileSize = GetFileSize(hFile, nullptr);
+  if(dwFileSize == INVALID_FILE_SIZE) {
+    std::cout << "ERROR: loadDDSTexture - GetFileSize failed, fname =  " << fname << std::endl;
+    return false;
+  }
+
+  HANDLE hMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+  if(hMapping == nullptr) { // yes, NULL, not INVALID_HANDLE_VALUE, see MSDN
+    std::cout << "ERROR: loadDDSTexture - CreateFileMapping failed, fname =  " << fname << std::endl;
+    return false;
+  }
+  defer(CloseHandle(hMapping));
+
+  unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, dwFileSize);
+  if(dataPtr == nullptr) {
+    std::cout << "ERROR: loadDDSTexture - MapViewOfFile failed, fname =  " << fname << std::endl;
+    return false;
+  }
+  defer(UnmapViewOfFile(dataPtr));
+
+  return loadDDSTextureCommon(fname, textureId, (size_t)dwFileSize, dataPtr);
+}
+
+#else // Linux, MacOS, etc
+
+#include <sys/mman.h>
+
+bool loadDDSTexture(char const *fname, GLuint textureId) {
+  int fd = open(fname, O_RDONLY, 0);
+  if(fd < 0) {
+    std::cout << "ERROR: loadDDSTexture - open failed, fname =  " << fname <<
+      ", " << strerror(errno) << std::endl;
+    return false;
+  }
+  defer(close(fd));
+
+  struct stat st;
+  if(fstat(fd, &st) < 0) {
+    std::cout << "ERROR: loadDDSTexture - fstat failed, fname = " << fname <<
+      ", " << strerror(errno) << std::endl;
+    return false;
+  }
+
+  size_t fsize = (size_t)st.st_size;
+
+  unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
+  if(dataPtr == MAP_FAILED) {
+    std::cout << "ERROR: loadDDSTexture - mmap failed, fname = " << fname <<
+      ", " << strerror(errno) << std::endl;
+    return false;
+  }
+  defer(munmap(dataPtr, fsize));
+
+  return loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
+}
+
+#endif // loadDDSTextures
 
 bool checkShaderCompileStatus(GLuint obj) {
   GLint status;
