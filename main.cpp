@@ -18,7 +18,7 @@
 #define U(x) (x)
 #define V(x) (1.0f - x)
 
-static const GLfloat globVertexBufferData[] = {
+static const GLfloat globBoxVertexData[] = {
 //   X     Y     Z       U        V
 // front
      1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
@@ -68,6 +68,13 @@ static const GLfloat globVertexBufferData[] = {
      1.0f,-1.0f, 1.0f,   U(1.0f), V(1.0f),
     -1.0f,-1.0f, 1.0f,   U(0.0f), V(1.0f),
     -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+};
+
+static const GLfloat globGrassVertexData[] = {
+//   X     Y     Z        U         V
+    10.0f,-1.0f,-10.0f,   U(10.0f), V(10.0f),
+   -10.0f,-1.0f,-10.0f,   U(10.0f), V(0.0f),
+   -10.0f,-1.0f, 10.0f,   U(0.0f),  V(0.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -136,27 +143,55 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
-  GLuint vertexVBO;
-  glGenBuffers(1, &vertexVBO);
-  defer(glDeleteBuffers(1, &vertexVBO));
+  GLuint boxVBO;
+  glGenBuffers(1, &boxVBO);
+  defer(glDeleteBuffers(1, &boxVBO));
 
-  glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData), globVertexBufferData, GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(globBoxVertexData), globBoxVertexData, GL_STATIC_DRAW);
 
-  GLuint texture;
-//  if(!loadCommonTexture("textures/box.jpg", &texture)) return -1;
+  GLuint grassVBO;
+  glGenBuffers(1, &grassVBO);
+  defer(glDeleteBuffers(1, &grassVBO));
+
+  glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
+
+  GLuint boxTexture;
+//  if(!loadCommonTexture("textures/box.jpg", &boxTexture)) return -1;
 //  defer(glDeleteTextures(1, &texture));
+  if(!loadDDSTexture("textures/box-dxt3.dds", &boxTexture)) return -1;
+  defer(glDeleteTextures(1, &boxTexture));
 
-  if(!loadDDSTexture("textures/box-dxt3.dds", &texture)) return -1;
-  defer(glDeleteTextures(1, &texture));
+  GLuint grassTexture;
+  if(!loadDDSTexture("textures/grass.dds", &grassTexture)) return -1;
+  defer(glDeleteTextures(1, &grassTexture));
 
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  defer(glDeleteVertexArrays(1, &vao));
+  GLuint boxVAO;
+  glGenVertexArrays(1, &boxVAO);
+  defer(glDeleteVertexArrays(1, &boxVAO));
 
-  glBindVertexArray(vao);
+  glBindVertexArray(boxVAO);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+  glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
+
+  glBindVertexArray(0); // unbind VAO
+
+
+  GLuint grassVAO;
+  glGenVertexArrays(1, &grassVAO);
+  defer(glDeleteVertexArrays(1, &grassVAO));
+
+  glBindVertexArray(grassVAO);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
   glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
@@ -166,7 +201,7 @@ int main() {
   glm::mat4 projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
-  GLint textureId = glGetUniformLocation(programId, "textureSampler");
+  GLint samplerId = glGetUniformLocation(programId, "textureSampler");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -201,33 +236,34 @@ int main() {
 
     float rotationTimeMs = 3000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
-    float angle = 360.0f*(currentRotation - (long)currentRotation);
+    float boxAngle = 360.0f*(currentRotation - (long)currentRotation);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);
-
-    glm::mat4 model = glm::rotate(angle, 0.0f, 1.0f, 0.0f);
-    glm::mat4 mvp = projection * view * model; // matrix multiplication is the other way around
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+    glm::mat4 vp = projection * view;
 
     // Bind texture in texture unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // Set "textureSampler"to texture unit 0
-    glUniform1i(textureId, 0);
+    glBindTexture(GL_TEXTURE_2D, boxTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, grassTexture);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programId);
 
-    glBindVertexArray(vao);
-    glEnableVertexAttribArray(0); // could be done once before while loop ... ->
-    glEnableVertexAttribArray(1);
+    glBindVertexArray(boxVAO);
+    glUniform1i(samplerId, 0);
+    glm::mat4 boxMatrix = glm::rotate(boxAngle, 0.0f, 1.0f, 0.0f);
+    glm::mat4 boxMVP = vp * boxMatrix;
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
-    glDisableVertexAttribArray(1); // -> ... in this cast remove these two lines
-    glDisableVertexAttribArray(0);
-    
+
+    glBindVertexArray(grassVAO);
+    glUniform1i(samplerId, 1);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 3*1);
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
