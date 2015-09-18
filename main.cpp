@@ -143,7 +143,7 @@ int main() {
   GLuint texture;
 //  if(!loadCommonTexture("textures/box.jpg", &texture)) return -1;
 //  defer(glDeleteTextures(1, &texture));
-  
+
   if(!loadDDSTexture("textures/box-debug.dds", &texture)) return -1;
   defer(glDeleteTextures(1, &texture));
 

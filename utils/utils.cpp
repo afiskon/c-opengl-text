@@ -63,46 +63,54 @@ bool loadCommonTextureExt(char const* fname, GLuint* texturePtr, bool flip) {
 }
 
 #define DDS_HEADER_SIZE 128
+#define DDS_SIGNATURE    0x20534444 // "DDS "
 #define FORMAT_CODE_DXT1 0x31545844 // "DXT1"
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
-bool loadDDSTexture(char const* fname, GLuint* texturePtr) {
+bool loadDDSTexture(char const *fname, GLuint *texturePtr) {
+  return loadDDSTextureExt(fname, texturePtr, true);
+}
+
+bool loadDDSTextureExt(char const *fname, GLuint *texturePtr, bool) {
   *texturePtr = 0;
 
   int fd = open(fname, O_RDONLY, 0);
   if(fd < 0) {
-    std::cout << "ERROR: loadDDSTexture failed, fname =  " << fname << ", " << strerror(errno) << std::endl;
+    std::cout << "ERROR: loadDDSTextureExt failed, fname =  " << fname << ", " << strerror(errno) << std::endl;
     return false;
   }
   defer(close(fd));
 
   struct stat st;
   if(fstat(fd, &st) < 0) {
-    std::cout << "ERROR: loadDDSTexture failed, fstat < 0" << std::endl;
+    std::cout << "ERROR: loadDDSTextureExt failed, fstat < 0" << std::endl;
     return false;
   }
   size_t fsize = (size_t)st.st_size;
 
   if(fsize < DDS_HEADER_SIZE) {
-    std::cout << "ERROR: loadDDSTexture failed, fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
+    std::cout << "ERROR: loadDDSTextureExt failed, fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
     return false;
   }
 
   unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
   if(dataPtr == MAP_FAILED) {
-    std::cout << "ERROR: loadDDSTexture() failed, mmap returned MAP_FAILED, " << strerror(errno) << std::endl;
+    std::cout << "ERROR: loadDDSTextureExt failed, mmap returned MAP_FAILED, " << strerror(errno) << std::endl;
     return false;
   }
   defer(munmap(dataPtr, fsize));
 
-  // TODO: check signature, first 4 bytes
+  unsigned int signature   = *(unsigned int*)&(dataPtr[ 0]);
+  unsigned int height      = *(unsigned int*)&(dataPtr[12]);
+  unsigned int width       = *(unsigned int*)&(dataPtr[16]);
+  unsigned int mipMapCount = *(unsigned int*)&(dataPtr[28]);
+  unsigned int formatCode  = *(unsigned int*)&(dataPtr[84]);
 
-  unsigned int height      = *(unsigned int*)&(dataPtr[ 8+4]);
-  unsigned int width       = *(unsigned int*)&(dataPtr[12+4]);
-//  unsigned int linearSize  = *(unsigned int*)&(dataPtr[16+4]);
-  unsigned int mipMapCount = *(unsigned int*)&(dataPtr[24+4]);
-  unsigned int formatCode  = *(unsigned int*)&(dataPtr[80+4]);
+  if(signature != DDS_SIGNATURE) {
+    std::cout << "ERROR: loadDDSTextureExt failed, invalid signature: 0x" << std::hex << signature << std::endl;
+    return false;
+  }
 
   unsigned int format;
   switch(formatCode)
@@ -117,15 +125,13 @@ bool loadDDSTexture(char const* fname, GLuint* texturePtr) {
       format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
       break;
     default:
-      std::cout << "ERROR: loadDDSTexture() failed, unknown formatCode: 0x" << std::hex << formatCode << std::endl;
+      std::cout << "ERROR: loadDDSTextureExt failed, unknown formatCode: 0x" << std::hex << formatCode << std::endl;
       return false;
   }
 
-  // TODO print DDS header here
-
   glGenTextures(1, texturePtr);
   glBindTexture(GL_TEXTURE_2D, *texturePtr);
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1); // TODO: describe!
+  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 
   unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
   unsigned int offset = DDS_HEADER_SIZE;
