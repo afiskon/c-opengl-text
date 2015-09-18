@@ -81,42 +81,43 @@ static const GLfloat globGrassVertexData[] = {
 };
 
 
-#define SKYBOX_SIZE 50.0f
+#define SKYBOX_SIZE 30.0f
+#define SKYBOX_Y 20.0f
 
 static const GLfloat globSkyboxVertexData[] = {
 //   X     Y     Z       U        V
 
-    SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE, U(1.0f), V(1.0f),
-   -SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE, U(0.0f), V(1.0f),
-    SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE, U(1.0f), V(0.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE, U(1.0f), V(1.0f),
+   -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE, U(0.0f), V(1.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE, U(1.0f), V(0.0f),
 
-    -SKYBOX_SIZE, SKYBOX_SIZE, -SKYBOX_SIZE,   U(0.0f), V(1.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE, -SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    SKYBOX_SIZE,-SKYBOX_SIZE, -SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, -SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, -SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, -SKYBOX_SIZE,   U(1.0f), V(0.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(1.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(1.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(1.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(1.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(0.0f), V(1.0f),
 
-    -SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(1.0f),
 
-    -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(1.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(1.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(1.0f), V(1.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE,SKYBOX_SIZE, U(1.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE,SKYBOX_SIZE, U(0.0f), V(1.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE,SKYBOX_SIZE, U(1.0f), V(1.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,SKYBOX_SIZE, U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,SKYBOX_SIZE, U(0.0f), V(1.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,SKYBOX_SIZE, U(1.0f), V(1.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(1.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -213,7 +214,7 @@ int main() {
   int boxTextureNum = 0;
   GLuint boxTexture = textureArray[boxTextureNum];
 //  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
-  if(!loadDDSTexture("textures/box-dxt3.dds", boxTexture)) return -1;
+  if(!loadDDSTexture("textures/box-dxt1.dds", boxTexture)) return -1;
 
   int grassTextureNum = 1;
   GLuint grassTexture = textureArray[grassTextureNum];
@@ -312,9 +313,8 @@ int main() {
     glUniform1i(samplerId, 0 /* boxTextureNum */);
 
     glBindVertexArray(boxVAO);
-//    glm::mat4 boxMatrix = glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f);
-//    glm::mat4 boxMVP = vp * boxMatrix;
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glm::mat4 boxMVP = vp * glm::translate(-2.0f, 0.0f, -3.0f);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
     // glActiveTexture(GL_TEXTURE0 + grassTextureNum);
