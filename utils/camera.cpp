@@ -11,6 +11,10 @@ Camera::Camera(GLFWwindow* window, const glm::vec3& startPosition, float startHo
   horizontalAngleRad(startHorizontalAngleRad),
   verticalAngleRad(startVerticalAngleRad) { }
 
+void Camera::getPosition(glm::vec3 *pOutVec) {
+  *pOutVec = position;
+}
+
 void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
   float deltaTimeSec = deltaTimeMs/1000.0f;
 

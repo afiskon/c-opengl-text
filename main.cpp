@@ -80,11 +80,37 @@ static const GLfloat globGrassVertexData[] = {
     10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
 };
 
+
+#define SKYBOX_SIZE 50.0f
+
 static const GLfloat globSkyboxVertexData[] = {
 //   X     Y     Z       U        V
-    20.0f, 20.0f,-20.0f, U(1.0f), V(1.0f),
-   -20.0f, 20.0f,-20.0f, U(0.0f), V(1.0f),
-    20.0f,-20.0f,-20.0f, U(1.0f), V(0.0f),
+
+    SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE, U(1.0f), V(1.0f),
+   -SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE, U(0.0f), V(1.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE, U(1.0f), V(0.0f),
+
+    -SKYBOX_SIZE, SKYBOX_SIZE, -SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE, -SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE, -SKYBOX_SIZE,   U(1.0f), V(0.0f),
+
+    SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(1.0f),
+
+    SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(1.0f), V(1.0f),
+    SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE,   U(0.0f), V(1.0f),
+
+    -SKYBOX_SIZE,-SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(0.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+
+    -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    -SKYBOX_SIZE,-SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -SKYBOX_SIZE, SKYBOX_SIZE,-SKYBOX_SIZE,   U(1.0f), V(1.0f),
+
+
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -105,7 +131,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  GLFWwindow* window = glfwCreateWindow(300, 300, "Rotating box", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating box", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
@@ -263,9 +289,9 @@ int main() {
     float prevDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - prevTime).count();
     prevTime = currentTime;
 
-    float rotationTimeMs = 3000.0f;
+    float rotationTimeMs = 300000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
-    float boxAngle = 360.0f*(currentRotation - (long)currentRotation);
+    float skyboxAngle = 360.0f*(currentRotation - (long)currentRotation);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);
@@ -280,9 +306,9 @@ int main() {
     glUniform1i(samplerId, 0 /* boxTextureNum */);
 
     glBindVertexArray(boxVAO);
-    glm::mat4 boxMatrix = glm::rotate(boxAngle, 0.0f, 1.0f, 0.0f);
-    glm::mat4 boxMVP = vp * boxMatrix;
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
+//    glm::mat4 boxMatrix = glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f);
+//    glm::mat4 boxMVP = vp * boxMatrix;
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
     // glActiveTexture(GL_TEXTURE0 + grassTextureNum);
@@ -298,8 +324,13 @@ int main() {
     glUniform1i(samplerId, 0 /* skyboxTextureNum */);
 
     glBindVertexArray(skyboxVAO);
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*1);
+    glm::vec3 cameraPos;
+    camera.getPosition(&cameraPos);
+
+    glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f);
+    glm::mat4 skyboxMVP = vp * skyboxMatrix;
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 3*6);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
