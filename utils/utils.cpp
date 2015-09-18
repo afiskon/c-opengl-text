@@ -8,11 +8,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <fcntl.h>
 
-#include <sys/stat.h>
 #include <defer.h>
-#include <unistd.h>
 #include <stb_image.h>
 
 void flipTexture(unsigned char *textureData, int width, int height, int n) {
@@ -163,6 +160,9 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
 #else // Linux, MacOS, etc
 
 #include <sys/mman.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 bool loadDDSTexture(char const *fname, GLuint textureId) {
   int fd = open(fname, O_RDONLY, 0);
