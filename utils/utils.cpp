@@ -8,7 +8,13 @@
 #include <sstream>
 #include <fstream>
 #include <fcntl.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/mman.h>
+#endif
+
 #include <sys/stat.h>
 #include <defer.h>
 #include <unistd.h>
@@ -63,35 +69,67 @@ bool loadCommonTextureExt(char const* fname, GLuint textureId, bool flip) {
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
 bool loadDDSTexture(char const *fname, GLuint textureId) {
-  int fd = open(fname, O_RDONLY, 0);
-  if(fd < 0) {
-    std::cout << "ERROR: loadDDSTexture - open failed, fname =  " << fname <<
-      ", " << strerror(errno) << std::endl;
+//  int fd = open(fname, O_RDONLY, 0);
+//  if(fd < 0) {
+//    std::cout << "ERROR: loadDDSTexture - open failed, fname =  " << fname <<
+//      ", " << strerror(errno) << std::endl;
+//    return false;
+//  }
+//  defer(close(fd));
+
+  HANDLE hFile = CreateFile(fname, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+  if(hFile == INVALID_HANDLE_VALUE) {
+    // TODO: error message
     return false;
   }
-  defer(close(fd));
+  defer(CloseHandle(hFile));
 
-  struct stat st;
-  if(fstat(fd, &st) < 0) {
-    std::cout << "ERROR: loadDDSTexture - fstat failed, fname = " << fname <<
-      ", " << strerror(errno) << std::endl;
+
+
+//  struct stat st;
+//  if(fstat(fd, &st) < 0) {
+//    std::cout << "ERROR: loadDDSTexture - fstat failed, fname = " << fname <<
+//      ", " << strerror(errno) << std::endl;
+//    return false;
+//  }
+
+  DWORD dwFileSize = GetFileSize(hFile, nullptr);
+  if(dwFileSize == INVALID_FILE_SIZE) {
+    // TODO: error message
     return false;
   }
 
-  size_t fsize = (size_t)st.st_size;
+//  size_t fsize = (size_t)st.st_size;
+
+  size_t fsize = (size_t)dwFileSize;
+
   if(fsize < DDS_HEADER_SIZE) {
     std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
       ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
     return false;
   }
 
-  unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
-  if(dataPtr == MAP_FAILED) {
-    std::cout << "ERROR: loadDDSTexture - mmap failed, fname = " << fname <<
-      ", " << strerror(errno) << std::endl;
+//  unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
+//  if(dataPtr == MAP_FAILED) {
+//    std::cout << "ERROR: loadDDSTexture - mmap failed, fname = " << fname <<
+//      ", " << strerror(errno) << std::endl;
+//    return false;
+//  }
+//  defer(munmap(dataPtr, fsize));
+
+  HANDLE hMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+  if(hMapping == nullptr) { // yes, NULL, not INVALID_HANDLE_VALUE, see MSDN
+    // TODO: report error
     return false;
   }
-  defer(munmap(dataPtr, fsize));
+  defer(CloseHandle(hMapping));
+
+  unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, dwFileSize);
+  if(dataPtr == nullptr) {
+    // TODO: report error
+    return false;
+  }
+  defer(UnmapViewOfFile(dataPtr));
 
   unsigned int signature    = *(unsigned int*)&(dataPtr[ 0]);
   unsigned int height       = *(unsigned int*)&(dataPtr[12]);
