@@ -80,44 +80,40 @@ static const GLfloat globGrassVertexData[] = {
     10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
 };
 
-
-#define SKYBOX_SIZE 30.0f
-#define SKYBOX_Y 20.0f
-
 static const GLfloat globSkyboxVertexData[] = {
 //   X     Y     Z       U        V
 
-    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE, U(1.0f), V(1.0f),
-   -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE, U(0.0f), V(1.0f),
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE, U(1.0f), V(0.0f),
+    1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
+   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
 
-    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, -SKYBOX_SIZE,   U(0.0f), V(1.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, -SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, -SKYBOX_SIZE,   U(1.0f), V(0.0f),
+    -1.0f, 1.0f, -1.0f,   U(0.0f), V(1.0f),
+    -1.0f,-1.0f, -1.0f,   U(0.0f), V(0.0f),
+    1.0f,-1.0f, -1.0f,   U(1.0f), V(0.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+    1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
+    1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(1.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
+    1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
+    1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
 
-    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    -1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
+    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
+    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
 
-    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(1.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,-SKYBOX_SIZE,   U(1.0f), V(1.0f),
+    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
+    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
+    -1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y,SKYBOX_SIZE, U(1.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,SKYBOX_SIZE, U(0.0f), V(1.0f),
-    SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y,SKYBOX_SIZE, U(1.0f), V(1.0f),
+    1.0f,-1.0f,1.0f, U(1.0f), V(0.0f),
+    -1.0f, 1.0f,1.0f, U(0.0f), V(1.0f),
+    1.0f, 1.0f,1.0f, U(1.0f), V(1.0f),
 
-    SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(1.0f), V(0.0f),
-    -SKYBOX_SIZE,-SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(0.0f),
-    -SKYBOX_SIZE, SKYBOX_SIZE+SKYBOX_Y, SKYBOX_SIZE,   U(0.0f), V(1.0f),
+    1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
+    -1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
+    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -260,7 +256,7 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
-  glm::mat4 projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.3f, 100.0f);
+  glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
   GLint matrixId = glGetUniformLocation(programId, "MVP");
   GLint samplerId = glGetUniformLocation(programId, "textureSampler");
@@ -332,8 +328,11 @@ int main() {
     glBindVertexArray(skyboxVAO);
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
+    
+    
+    glm::vec3 skyboxPos = cameraPos + glm::vec3(0.0f, 20.0f, 0.0f);
 
-    glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f);
+    glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(50.0f,50.0f,50.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*8);
