@@ -152,6 +152,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_SAMPLES, 4);
 
   GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating box", nullptr, nullptr);
   if(window == nullptr) {
@@ -287,8 +288,9 @@ int main() {
   Camera camera(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
 
   glEnable(GL_DOUBLEBUFFER);
-  glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_MULTISAMPLE);
+  glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
   glClearColor(0, 0, 0, 1);
