@@ -71,13 +71,20 @@ static const GLfloat globBoxVertexData[] = {
 };
 
 static const GLfloat globGrassVertexData[] = {
-//   X     Y     Z        U         V
-    10.0f,-1.0f,-10.0f,   U(10.0f), V(10.0f),
-   -10.0f,-1.0f,-10.0f,   U(10.0f), V( 0.0f),
-   -10.0f,-1.0f, 10.0f,   U( 0.0f), V( 0.0f),
-    10.0f,-1.0f,-10.0f,   U(10.0f), V(10.0f),
-   -10.0f,-1.0f, 10.0f,   U( 0.0f), V( 0.0f),
-    10.0f,-1.0f, 10.0f,   U(10.0f), V( 0.0f),
+//   X     Y     Z       U         V
+    10.0f,-1.0f,-10.0f,  U(10.0f), V(10.0f),
+   -10.0f,-1.0f,-10.0f,  U(10.0f), V( 0.0f),
+   -10.0f,-1.0f, 10.0f,  U( 0.0f), V( 0.0f),
+    10.0f,-1.0f,-10.0f,  U(10.0f), V(10.0f),
+   -10.0f,-1.0f, 10.0f,  U( 0.0f), V( 0.0f),
+    10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
+};
+
+static const GLfloat globSkyboxVertexData[] = {
+//   X     Y     Z       U        V
+    20.0f, 20.0f,-20.0f, U(1.0f), V(1.0f),
+   -20.0f, 20.0f,-20.0f, U(0.0f), V(1.0f),
+    20.0f,-20.0f,-20.0f, U(1.0f), V(0.0f),
 };
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -147,12 +154,14 @@ int main() {
   glDeleteShader(fragmentShaderId);
 
   // === prepare VBOs ===
-  GLuint vboArray[2];
-  glGenBuffers(2, vboArray);
-  defer(glDeleteBuffers(2, vboArray));
+  GLuint vboArray[3];
+  int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
+  glGenBuffers(vbosNum, vboArray);
+  defer(glDeleteBuffers(vbosNum, vboArray));
 
   GLuint boxVBO = vboArray[0];
   GLuint grassVBO = vboArray[1];
+  GLuint skyboxVBO = vboArray[2];
 
   glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globBoxVertexData), globBoxVertexData, GL_STATIC_DRAW);
@@ -160,25 +169,33 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(globSkyboxVertexData), globSkyboxVertexData, GL_STATIC_DRAW);
+
   // === prepare textures ===
-  GLuint textureArray[2];
-  glGenTextures(2, textureArray);
-  defer(glDeleteTextures(2, textureArray));
+  GLuint textureArray[3];
+  int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
+  glGenTextures(texturesNum, textureArray);
+  defer(glDeleteTextures(texturesNum, textureArray));
 
   GLuint boxTexture = textureArray[0];
   GLuint grassTexture = textureArray[1];
+  GLuint skyboxTexture = textureArray[2];
 
 //  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
   if(!loadDDSTexture("textures/box-dxt3.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
+  if(!loadDDSTexture("textures/skybox-side.dds", skyboxTexture)) return -1;
 
   // === prepare VAOs ===
-  GLuint vaoArray[2];
-  glGenVertexArrays(2, vaoArray);
-  defer(glDeleteVertexArrays(2, vaoArray));
+  GLuint vaoArray[3];
+  int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
+  glGenVertexArrays(vaosNum, vaoArray);
+  defer(glDeleteVertexArrays(vaosNum, vaoArray));
 
   GLuint boxVAO = vaoArray[0];
   GLuint grassVAO = vaoArray[1];
+  GLuint skyboxVAO = vaoArray[2];
 
   glBindVertexArray(boxVAO);
   glEnableVertexAttribArray(0);
@@ -188,7 +205,6 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
   // glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
-
   // glBindVertexArray(0); // unbind VAO
 
   glBindVertexArray(grassVAO);
@@ -198,9 +214,14 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-  // glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
 
-  // glBindVertexArray(0); // unbind VAO
+  glBindVertexArray(skyboxVAO);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
   glm::mat4 projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
@@ -246,10 +267,13 @@ int main() {
     camera.getViewMatrix(prevDeltaTimeMs, &view);
     glm::mat4 vp = projection * view;
 
+    // TODO: move above
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, boxTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, grassTexture);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -266,6 +290,11 @@ int main() {
     glUniform1i(samplerId, 1);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*2);
+
+    glBindVertexArray(skyboxVAO);
+    glUniform1i(samplerId, 2);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 3*1);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
