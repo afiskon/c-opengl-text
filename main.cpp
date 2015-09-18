@@ -186,14 +186,10 @@ int main() {
   int grassTextureNum = 1;
   GLuint grassTexture = textureArray[grassTextureNum];
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, grassTexture);
 
   int skyboxTextureNum = 2;
   GLuint skyboxTexture = textureArray[skyboxTextureNum];
   if(!loadDDSTexture("textures/skybox-side.dds", skyboxTexture)) return -1;
-  glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 
   // === prepare VAOs ===
   GLuint vaoArray[3];
