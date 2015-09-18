@@ -146,33 +146,39 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
-  GLuint boxVBO;
-  glGenBuffers(1, &boxVBO);
-  defer(glDeleteBuffers(1, &boxVBO));
+  // === prepare VBOs ===
+  GLuint vboArray[2];
+  glGenBuffers(2, vboArray);
+  defer(glDeleteBuffers(2, vboArray));
+
+  GLuint boxVBO = vboArray[0];
+  GLuint grassVBO = vboArray[1];
 
   glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globBoxVertexData), globBoxVertexData, GL_STATIC_DRAW);
 
-  GLuint grassVBO;
-  glGenBuffers(1, &grassVBO);
-  defer(glDeleteBuffers(1, &grassVBO));
-
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
 
-  GLuint boxTexture;
+  // === prepare textures ===
+  GLuint textureArray[2];
+  glGenTextures(2, textureArray);
+  defer(glDeleteTextures(2, textureArray));
+
+  GLuint boxTexture = textureArray[0];
+  GLuint grassTexture = textureArray[1];
+
 //  if(!loadCommonTexture("textures/box.jpg", &boxTexture)) return -1;
-//  defer(glDeleteTextures(1, &texture));
   if(!loadDDSTexture("textures/box-dxt3.dds", &boxTexture)) return -1;
-  defer(glDeleteTextures(1, &boxTexture));
-
-  GLuint grassTexture;
   if(!loadDDSTexture("textures/grass.dds", &grassTexture)) return -1;
-  defer(glDeleteTextures(1, &grassTexture));
 
-  GLuint boxVAO;
-  glGenVertexArrays(1, &boxVAO);
-  defer(glDeleteVertexArrays(1, &boxVAO));
+  // === prepare VAOs ===
+  GLuint vaoArray[2];
+  glGenVertexArrays(2, vaoArray);
+  defer(glDeleteVertexArrays(2, vaoArray));
+
+  GLuint boxVAO = vaoArray[0];
+  GLuint grassVAO = vaoArray[1];
 
   glBindVertexArray(boxVAO);
   glEnableVertexAttribArray(0);
@@ -181,14 +187,9 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-  glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
+  // glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
 
-  glBindVertexArray(0); // unbind VAO
-
-
-  GLuint grassVAO;
-  glGenVertexArrays(1, &grassVAO);
-  defer(glDeleteVertexArrays(1, &grassVAO));
+  // glBindVertexArray(0); // unbind VAO
 
   glBindVertexArray(grassVAO);
   glEnableVertexAttribArray(0);
@@ -197,9 +198,9 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-  glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
+  // glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
 
-  glBindVertexArray(0); // unbind VAO
+  // glBindVertexArray(0); // unbind VAO
 
   glm::mat4 projection = glm::perspective(80.0f, 4.0f / 3.0f, 0.3f, 100.0f);
 
@@ -245,7 +246,6 @@ int main() {
     camera.getViewMatrix(prevDeltaTimeMs, &view);
     glm::mat4 vp = projection * view;
 
-    // Bind texture in texture unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, boxTexture);
     glActiveTexture(GL_TEXTURE1);
