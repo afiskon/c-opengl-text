@@ -6,6 +6,7 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(glfw)
 add_subdirectory(glxw)
 
+include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(glxw/include)
 include_directories(glfw/include)
 include_directories(glm)

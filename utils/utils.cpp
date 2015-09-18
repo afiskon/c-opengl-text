@@ -1,4 +1,6 @@
 #include "utils.h"
+// <GL/glext.h> on Linux, <OpenGL/glext.h> on MacOS :(
+#include "../glfw/deps/GL/glext.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -11,7 +13,7 @@
 #include <defer.h>
 #include <unistd.h>
 #include <stb_image.h>
-#include <GL/glext.h>
+
 
 void flipTexture(unsigned char *textureData, int width, int height, int n) {
   for(int h = 0; h < height/2; ++h) {
