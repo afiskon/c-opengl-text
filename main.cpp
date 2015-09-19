@@ -311,7 +311,7 @@ int main() {
     float prevDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - prevTime).count();
     prevTime = currentTime;
 
-    float rotationTimeMs = 300000.0f;
+    float rotationTimeMs = 1000000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float skyboxAngle = 360.0f*(currentRotation - (long)currentRotation);
 
