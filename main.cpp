@@ -290,6 +290,8 @@ int main() {
 
   glClearColor(0, 0, 0, 1);
 
+  glUniform1i(samplerId, 0);
+
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
@@ -318,9 +320,7 @@ int main() {
 
     glUseProgram(programId);
 
-//    glActiveTexture(GL_TEXTURE0 + boxTextureNum);
     glBindTexture(GL_TEXTURE_2D, boxTexture);
-    glUniform1i(samplerId, 0 /* boxTextureNum */);
 
     glBindVertexArray(boxVAO);
     glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-2.0f, 0.0f, -3.0f);
@@ -328,7 +328,6 @@ int main() {
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
-    glUniform1i(samplerId, 0);
 
     glBindVertexArray(grassVAO);
     glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f);
@@ -336,7 +335,6 @@ int main() {
     glDrawArrays(GL_TRIANGLES, 0, 3*2);
 
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
-    glUniform1i(samplerId, 0);
 
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
