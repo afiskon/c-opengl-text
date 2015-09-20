@@ -152,7 +152,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_SAMPLES, 4);
 
-  GLFWwindow* window = glfwCreateWindow(500, 400, "Skybox", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(800, 600, "Skybox", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
@@ -230,7 +230,7 @@ int main() {
   if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
   if(!loadCommonTexture("textures/skybox.jpg", skyboxTexture)) return -1;
-
+  
   // see http://gamedev.stackexchange.com/a/11975
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

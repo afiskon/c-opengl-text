@@ -32,7 +32,7 @@ bool loadCommonTexture(char const* fname, GLuint textureId) {
 
 bool loadCommonTextureExt(char const* fname, GLuint textureId, bool flip) {
   int width, height, n;
-  unsigned char *textureData = stbi_load(fname, &width, &height, &n, 0);
+  unsigned char *textureData = stbi_load(fname, &width, &height, &n, 3);
   if(textureData == nullptr) {
     std::cout << "ERROR: loadCommonTextureExt failed, fname = " << fname << ", stbi_load returned nullptr" << std::endl;
     return false;
@@ -118,6 +118,9 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, uns
     height = height > 1 ? height >> 1 : 1;
     offset += size;
   }
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
   return true;
 }
