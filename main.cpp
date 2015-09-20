@@ -80,60 +80,116 @@ static const GLfloat globGrassVertexData[] = {
     10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
 };
 
+//static const GLfloat globSkyboxVertexData[] = {
+////   X    Y     Z     U        V
+//    1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
+//   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
+//    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+//
+//   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
+//   -1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
+//    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+//
+//    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
+//    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
+//    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
+//
+//    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
+//    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
+//    1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
+//
+//   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
+//   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+//
+//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+//   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+//   -1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
+//
+//    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
+//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+//    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
+//
+//    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
+//   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
+//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+//
+//// top
+//
+//    -1.0f,1.0f,1.0f, U(0.95f), V(0.99f),
+//    -1.0f, 1.0f,-1.0f, U(0.95f), V(0.95f),
+//    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
+//
+//    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
+//    1.0f, 1.0f, 1.0f, U(0.99f), V(0.99f),
+//   -1.0f, 1.0f, 1.0f, U(0.95f), V(0.99f),
+//
+//// bottom
+//
+//    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
+//    -1.0f, -1.0f,-1.0f, U(0.01f), V(0.01f),
+//    -1.0f,-1.0f,1.0f, U(0.01f), V(0.05f),
+//
+//    -1.0f,-1.0f, 1.0f, U(0.01f), V(0.05f),
+//    1.0f, -1.0f, 1.0f, U(0.05f), V(0.05f),
+//    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
+//};
+
 static const GLfloat globSkyboxVertexData[] = {
 //   X    Y     Z     U        V
-    1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
-   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
-    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
+    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
+    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
 
-   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
-   -1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
-    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
+    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
+    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.33f),
+    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
 
-    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
-    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
-    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
+    1.0f,-1.0f, 1.0f, U(0.75f), V(0.33f),
+    1.0f, 1.0f, 1.0f, U(0.75f), V(0.66f),
 
-    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
-    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
-    1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
+    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
+    1.0f, 1.0f, 1.0f, U(0.75f), V(0.66f),
+    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
 
-   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
-   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
-   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+    -1.0f,-1.0f, 1.0f, U(0.0f), V(0.33f),
+    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.33f),
+    -1.0f, 1.0f, 1.0f, U(0.0f), V(0.66f),
 
-   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
-   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
-   -1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
+    -1.0f, 1.0f, 1.0f, U(0.0f), V(0.66f),
+    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.33f),
+    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
 
-    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
-   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
-    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
+    1.0f,-1.0f, 1.0f, U(0.75f), V(0.33f),
+    -1.0f, 1.0f, 1.0f, U(1.0f), V(0.66f),
+    1.0f, 1.0f, 1.0f, U(0.75f), V(0.66f),
 
-    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
-   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
-   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
+    1.0f,-1.0f, 1.0f, U(0.75f), V(0.33f),
+    -1.0f,-1.0f, 1.0f, U(1.0f), V(0.33f),
+    -1.0f, 1.0f, 1.0f, U(1.0f), V(0.66f),
 
 // top
 
-    -1.0f,1.0f,1.0f, U(0.95f), V(0.99f),
-    -1.0f, 1.0f,-1.0f, U(0.95f), V(0.95f),
-    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
+    -1.0f,1.0f,1.0f, U(0.25f), V(1.0f),
+    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
+    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
 
-    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
-    1.0f, 1.0f, 1.0f, U(0.99f), V(0.99f),
-   -1.0f, 1.0f, 1.0f, U(0.95f), V(0.99f),
+    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
+    1.0f, 1.0f, 1.0f, U(0.5f), V(1.0f),
+    -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
 
 // bottom
 
-    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
-    -1.0f, -1.0f,-1.0f, U(0.01f), V(0.01f),
-    -1.0f,-1.0f,1.0f, U(0.01f), V(0.05f),
+    1.0f, -1.0f,-1.0f, U(0.5f), V(0.0f),
+    -1.0f, -1.0f,-1.0f, U(0.25f), V(0.0f),
+    -1.0f,-1.0f,1.0f, U(0.25f), V(0.33f),
 
-    -1.0f,-1.0f, 1.0f, U(0.01f), V(0.05f),
-    1.0f, -1.0f, 1.0f, U(0.05f), V(0.05f),
-    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
+    -1.0f,-1.0f, 1.0f, U(0.25f), V(0.33f),
+    1.0f, -1.0f, 1.0f, U(0.5f), V(0.33f),
+    1.0f, -1.0f,-1.0f, U(0.5f), V(0.0f),
 };
+
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
@@ -232,7 +288,8 @@ int main() {
 //  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
   if(!loadDDSTexture("textures/box-dxt1.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-  if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
+//  if(!loadDDSTexture("textures/my_skybox.dds", skyboxTexture)) return -1;
+  if(!loadCommonTexture("textures/skyboxsun.png", skyboxTexture)) return -1;
 
   // see http://gamedev.stackexchange.com/a/11975
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -311,9 +368,9 @@ int main() {
     float prevDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - prevTime).count();
     prevTime = currentTime;
 
-    float rotationTimeMs = 1000000.0f;
+    float rotationTimeMs = 100000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
-    float skyboxAngle = 360.0f*(currentRotation - (long)currentRotation);
+    float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);
@@ -328,7 +385,7 @@ int main() {
     glUniform1i(samplerId, 0 /* boxTextureNum */);
 
     glBindVertexArray(boxVAO);
-    glm::mat4 boxMVP = vp * glm::translate(-2.0f, 0.0f, -3.0f);
+    glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-2.0f, 0.0f, -3.0f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
 
@@ -336,7 +393,8 @@ int main() {
     glUniform1i(samplerId, 0);
 
     glBindVertexArray(grassVAO);
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &grassMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*2);
 
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
@@ -344,11 +402,9 @@ int main() {
 
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
-    glm::vec3 skyboxPos = cameraPos + glm::vec3(0.0f, 70.0f, 0.0f);
-    glm::mat4 skyboxRotateScale = glm::rotate(skyboxAngle, 0.0f, 1.0f, 0.0f) * glm::scale(80.0f,80.0f,80.0f);
 
     glBindVertexArray(skyboxVAO);
-    glm::mat4 skyboxMatrix = glm::translate(skyboxPos) * skyboxRotateScale;
+    glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(80.0f,80.0f,80.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
