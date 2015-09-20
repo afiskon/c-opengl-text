@@ -80,114 +80,56 @@ static const GLfloat globGrassVertexData[] = {
     10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
 };
 
-//static const GLfloat globSkyboxVertexData[] = {
-////   X    Y     Z     U        V
-//    1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
-//   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
-//    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
-//
-//   -1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
-//   -1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
-//    1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
-//
-//    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
-//    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
-//    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
-//
-//    1.0f,-1.0f,-1.0f, U(0.0f), V(0.0f),
-//    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
-//    1.0f, 1.0f,-1.0f, U(0.0f), V(1.0f),
-//
-//   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
-//   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
-//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
-//
-//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
-//   -1.0f,-1.0f,-1.0f, U(1.0f), V(0.0f),
-//   -1.0f, 1.0f,-1.0f, U(1.0f), V(1.0f),
-//
-//    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
-//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
-//    1.0f, 1.0f, 1.0f, U(1.0f), V(1.0f),
-//
-//    1.0f,-1.0f, 1.0f, U(1.0f), V(0.0f),
-//   -1.0f,-1.0f, 1.0f, U(0.0f), V(0.0f),
-//   -1.0f, 1.0f, 1.0f, U(0.0f), V(1.0f),
-//
-//// top
-//
-//    -1.0f,1.0f,1.0f, U(0.95f), V(0.99f),
-//    -1.0f, 1.0f,-1.0f, U(0.95f), V(0.95f),
-//    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
-//
-//    1.0f, 1.0f,-1.0f, U(0.99f), V(0.95f),
-//    1.0f, 1.0f, 1.0f, U(0.99f), V(0.99f),
-//   -1.0f, 1.0f, 1.0f, U(0.95f), V(0.99f),
-//
-//// bottom
-//
-//    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
-//    -1.0f, -1.0f,-1.0f, U(0.01f), V(0.01f),
-//    -1.0f,-1.0f,1.0f, U(0.01f), V(0.05f),
-//
-//    -1.0f,-1.0f, 1.0f, U(0.01f), V(0.05f),
-//    1.0f, -1.0f, 1.0f, U(0.05f), V(0.05f),
-//    1.0f, -1.0f,-1.0f, U(0.05f), V(0.01f),
-//};
-
 static const GLfloat globSkyboxVertexData[] = {
-//   X    Y     Z     U        V
-    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
-    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
-    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
+//   X    Y     Z     U         V
+    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
+   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
 
-    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
-    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.33f),
-    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
+   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
+    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
 
-    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
-    1.0f,-1.0f, 1.0f, U(0.75f), V(0.33f),
-    1.0f, 1.0f, 1.0f, U(0.75f), V(0.66f),
+    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
+    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
+    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
 
-    1.0f,-1.0f,-1.0f, U(0.5f), V(0.33f),
-    1.0f, 1.0f, 1.0f, U(0.75f), V(0.66f),
-    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
+    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
+    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
+    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
 
-    -1.0f,-1.0f, 1.0f, U(0.0f), V(0.33f),
-    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.33f),
-    -1.0f, 1.0f, 1.0f, U(0.0f), V(0.66f),
+   -1.0f,-1.0f, 1.0f, U(0.0f),  V(1.0f/3.0f),
+   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
+   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
 
-    -1.0f, 1.0f, 1.0f, U(0.0f), V(0.66f),
-    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.33f),
-    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
+   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
+   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
+   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
 
-    1.0f,-1.0f, 1.0f, U(0.75f), V(0.33f),
-    -1.0f, 1.0f, 1.0f, U(1.0f), V(0.66f),
-    1.0f, 1.0f, 1.0f, U(0.75f), V(0.66f),
+    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
+   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
+    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
 
-    1.0f,-1.0f, 1.0f, U(0.75f), V(0.33f),
-    -1.0f,-1.0f, 1.0f, U(1.0f), V(0.33f),
-    -1.0f, 1.0f, 1.0f, U(1.0f), V(0.66f),
+    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
+   -1.0f,-1.0f, 1.0f, U(1.0f),  V(1.0f/3.0f),
+   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
 
-// top
+   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
+   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
 
-    -1.0f,1.0f,1.0f, U(0.25f), V(1.0f),
-    -1.0f, 1.0f,-1.0f, U(0.25f), V(0.66f),
-    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
+    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
+    1.0f, 1.0f, 1.0f, U(0.5f),  V(1.0f),
+   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
 
-    1.0f, 1.0f,-1.0f, U(0.5f), V(0.66f),
-    1.0f, 1.0f, 1.0f, U(0.5f), V(1.0f),
-    -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
 
-// bottom
+    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
+   -1.0f,-1.0f,-1.0f, U(0.25f), V(0.0f),
+   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
 
-    1.0f, -1.0f,-1.0f, U(0.5f), V(0.0f),
-    -1.0f, -1.0f,-1.0f, U(0.25f), V(0.0f),
-    -1.0f,-1.0f,1.0f, U(0.25f), V(0.33f),
-
-    -1.0f,-1.0f, 1.0f, U(0.25f), V(0.33f),
-    1.0f, -1.0f, 1.0f, U(0.5f), V(0.33f),
-    1.0f, -1.0f,-1.0f, U(0.5f), V(0.0f),
+   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
+    1.0f,-1.0f, 1.0f, U(0.5f),  V(1.0f/3.0f),
+    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
 };
 
 
@@ -285,11 +227,9 @@ int main() {
   GLuint grassTexture = textureArray[1];
   GLuint skyboxTexture = textureArray[2];
 
-//  if(!loadCommonTexture("textures/box.jpg", boxTexture)) return -1;
-  if(!loadDDSTexture("textures/box-dxt1.dds", boxTexture)) return -1;
+  if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-//  if(!loadDDSTexture("textures/my_skybox.dds", skyboxTexture)) return -1;
-  if(!loadCommonTexture("textures/skyboxsun.png", skyboxTexture)) return -1;
+  if(!loadCommonTexture("textures/skybox.jpg", skyboxTexture)) return -1;
 
   // see http://gamedev.stackexchange.com/a/11975
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -312,8 +252,6 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-  // glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO
-  // glBindVertexArray(0); // unbind VAO
 
   glBindVertexArray(grassVAO);
   glEnableVertexAttribArray(0);
@@ -404,7 +342,7 @@ int main() {
     camera.getPosition(&cameraPos);
 
     glBindVertexArray(skyboxVAO);
-    glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(80.0f,80.0f,80.0f);
+    glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 3*12);
