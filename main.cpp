@@ -152,7 +152,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_SAMPLES, 4);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Rotating box", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(500, 400, "Skybox", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
