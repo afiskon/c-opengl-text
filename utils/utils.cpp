@@ -97,7 +97,6 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, uns
   }
 
   glBindTexture(GL_TEXTURE_2D, textureId);
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 
   unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
   unsigned int offset = DDS_HEADER_SIZE;
