@@ -38,7 +38,7 @@ static const GLfloat globBoxVertexData[] = {
     -1.0f,-1.0f, 1.0f,   U(0.0f), V(1.0f),
 };
 
-static const unsigned short globBoxIndices[] = {
+static const unsigned char globBoxIndices[] = {
     0, 1, 2, 1, 3, 2, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 11, 9,
     12, 13, 14, 13, 12, 15, 16, 14, 7, 16, 7, 17, 18, 4, 13, 18, 19, 4
 };
@@ -103,8 +103,6 @@ static const GLfloat globSkyboxVertexData[] = {
     1.0f,-1.0f, 1.0f, U(0.5f),  V(1.0f/3.0f),
     1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
 };
-
-
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
@@ -304,7 +302,7 @@ int main() {
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
-    glDrawElements(GL_TRIANGLES, sizeof(globBoxIndices)/sizeof(globBoxIndices[0]), GL_UNSIGNED_SHORT, nullptr);
+    glDrawElements(GL_TRIANGLES, sizeof(globBoxIndices)/sizeof(globBoxIndices[0]), GL_UNSIGNED_BYTE, nullptr);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
