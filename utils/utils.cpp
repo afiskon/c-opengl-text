@@ -10,48 +10,6 @@
 #include <fstream>
 
 #include <defer.h>
-#include <stb_image.h>
-
-void flipTexture(unsigned char *textureData, int width, int height, int n) {
-  for(int h = 0; h < height/2; ++h) {
-    for(int w = 0; w < width; ++w) {
-      for(int i = 0; i < n; ++i) {
-        int offset1 = (h*width + w)*n + i;
-        int offset2 = ((height - h - 1)*width + w)*n + i;
-        unsigned char t = textureData[offset1];
-        textureData[offset1] = textureData[offset2];
-        textureData[offset2] = t;
-      }
-    }
-  }
-}
-
-bool loadCommonTexture(char const* fname, GLuint textureId) {
-  return loadCommonTextureExt(fname, textureId, false);
-}
-
-bool loadCommonTextureExt(char const* fname, GLuint textureId, bool flip) {
-  int width, height, n;
-  unsigned char *textureData = stbi_load(fname, &width, &height, &n, 3);
-  if(textureData == nullptr) {
-    std::cout << "ERROR: loadCommonTextureExt failed, fname = " << fname << ", stbi_load returned nullptr" << std::endl;
-    return false;
-  }
-  defer(stbi_image_free(textureData));
-
-  if(flip) flipTexture(textureData, width, height, n);
-
-  glBindTexture(GL_TEXTURE_2D, textureId);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-  // glBindTexture(GL_TEXTURE_2D, 0); // unbind
-  return true;
-}
 
 #define DDS_HEADER_SIZE 128
 #define DDS_SIGNATURE    0x20534444 // "DDS "

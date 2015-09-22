@@ -4,9 +4,6 @@
 #include <GLXW/glxw.h>
 #include <vector>
 
-bool loadCommonTexture(const char* fname, GLuint textureId);
-bool loadCommonTextureExt(const char* fname, GLuint textureId, bool flip);
-
 bool loadDDSTexture(char const *fname, GLuint textureId);
 
 GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr);

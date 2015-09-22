@@ -1,4 +1,4 @@
-# cpp-opengl-textures
+# cpp-opengl-models
 
 Usage:
 
