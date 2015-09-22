@@ -66,6 +66,11 @@ static const GLfloat globBoxVertexData[] = {
     -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
 };
 
+static const unsigned short globBoxIndices[] = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,
+    18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
+};
+
 static const GLfloat globGrassVertexData[] = {
 //   X     Y     Z       U         V
     10.0f,-1.0f,-10.0f,  U(10.0f), V(10.0f),
@@ -118,7 +123,6 @@ static const GLfloat globSkyboxVertexData[] = {
     1.0f, 1.0f, 1.0f, U(0.5f),  V(1.0f),
    -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
 
-
     1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
    -1.0f,-1.0f,-1.0f, U(0.25f), V(0.0f),
    -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
@@ -127,6 +131,7 @@ static const GLfloat globSkyboxVertexData[] = {
     1.0f,-1.0f, 1.0f, U(0.5f),  V(1.0f/3.0f),
     1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
 };
+
 
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
@@ -195,7 +200,7 @@ int main() {
   glDeleteShader(fragmentShaderId);
 
   // === prepare VBOs ===
-  GLuint vboArray[3];
+  GLuint vboArray[4];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -203,6 +208,7 @@ int main() {
   GLuint boxVBO = vboArray[0];
   GLuint grassVBO = vboArray[1];
   GLuint skyboxVBO = vboArray[2];
+  GLuint boxIndicesVBO = vboArray[3];
 
   glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globBoxVertexData), globBoxVertexData, GL_STATIC_DRAW);
@@ -212,6 +218,9 @@ int main() {
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globSkyboxVertexData), globSkyboxVertexData, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(globBoxIndices), globBoxIndices, GL_STATIC_DRAW);
 
   // === prepare textures ===
   GLuint textureArray[3];
@@ -321,7 +330,9 @@ int main() {
     glBindVertexArray(boxVAO);
     glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-2.0f, 0.0f, -3.0f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*12);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
+    glDrawElements(GL_TRIANGLES, sizeof(globBoxIndices)/sizeof(globBoxIndices[0]), GL_UNSIGNED_SHORT, nullptr);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
