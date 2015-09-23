@@ -84,7 +84,7 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 // TODO: оптимизировать skybox. положить в текстуру 512x512 или 1024x1024
 // TODO: переписать класс сamera на обычные struct?
 // TODO: избавиться от схемы с errorFlagPtr
-// TODO: написать конвертер, добавить с его помощью моделей - куст, дерево, статую, ....
+// TODO: написать конвертер, добавить с его помощью моделей - куст, дерево, статую (можно нарисовать самому в Blender), ....
 
 int main() {
 //  bool saved = modelSave("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
