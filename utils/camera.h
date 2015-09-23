@@ -6,7 +6,7 @@
 class Camera {
 
 private:
-  GLFWwindow*window;  // TODO: use pImpl
+  GLFWwindow*window;
   glm::vec3 position;
   float horizontalAngleRad;
   float verticalAngleRad;

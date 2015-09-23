@@ -109,6 +109,11 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
+//TODO: оптимизировать skybox. положить в текстуру 512x512 или 1024x1024
+//TODO: переписать класс сamera на обычные struct?
+//TODO: переписать loadShader на fileMapping
+//TODO: создать fileMapping.cpp/h, проверить под windows
+
 int main() {
   bool saved = saveModel("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
   std::cout << "Model saved = " << saved << std::endl;
