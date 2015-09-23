@@ -15,35 +15,6 @@
 #define U(x) (x)
 #define V(x) (1.0f - (x))
 
-static const GLfloat globBoxVertexData[] = {
-//   X     Y     Z       U        V
-     1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
-    -1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
-     1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
-    -1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
-    -1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
-    -1.0f,-1.0f, 1.0f,   U(1.0f), V(0.0f),
-    -1.0f, 1.0f, 1.0f,   U(1.0f), V(1.0f),
-    -1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
-     1.0f, 1.0f,-1.0f,   U(0.0f), V(1.0f),
-    -1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
-    -1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
-     1.0f,-1.0f,-1.0f,   U(0.0f), V(0.0f),
-     1.0f, 1.0f, 1.0f,   U(0.0f), V(1.0f),
-     1.0f,-1.0f,-1.0f,   U(1.0f), V(0.0f),
-     1.0f, 1.0f,-1.0f,   U(1.0f), V(1.0f),
-     1.0f,-1.0f, 1.0f,   U(0.0f), V(0.0f),
-     1.0f, 1.0f, 1.0f,   U(1.0f), V(0.0f),
-    -1.0f, 1.0f, 1.0f,   U(0.0f), V(0.0f),
-     1.0f,-1.0f, 1.0f,   U(1.0f), V(1.0f),
-    -1.0f,-1.0f, 1.0f,   U(0.0f), V(1.0f),
-};
-
-static const unsigned char globBoxIndices[] = {
-    0, 1, 2, 1, 3, 2, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 11, 9,
-    12, 13, 14, 13, 12, 15, 16, 14, 7, 16, 7, 17, 18, 4, 13, 18, 19, 4
-};
-
 static const GLfloat globGrassVertexData[] = {
 //   X     Y     Z       U         V
     10.0f,-1.0f,-10.0f,  U(10.0f), V(10.0f),
@@ -115,9 +86,8 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 //TODO: создать fileMapping.cpp/h, проверить под windows
 
 int main() {
-  bool saved = saveModel("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
-  std::cout << "Model saved = " << saved << std::endl;
-
+//  bool saved = modelSave("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
+//  std::cout << "Model saved = " << saved << std::endl;
 
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -190,17 +160,11 @@ int main() {
   GLuint skyboxVBO = vboArray[2];
   GLuint boxIndicesVBO = vboArray[3];
 
-  glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(globBoxVertexData), globBoxVertexData, GL_STATIC_DRAW);
-
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globSkyboxVertexData), globSkyboxVertexData, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(globBoxIndices), globBoxIndices, GL_STATIC_DRAW);
 
   // === prepare textures ===
   GLuint textureArray[3];
@@ -230,13 +194,9 @@ int main() {
   GLuint grassVAO = vaoArray[1];
   GLuint skyboxVAO = vaoArray[2];
 
-  glBindVertexArray(boxVAO);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+  GLsizei boxIndicesNumber;
+  GLenum boxIndexType;
+  if(!modelLoad("models/box-v0.emd", boxVAO, boxVBO, boxIndicesVBO, &boxIndicesNumber, &boxIndexType)) return -1;
 
   glBindVertexArray(grassVAO);
   glEnableVertexAttribArray(0);
@@ -312,7 +272,7 @@ int main() {
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
-    glDrawElements(GL_TRIANGLES, sizeof(globBoxIndices)/sizeof(globBoxIndices[0]), GL_UNSIGNED_BYTE, nullptr);
+    glDrawElements(GL_TRIANGLES, boxIndicesNumber, boxIndexType, nullptr);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 

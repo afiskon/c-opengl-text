@@ -14,48 +14,54 @@ struct EaxmodHeader {
   uint16_t headerSize;
   uint32_t verticesDataSize;
   uint32_t indicesDataSize;
+  unsigned char indexSize;
 };
 
 #pragma pack(pop)
 
 static const char eaxmodSignature[] = "EAXMOD";
-static const char eaxmodVersion = 0;
+static const char eaxmodVersion = 1;
 
 bool checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header, unsigned int fileSize) {
   if(fileSize < sizeof(EaxmodHeader)) {
-    std::cout << "loadModel - file is too small, fname = " << fname << std::endl;
+    std::cout << "modelLoad - file is too small, fname = " << fname << std::endl;
     return false;
   }
 
   if(strncmp(header->signature, eaxmodSignature, sizeof(eaxmodSignature)) != 0) {
-    std::cout << "loadModel - invalid signature, fname = " << fname << std::endl;
+    std::cout << "modelLoad - invalid signature, fname = " << fname << std::endl;
     return false;
   }
 
-  if(header->version != eaxmodVersion) {
-    std::cout << "loadModel - unsupported version " << header->version << ", fname = " << fname << std::endl;
+  if(header->version > eaxmodVersion) {
+    std::cout << "modelLoad - unsupported version " << header->version << ", fname = " << fname << std::endl;
     return false;
   }
 
   if(sizeof(eaxmodSignature) > header->headerSize) {
-    std::cout << "loadModel - invalid header size, actual: " << header->headerSize << ", expected at least: " << sizeof(eaxmodSignature) << ", fname = " << fname << std::endl;
+    std::cout << "modelLoad - invalid header size, actual: " << header->headerSize << ", expected at least: " << sizeof(eaxmodSignature) << ", fname = " << fname << std::endl;
     return false;
   }
 
   uint32_t expectedSize = header->headerSize + header->verticesDataSize + header->indicesDataSize;
-
   if(fileSize != expectedSize) {
-    std::cout << "loadModel - invalid size, actual: " << fileSize << ", expected: " << expectedSize << ", fname = " << fname << std::endl;
+    std::cout << "modelLoad - invalid size, actual: " << fileSize << ", expected: " << expectedSize << ", fname = " << fname << std::endl;
     return false;
   }
 
   return true;
 }
 
-bool saveModel(const char* fname, const void* verticesData, size_t verticesDataSize, const void* indicesData, size_t indicesDataSize) {
+bool modelSave(const char *fname, const void *verticesData, size_t verticesDataSize, const void *indicesData,
+               size_t indicesDataSize, unsigned char indexSize) {
+  if(indexSize != 1 && indexSize != 2 && indexSize != 4) {
+    std::cout << "modelSave - invalid index size " << indexSize << std::endl;
+    return false;
+  }
+
   FILE* fd = fopen(fname, "wb");
   if(fd == nullptr) {
-    std::cout << "saveModel - failed to open file, fname = " << fname << std::endl;
+    std::cout << "modelSave - failed to open file, fname = " << fname << std::endl;
     return false;
   }
   defer(fclose(fd));
@@ -66,26 +72,31 @@ bool saveModel(const char* fname, const void* verticesData, size_t verticesDataS
   header.headerSize = sizeof(header);
   header.verticesDataSize = (uint32_t)verticesDataSize;
   header.indicesDataSize = (uint32_t)indicesDataSize;
+  header.indexSize = indexSize;
 
   if(fwrite(&header, sizeof(header), 1, fd) != 1) {
-    std::cout << "saveModel - failed to write header, fname = " << fname << std::endl;
+    std::cout << "modelSave - failed to write header, fname = " << fname << std::endl;
     return false;
   }
 
   if(fwrite(verticesData, verticesDataSize, 1, fd) != 1) {
-    std::cout << "saveModel - failed to write verticesData, fname = " << fname << std::endl;
+    std::cout << "modelSave - failed to write verticesData, fname = " << fname << std::endl;
     return false;
   }
 
   if(fwrite(indicesData, indicesDataSize, 1, fd) != 1) {
-    std::cout << "saveModel - failed to write indicesData, fname = " << fname << std::endl;
+    std::cout << "modelSave - failed to write indicesData, fname = " << fname << std::endl;
     return false;
   }
 
   return true;
 }
 
-bool loadModel(const char* fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO) {
+bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO, GLsizei* outIndicesNumber, GLenum* outIndicesType) {
+  *outIndicesNumber = 0;
+  *outIndicesType = GL_UNSIGNED_BYTE;
+  unsigned char indexSize = 1; // default, for v0 format
+
   FileMapping* mapping = fileMappingCreate(fname);
   if(mapping == nullptr) return false;
   defer(fileMappingClose(mapping));
@@ -95,6 +106,22 @@ bool loadModel(const char* fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
 
   EaxmodHeader * header = (EaxmodHeader *)dataPtr;
   if(!checkFileSizeAndHeader(fname, header, dataSize)) return false;
+
+  if(header->version > 0) {
+    indexSize = header->indexSize;
+    if(indexSize == 1) {
+      *outIndicesType = GL_UNSIGNED_BYTE;
+    } else if(indexSize == 2) {
+      *outIndicesType = GL_UNSIGNED_SHORT;
+    } else if(indexSize == 4) {
+      *outIndicesType = GL_UNSIGNED_INT;
+    } else {
+      std::cout << "modelLoad - unsupported indexSize: " << indexSize << std::endl;
+      return false;
+    }
+  }
+
+  *outIndicesNumber = header->indicesDataSize / indexSize;
 
   unsigned char* verticesPtr = dataPtr + header->headerSize;
   unsigned char* indicesPtr = verticesPtr + header->verticesDataSize;
@@ -111,5 +138,6 @@ bool loadModel(const char* fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+
   return true;
 }

@@ -4,9 +4,7 @@
 #include <GL/gl.h>
 #include <cstddef>
 
-bool saveModel(const char* fname, const void* verticesData, size_t verticesDataSize, const void* indicesData, size_t indicesDataSize);
-bool loadModel(const char* fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO);
-
-// TODO: 1) LoadedModel struct 2) rename to modelSave, modelLoad 3) create modelRender
+bool modelSave(const char *fname, const void *verticesData, size_t verticesDataSize, const void *indicesData, size_t indicesDataSize);
+bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO, GLsizei* outIndicesNumber, GLenum* outIndicesType);
 
 #endif // AFISKON_MODELS_H
