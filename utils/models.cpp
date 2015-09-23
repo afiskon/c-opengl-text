@@ -5,6 +5,7 @@
 #include <cstring>
 #include "utils.h"
 #include "models.h"
+#include "fileMapping.h"
 
 #pragma pack(push, 1)
 

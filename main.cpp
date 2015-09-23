@@ -80,10 +80,9 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-//TODO: проверить загрузку модели на всех платформах!
+//TODO: проверить загрузку модели на всех платформах! + переписать fileMapping под Windows
 //TODO: оптимизировать skybox. положить в текстуру 512x512 или 1024x1024
 //TODO: переписать класс сamera на обычные struct?
-//TODO: создать fileMapping.cpp/h, проверить под windows
 //TODO: избавиться от схемы с errorFlagPtr
 
 int main() {
