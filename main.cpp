@@ -93,7 +93,7 @@ int main() {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
   }
-  defer(std::cout << "Calling glfwTerminate()" << std::endl; glfwTerminate());
+  defer(glfwTerminate());
 
   glfwDefaultWindowHints();
 
@@ -108,7 +108,7 @@ int main() {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
   }
-  defer(std::cout << "Calling glfwDestroyWindow()" << std::endl; glfwDestroyWindow(window));
+  defer(glfwDestroyWindow(window));
 
   glfwMakeContextCurrent(window);
 
