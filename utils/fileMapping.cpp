@@ -6,37 +6,64 @@
 
 #include <windows.h>
 
-// TODO: under construction!
+struct FileMapping {
+  HANDLE hFile;
+  HANDLE hMapping;
+  size_t fsize;
+  unsigned char* dataPtr;
+};
 
-bool loadDDSTexture(char const *fname, GLuint textureId) {
+FileMapping * fileMappingCreate(const char* fname) {
   HANDLE hFile = CreateFile(fname, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
   if(hFile == INVALID_HANDLE_VALUE) {
-    std::cout << "ERROR: loadDDSTexture - CreateFile failed, fname =  " << fname << std::endl;
-    return false;
+    std::cout << "ERROR: fileMappingCreate - CreateFile failed, fname =  " << fname << std::endl;
+    return nullptr;
   }
-  defer(CloseHandle(hFile));
 
   DWORD dwFileSize = GetFileSize(hFile, nullptr);
   if(dwFileSize == INVALID_FILE_SIZE) {
-    std::cout << "ERROR: loadDDSTexture - GetFileSize failed, fname =  " << fname << std::endl;
-    return false;
+    std::cout << "ERROR: fileMappingCreate - GetFileSize failed, fname =  " << fname << std::endl;
+    CloseHandle(hFile);
+    return nullptr;
   }
 
   HANDLE hMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
   if(hMapping == nullptr) { // yes, NULL, not INVALID_HANDLE_VALUE, see MSDN
-    std::cout << "ERROR: loadDDSTexture - CreateFileMapping failed, fname =  " << fname << std::endl;
-    return false;
+    std::cout << "ERROR: fileMappingCreate - CreateFileMapping failed, fname =  " << fname << std::endl;
+    CloseHandle(hFile);
+    return nullptr;
   }
-  defer(CloseHandle(hMapping));
 
   unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, dwFileSize);
   if(dataPtr == nullptr) {
-    std::cout << "ERROR: loadDDSTexture - MapViewOfFile failed, fname =  " << fname << std::endl;
-    return false;
+    std::cout << "ERROR: fileMappingCreate - MapViewOfFile failed, fname =  " << fname << std::endl;
+    CloseHandle(hMapping);
+    CloseHandle(hFile);
+    return nullptr;
   }
-  defer(UnmapViewOfFile(dataPtr));
 
-  return loadDDSTextureCommon(fname, textureId, (size_t)dwFileSize, dataPtr);
+  FileMapping* mapping = (FileMapping*)malloc(sizeof(FileMapping));
+  if(mapping == nullptr) {
+    std::cout << "ERROR: fileMappingCreate - malloc failed, fname = " << fname << std::endl;
+    UnmapViewOfFile(dataPtr);
+    CloseHandle(hMapping);
+    CloseHandle(hFile);
+    return nullptr;
+  }
+
+  mapping->hFile = hFile;
+  mapping->hMapping = hMapping;
+  mapping->dataPtr = dataPtr;
+  mapping->fsize = (size_t)dwFileSize;
+
+  return mapping;
+}
+
+void fileMappingClose(FileMapping* mapping) {
+  UnmapViewOfFile(mapping->dataPtr);
+  CloseHandle(mapping->hMapping);
+  CloseHandle(mapping->hFile);
+  free(mapping);
 }
 
 #else // Linux, MacOS, etc
@@ -80,19 +107,13 @@ FileMapping * fileMappingCreate(const char* fname) {
   }
 
   FileMapping * mapping = (FileMapping *)malloc(sizeof(FileMapping));
+  // TODO: check malloc error!!!
+
   mapping->fd = fd;
   mapping->fsize = fsize;
   mapping->dataPtr = dataPtr;
 
   return mapping;
-}
-
-unsigned char* fileMappingGetPointer(FileMapping * mapping) {
-  return mapping->dataPtr;
-}
-
-unsigned int fileMappingGetSize(FileMapping * mapping) {
-  return (unsigned int)mapping->fsize;
 }
 
 void fileMappingClose(FileMapping * mapping) {
@@ -102,3 +123,11 @@ void fileMappingClose(FileMapping * mapping) {
 }
 
 #endif
+
+unsigned char* fileMappingGetPointer(FileMapping * mapping) {
+  return mapping->dataPtr;
+}
+
+unsigned int fileMappingGetSize(FileMapping * mapping) {
+  return (unsigned int)mapping->fsize;
+}
