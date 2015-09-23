@@ -17,7 +17,7 @@
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
-bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, unsigned char* dataPtr) {
+bool loadDDSTextureCommon(const char* fname, GLuint textureId, unsigned int fsize, unsigned char* dataPtr) {
   if(fsize < DDS_HEADER_SIZE) {
     std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
       ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
@@ -86,6 +86,8 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, size_t fsize, uns
 
 #include <windows.h>
 
+// TODO: rewrite to createFileMapping / closeFileMapping
+
 bool loadDDSTexture(char const *fname, GLuint textureId) {
   HANDLE hFile = CreateFile(fname, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
   if(hFile == INVALID_HANDLE_VALUE) {
@@ -124,31 +126,67 @@ bool loadDDSTexture(char const *fname, GLuint textureId) {
 #include <sys/stat.h>
 #include <unistd.h>
 
-bool loadDDSTexture(char const *fname, GLuint textureId) {
+struct FileMapping {
+    int fd;
+    size_t fsize;
+    unsigned char* dataPtr;
+};
+
+FileMapping * fileMappingCreate(const char* fname) {
   int fd = open(fname, O_RDONLY, 0);
   if(fd < 0) {
-    std::cout << "ERROR: loadDDSTexture - open failed, fname =  " << fname <<
+    std::cout << "ERROR: fileMappingCreate - open failed, fname =  " << fname <<
       ", " << strerror(errno) << std::endl;
-    return false;
+    return nullptr;
   }
-  defer(close(fd));
 
   struct stat st;
   if(fstat(fd, &st) < 0) {
-    std::cout << "ERROR: loadDDSTexture - fstat failed, fname = " << fname <<
+    std::cout << "ERROR: fileMappingCreate - fstat failed, fname = " << fname <<
       ", " << strerror(errno) << std::endl;
-    return false;
+    close(fd);
+    return nullptr;
   }
 
   size_t fsize = (size_t)st.st_size;
 
   unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
   if(dataPtr == MAP_FAILED) {
-    std::cout << "ERROR: loadDDSTexture - mmap failed, fname = " << fname <<
+    std::cout << "ERROR: fileMappingCreate - mmap failed, fname = " << fname <<
       ", " << strerror(errno) << std::endl;
-    return false;
+    close(fd);
+    return nullptr;
   }
-  defer(munmap(dataPtr, fsize));
+
+  FileMapping * mapping = (FileMapping *)malloc(sizeof(FileMapping));
+  mapping->fd = fd;
+  mapping->fsize = fsize;
+  mapping->dataPtr = dataPtr;
+
+  return mapping;
+}
+
+unsigned char* fileMappingGetPointer(FileMapping * mapping) {
+  return mapping->dataPtr;
+}
+
+unsigned int fileMappingGetSize(FileMapping * mapping) {
+  return (unsigned int)mapping->fsize;
+}
+
+void fileMappingClose(FileMapping * mapping) {
+  munmap(mapping->dataPtr, mapping->fsize);
+  close(mapping->fd);
+  free(mapping);
+}
+
+bool loadDDSTexture(const char *fname, GLuint textureId) {
+  FileMapping* mapping = fileMappingCreate(fname);
+  if(mapping == nullptr) return false;
+  defer(fileMappingClose(mapping));
+
+  unsigned char* dataPtr = fileMappingGetPointer(mapping);
+  unsigned int fsize = fileMappingGetSize(mapping);
 
   return loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
 }
@@ -183,7 +221,7 @@ bool checkProgramLinkStatus(GLuint obj) {
   return false;
 }
 
-GLuint loadShader(char const *fname, GLenum shaderType, bool *errorFlagPtr) {
+GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
   std::ifstream fileStream(fname);
   std::stringstream buffer;
   buffer << fileStream.rdbuf();

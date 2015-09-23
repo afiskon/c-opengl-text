@@ -10,6 +10,7 @@
 
 #include "utils/utils.h"
 #include "utils/camera.h"
+#include "utils/models.h"
 
 #define U(x) (x)
 #define V(x) (1.0f - (x))
@@ -109,6 +110,10 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 }
 
 int main() {
+  bool saved = saveModel("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
+  std::cout << "Model saved = " << saved << std::endl;
+
+
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
