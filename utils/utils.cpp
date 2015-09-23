@@ -18,7 +18,7 @@
 
 bool loadDDSTextureCommon(const char* fname, GLuint textureId, unsigned int fsize, unsigned char* dataPtr) {
   if(fsize < DDS_HEADER_SIZE) {
-    std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
+    std::cout << "loadDDSTexture failed, fname = " << fname <<
       ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
     return false;
   }
@@ -30,7 +30,7 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, unsigned int fsiz
   unsigned int formatCode   = *(unsigned int*)&(dataPtr[84]);
 
   if(signature != DDS_SIGNATURE) {
-    std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
+    std::cout << "loadDDSTexture failed, fname = " << fname <<
       "invalid signature: 0x" << std::hex << signature << std::endl;
     return false;
   }
@@ -48,7 +48,7 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, unsigned int fsiz
       format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
       break;
     default:
-      std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
+      std::cout << "loadDDSTexture failed, fname = " << fname <<
         ", unknown formatCode: 0x" << std::hex << formatCode << std::endl;
       return false;
   }
@@ -63,7 +63,7 @@ bool loadDDSTextureCommon(const char* fname, GLuint textureId, unsigned int fsiz
   {
     unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
     if(fsize < offset + size) {
-      std::cout << "ERROR: loadDDSTexture failed, fname = " << fname <<
+      std::cout << "loadDDSTexture failed, fname = " << fname <<
         ", fsize = " << fsize << ", level = " << level <<
         ", offset = " << offset << ", size = " << size << std::endl;
       return false;
