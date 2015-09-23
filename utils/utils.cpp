@@ -6,9 +6,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include <sstream>
-#include <fstream>
-
 #include <defer.h>
 
 #define DDS_HEADER_SIZE 128
@@ -222,15 +219,21 @@ bool checkProgramLinkStatus(GLuint obj) {
 }
 
 GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
-  std::ifstream fileStream(fname);
-  std::stringstream buffer;
-  buffer << fileStream.rdbuf();
-  std::string shaderSource(buffer.str());
+  FileMapping* mapping = fileMappingCreate(fname);
+  if(mapping == nullptr) {
+    *errorFlagPtr = true;
+    return 0;
+  }
+  defer(fileMappingClose(mapping));
 
   GLuint shaderId = glCreateShader(shaderType);
-  const GLchar * const shaderSourceCStr = shaderSource.c_str();
+  GLchar* stringArray[1];
+  GLint lengthArray[1];
 
-  glShaderSource(shaderId, 1, &shaderSourceCStr, nullptr);
+  stringArray[0] = (GLchar*)fileMappingGetPointer(mapping);
+  lengthArray[0] = fileMappingGetSize(mapping);
+
+  glShaderSource(shaderId, 1, (GLchar const * const *)stringArray, lengthArray);
   glCompileShader(shaderId);
 
   *errorFlagPtr = checkShaderCompileStatus(shaderId);
