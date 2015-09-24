@@ -10,3 +10,6 @@
 [submodule "deferxx"]
 	path = deferxx
 	url = https://github.com/lichray/deferxx
+[submodule "assimp"]
+	path = assimp
+	url = https://github.com/assimp/assimp.git
