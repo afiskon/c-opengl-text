@@ -93,43 +93,6 @@ int main() {
 //  bool saved = modelSave("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
 //  std::cout << "Model saved = " << saved << std::endl;
 
-  // ----------------------------------------
-  Assimp::Importer importer;
-  const char* fname = "models/monkey.obj";
-  const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-
-  if(scene == nullptr) {
-    std::cerr << "Failed to load model " << fname << std::endl;
-    return -1;
-  }
-
-  if(scene->mNumMeshes <= 0) {
-    std::cerr << "No meshes in model " << fname << std::endl;
-    return -1;
-  }
-
-  aiMesh* mesh = scene->mMeshes[0];
-  unsigned int facesNum = mesh->mNumFaces;
-  unsigned int verticesNum = mesh->mNumVertices;
-
-  // facesNum = 968, verticesNum = 505
-  std::cout << "facesNum = " << facesNum << ", verticesNum = " << verticesNum << std::endl;
-
-  GLfloat* verticesBuffer = (GLfloat*)malloc(facesNum*sizeof(GLfloat)*3); // not optimized so far
-  defer(free(verticesBuffer));
-
-  for(unsigned int i = 0; i < facesNum; ++i) {
-    const aiFace& face = mesh->mFaces[i];
-    if(face.mNumIndices != 3) {
-      std::cerr << "face.numIndices = " << face.mNumIndices << " (3 expected), i = " << i << ", fname = " << fname << std::endl;
-      return -1;
-    }
-//    face.
-  }
-
-  // ----------------------------------------
-
-
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
@@ -190,8 +153,63 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
+
+  // ----------------------------------------
+  Assimp::Importer importer;
+  const char* fname = "models/monkey.obj";
+  const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+
+  if(scene == nullptr) {
+    std::cerr << "Failed to load model " << fname << std::endl;
+    return -1;
+  }
+
+  if(scene->mNumMeshes <= 0) {
+    std::cerr << "No meshes in model " << fname << std::endl;
+    return -1;
+  }
+
+  aiMesh* mesh = scene->mMeshes[0];
+  unsigned int facesNum = mesh->mNumFaces;
+  unsigned int verticesNum = mesh->mNumVertices;
+
+  // facesNum = 968, verticesNum = 505
+  std::cout << "facesNum = " << facesNum << ", verticesNum = " << verticesNum << std::endl;
+
+  size_t verticesBufferSize = facesNum*sizeof(GLfloat)* 5 /* coordinates per vertex */ * 3 /* 3 vertices per face */;
+  GLfloat* verticesBuffer = (GLfloat*)malloc(verticesBufferSize);
+  defer(free(verticesBuffer));
+
+  unsigned int verticesBufferIndex = 0;
+
+  for(unsigned int i = 0; i < facesNum; ++i) {
+    const aiFace& face = mesh->mFaces[i];
+    if(face.mNumIndices != 3) {
+      std::cerr << "face.numIndices = " << face.mNumIndices << " (3 expected), i = " << i << ", fname = " << fname << std::endl;
+      return -1;
+    }
+
+    for(unsigned int j = 0; j < face.mNumIndices; ++j) {
+      unsigned int index = face.mIndices[j];
+      aiVector3D pos = mesh->mVertices[index];
+//      aiVector3D uv = mesh->mTextureCoords[0][index];
+//      std::cout << "uv = (" << uv.x << "," << uv.y << "," << uv.z << ")" << std::endl;
+//      aiVector3D normal = mesh->mNormals[index];
+      verticesBuffer[verticesBufferIndex++] = pos.x;
+      verticesBuffer[verticesBufferIndex++] = pos.y;
+      verticesBuffer[verticesBufferIndex++] = pos.z;
+      verticesBuffer[verticesBufferIndex++] = 0.0; // U
+      verticesBuffer[verticesBufferIndex++] = 0.0; // V
+    }
+  }
+
+  std::cout << "Load complete!" << std::endl;
+
+  // ----------------------------------------
+
+
   // === prepare VBOs ===
-  GLuint vboArray[4];
+  GLuint vboArray[5];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -200,12 +218,16 @@ int main() {
   GLuint grassVBO = vboArray[1];
   GLuint skyboxVBO = vboArray[2];
   GLuint boxIndicesVBO = vboArray[3];
+  GLuint monkeyVBO = vboArray[4];
 
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globSkyboxVertexData), globSkyboxVertexData, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
+  glBufferData(GL_ARRAY_BUFFER, verticesBufferSize, verticesBuffer, GL_STATIC_DRAW);
 
   // === prepare textures ===
   GLuint textureArray[3];
@@ -226,7 +248,7 @@ int main() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   // === prepare VAOs ===
-  GLuint vaoArray[3];
+  GLuint vaoArray[4];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
   glGenVertexArrays(vaosNum, vaoArray);
   defer(glDeleteVertexArrays(vaosNum, vaoArray));
@@ -234,6 +256,7 @@ int main() {
   GLuint boxVAO = vaoArray[0];
   GLuint grassVAO = vaoArray[1];
   GLuint skyboxVAO = vaoArray[2];
+  GLuint monkeyVAO = vaoArray[3];
 
   GLsizei boxIndicesNumber;
   GLenum boxIndexType;
@@ -252,6 +275,14 @@ int main() {
   glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+
+  glBindVertexArray(monkeyVAO);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
@@ -314,6 +345,12 @@ int main() {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
     glDrawElements(GL_TRIANGLES, boxIndicesNumber, boxIndexType, nullptr);
+
+
+
+    glBindVertexArray(monkeyVAO);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
