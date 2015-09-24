@@ -198,8 +198,8 @@ int main() {
       verticesBuffer[verticesBufferIndex++] = pos.x;
       verticesBuffer[verticesBufferIndex++] = pos.y;
       verticesBuffer[verticesBufferIndex++] = pos.z;
-      verticesBuffer[verticesBufferIndex++] = 0.0; // U
-      verticesBuffer[verticesBufferIndex++] = 0.0; // V
+      verticesBuffer[verticesBufferIndex++] = (GLfloat) ((float)rand()/RAND_MAX); // U
+      verticesBuffer[verticesBufferIndex++] = (GLfloat) ((float)rand()/RAND_MAX); // V
     }
   }
 
@@ -350,6 +350,8 @@ int main() {
 
     glBindVertexArray(monkeyVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 968*3);
+
 
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
