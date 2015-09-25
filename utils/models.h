@@ -7,7 +7,8 @@
 bool modelSave(const char *fname, const void *verticesData, size_t verticesDataSize, const void *indicesData, size_t indicesDataSize);
 bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO, GLsizei* outIndicesNumber, GLenum* outIndicesType);
 
-GLfloat* importedModelCreate(const char* fname, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber); // TODO: optimize + indices
+// TODO: optimize + indices
+GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber);
 void importedModelFree(GLfloat* model);
 
 #endif // AFISKON_MODELS_H

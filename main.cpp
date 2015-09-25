@@ -80,8 +80,7 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-// TODO: нарисовать ящик заново в Blender, написать конвертер, загрузить
-// TODO: перерисовать остальные модели (оптимизировать skybox, особенно текстуру) и также заимпортить
+// TODO: полностью перейти на внешние модели
 // TODO: переписать класс сamera на обычные struct
 // TODO: избавиться от схемы с errorFlagPtr
 // TODO: пройтись по исходникам, заменить std::cout на std::cerr для вывода ошибок
@@ -152,11 +151,20 @@ int main() {
 
   unsigned int monkeyVerticesNumber;
   size_t monkeyVerticesBufferSize;
-  GLfloat* monkeyVerticesBuffer = importedModelCreate("models/monkey-textured.obj", &monkeyVerticesBufferSize, &monkeyVerticesNumber);
+  GLfloat* monkeyVerticesBuffer = importedModelCreate("models/monkey-textured.obj", 0, &monkeyVerticesBufferSize, &monkeyVerticesNumber);
+  if(monkeyVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(monkeyVerticesBuffer));
 
+  unsigned int towerVerticesNumber;
+  size_t towerVerticesBufferSize;
+  GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
+//  GLfloat* towerVerticesBuffer = importedModelCreate("blendswap_com/watchtower.blend", 2, &towerVerticesBufferSize, &towerVerticesNumber);
+  if(towerVerticesBuffer == nullptr) return -1;
+  defer(importedModelFree(towerVerticesBuffer));
+
+
   // === prepare VBOs ===
-  GLuint vboArray[5];
+  GLuint vboArray[6];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -166,6 +174,7 @@ int main() {
   GLuint skyboxVBO = vboArray[2];
   GLuint boxIndicesVBO = vboArray[3];
   GLuint monkeyVBO = vboArray[4];
+  GLuint towerVBO = vboArray[5];
 
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
@@ -176,8 +185,11 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
   glBufferData(GL_ARRAY_BUFFER, monkeyVerticesBufferSize, monkeyVerticesBuffer, GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ARRAY_BUFFER, towerVBO);
+  glBufferData(GL_ARRAY_BUFFER, towerVerticesBufferSize, towerVerticesBuffer, GL_STATIC_DRAW);
+
   // === prepare textures ===
-  GLuint textureArray[4];
+  GLuint textureArray[5];
   int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
@@ -186,18 +198,21 @@ int main() {
   GLuint grassTexture = textureArray[1];
   GLuint skyboxTexture = textureArray[2];
   GLuint monkeyTexture = textureArray[3];
+  GLuint towerTexture = textureArray[4];
 
   if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-  if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
-  if(!loadDDSTexture("textures/monkey-texture.dds", monkeyTexture)) return -1;
 
+  if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
   // see http://gamedev.stackexchange.com/a/11975
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+  if(!loadDDSTexture("textures/monkey-texture.dds", monkeyTexture)) return -1;
+  if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
+
   // === prepare VAOs ===
-  GLuint vaoArray[4];
+  GLuint vaoArray[5];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
   glGenVertexArrays(vaosNum, vaoArray);
   defer(glDeleteVertexArrays(vaosNum, vaoArray));
@@ -206,6 +221,7 @@ int main() {
   GLuint grassVAO = vaoArray[1];
   GLuint skyboxVAO = vaoArray[2];
   GLuint monkeyVAO = vaoArray[3];
+  GLuint towerVAO = vaoArray[4];
 
   GLsizei boxIndicesNumber;
   GLenum boxIndexType;
@@ -232,6 +248,14 @@ int main() {
   glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+
+  glBindVertexArray(towerVAO);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, towerVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
@@ -300,6 +324,11 @@ int main() {
     glBindVertexArray(monkeyVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &monkeyMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, monkeyVerticesNumber);
+
+    glBindTexture(GL_TEXTURE_2D, towerTexture);
+    glBindVertexArray(towerVAO);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, towerVerticesNumber);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 

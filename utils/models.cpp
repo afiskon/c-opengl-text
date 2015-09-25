@@ -147,7 +147,7 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
 }
 
 // TODO: import from .blend, join textures to one file, convert UV coordinates, etc...
-GLfloat* importedModelCreate(const char* fname, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) { // TODO: optimize + indices
+GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) { // TODO: optimize + indices
   *outVerticesBufferSize = 0;
   *outVerticesNumber = 0;
   Assimp::Importer importer;
@@ -158,12 +158,12 @@ GLfloat* importedModelCreate(const char* fname, size_t* outVerticesBufferSize, u
     return nullptr;
   }
 
-  if(scene->mNumMeshes <= 0) {
-    std::cerr << "No meshes in model " << fname << std::endl;
+  if(scene->mNumMeshes <= meshNumber) {
+    std::cerr << "There is no mesh #" << meshNumber << " in model (" << scene->mNumMeshes << " only)" << fname << std::endl;
     return nullptr;
   }
 
-  aiMesh* mesh = scene->mMeshes[0];
+  aiMesh* mesh = scene->mMeshes[meshNumber];
   unsigned int facesNum = mesh->mNumFaces;
 //  unsigned int verticesNum = mesh->mNumVertices;
 
