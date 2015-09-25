@@ -6,6 +6,9 @@
 #include "utils.h"
 #include "models.h"
 #include "fileMapping.h"
+#include "../assimp/include/assimp/Importer.hpp"
+#include "../assimp/include/assimp/postprocess.h"
+#include "../assimp/include/assimp/scene.h"
 
 #pragma pack(push, 1)
 
@@ -141,4 +144,71 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
   return true;
+}
+
+// TODO: import from .blend, join textures to one file, convert UV coordinates, etc...
+GLfloat* importedModelCreate(const char* fname, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) { // TODO: optimize + indices
+  *outVerticesBufferSize = 0;
+  *outVerticesNumber = 0;
+  Assimp::Importer importer;
+  const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+
+  if(scene == nullptr) {
+    std::cerr << "Failed to load model " << fname << std::endl;
+    return nullptr;
+  }
+
+  if(scene->mNumMeshes <= 0) {
+    std::cerr << "No meshes in model " << fname << std::endl;
+    return nullptr;
+  }
+
+  aiMesh* mesh = scene->mMeshes[0];
+  unsigned int facesNum = mesh->mNumFaces;
+//  unsigned int verticesNum = mesh->mNumVertices;
+
+  *outVerticesNumber = facesNum*3;
+
+  if(mesh->mTextureCoords == nullptr) {
+    std::cerr << "mesh->mTextureCoords == nullptr, fname = " << fname << std::endl;
+    return nullptr;
+  }
+
+  if(mesh->mTextureCoords[0] == nullptr) {
+    std::cerr << "mesh->mTextureCoords[0] == nullptr, fname = " << fname << std::endl;
+    return nullptr;
+  }
+
+  *outVerticesBufferSize = facesNum*sizeof(GLfloat)* 5 /* coordinates per vertex */ * 3 /* 3 vertices per face */;
+  GLfloat* verticesBuffer = (GLfloat*)malloc(*outVerticesBufferSize);
+
+  unsigned int verticesBufferIndex = 0;
+
+  for(unsigned int i = 0; i < facesNum; ++i) {
+    const aiFace& face = mesh->mFaces[i];
+    if(face.mNumIndices != 3) {
+      std::cerr << "face.numIndices = " << face.mNumIndices << " (3 expected), i = " << i << ", fname = " << fname << std::endl;
+      free(verticesBuffer);
+      return nullptr;
+    }
+
+    for(unsigned int j = 0; j < face.mNumIndices; ++j) {
+      unsigned int index = face.mIndices[j];
+      aiVector3D pos = mesh->mVertices[index];
+      aiVector3D uv = mesh->mTextureCoords[0][index];
+//      aiVector3D normal = mesh->mNormals[index];
+
+      verticesBuffer[verticesBufferIndex++] = pos.x;
+      verticesBuffer[verticesBufferIndex++] = pos.y;
+      verticesBuffer[verticesBufferIndex++] = pos.z;
+      verticesBuffer[verticesBufferIndex++] = uv.x;
+      verticesBuffer[verticesBufferIndex++] = 1.0f - uv.y;
+    }
+  }
+
+  return verticesBuffer;
+}
+
+void importedModelFree(GLfloat* model) {
+  free(model);
 }

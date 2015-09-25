@@ -11,9 +11,6 @@
 #include "utils/utils.h"
 #include "utils/camera.h"
 #include "utils/models.h"
-#include "assimp/include/assimp/Importer.hpp"
-#include "assimp/include/assimp/postprocess.h"
-#include "assimp/include/assimp/scene.h"
 
 #define U(x) (x)
 #define V(x) (1.0f - (x))
@@ -153,70 +150,10 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
-
-  // TODO: move to modelImport procedure
-  // TODO: implement modelOptimize procedure (used in modelImport)
-
-  // ----------------------------------------
-  Assimp::Importer importer;
-  const char* fname = "models/monkey-textured.obj";
-  const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-
-  if(scene == nullptr) {
-    std::cerr << "Failed to load model " << fname << std::endl;
-    return -1;
-  }
-
-  if(scene->mNumMeshes <= 0) {
-    std::cerr << "No meshes in model " << fname << std::endl;
-    return -1;
-  }
-
-  aiMesh* mesh = scene->mMeshes[0];
-  unsigned int facesNum = mesh->mNumFaces;
-//  unsigned int verticesNum = mesh->mNumVertices;
-
-  unsigned int monkeyVerticesNumber = facesNum*3; // used below
-
-  if(mesh->mTextureCoords == nullptr) {
-    std::cerr << "mesh->mTextureCoords == nullptr, fname = " << fname << std::endl;
-    return -1;
-  }
-
-  if(mesh->mTextureCoords[0] == nullptr) {
-    std::cerr << "mesh->mTextureCoords[0] == nullptr, fname = " << fname << std::endl;
-    return -1;
-  }
-
-  size_t verticesBufferSize = facesNum*sizeof(GLfloat)* 5 /* coordinates per vertex */ * 3 /* 3 vertices per face */;
-  GLfloat* verticesBuffer = (GLfloat*)malloc(verticesBufferSize);
-  defer(free(verticesBuffer));
-
-  unsigned int verticesBufferIndex = 0;
-
-  for(unsigned int i = 0; i < facesNum; ++i) {
-    const aiFace& face = mesh->mFaces[i];
-    if(face.mNumIndices != 3) {
-      std::cerr << "face.numIndices = " << face.mNumIndices << " (3 expected), i = " << i << ", fname = " << fname << std::endl;
-      return -1;
-    }
-
-    for(unsigned int j = 0; j < face.mNumIndices; ++j) {
-      unsigned int index = face.mIndices[j];
-      aiVector3D pos = mesh->mVertices[index];
-      aiVector3D uv = mesh->mTextureCoords[0][index];
-//      aiVector3D normal = mesh->mNormals[index];
-
-      verticesBuffer[verticesBufferIndex++] = pos.x;
-      verticesBuffer[verticesBufferIndex++] = pos.y;
-      verticesBuffer[verticesBufferIndex++] = pos.z;
-      verticesBuffer[verticesBufferIndex++] = uv.x;
-      verticesBuffer[verticesBufferIndex++] = 1.0f - uv.y;
-    }
-  }
-
-  // ----------------------------------------
-
+  unsigned int monkeyVerticesNumber;
+  size_t monkeyVerticesBufferSize;
+  GLfloat* monkeyVerticesBuffer = importedModelCreate("models/monkey-textured.obj", &monkeyVerticesBufferSize, &monkeyVerticesNumber);
+  defer(importedModelFree(monkeyVerticesBuffer));
 
   // === prepare VBOs ===
   GLuint vboArray[5];
@@ -237,7 +174,7 @@ int main() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(globSkyboxVertexData), globSkyboxVertexData, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
-  glBufferData(GL_ARRAY_BUFFER, verticesBufferSize, verticesBuffer, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, monkeyVerticesBufferSize, monkeyVerticesBuffer, GL_STATIC_DRAW);
 
   // === prepare textures ===
   GLuint textureArray[4];
