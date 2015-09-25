@@ -176,7 +176,7 @@ int main() {
   unsigned int facesNum = mesh->mNumFaces;
 //  unsigned int verticesNum = mesh->mNumVertices;
 
-  unsigned int monkeyFacesNumber = facesNum; // used below
+  unsigned int monkeyVerticesNumber = facesNum*3; // used below
 
   if(mesh->mTextureCoords == nullptr) {
     std::cerr << "mesh->mTextureCoords == nullptr, fname = " << fname << std::endl;
@@ -362,7 +362,7 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, monkeyTexture);
     glBindVertexArray(monkeyVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &monkeyMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, monkeyFacesNumber*3);
+    glDrawArrays(GL_TRIANGLES, 0, monkeyVerticesNumber);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
