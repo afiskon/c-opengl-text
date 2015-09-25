@@ -154,9 +154,12 @@ int main() {
   glDeleteShader(fragmentShaderId);
 
 
+  // TODO: move to modelImport procedure
+  // TODO: implement modelOptimize procedure (used in modelImport)
+
   // ----------------------------------------
   Assimp::Importer importer;
-  const char* fname = "models/monkey.obj";
+  const char* fname = "models/monkey-textured.obj";
   const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
   if(scene == nullptr) {
@@ -171,10 +174,19 @@ int main() {
 
   aiMesh* mesh = scene->mMeshes[0];
   unsigned int facesNum = mesh->mNumFaces;
-  unsigned int verticesNum = mesh->mNumVertices;
+//  unsigned int verticesNum = mesh->mNumVertices;
 
-  // facesNum = 968, verticesNum = 505
-  std::cout << "facesNum = " << facesNum << ", verticesNum = " << verticesNum << std::endl;
+  unsigned int monkeyFacesNumber = facesNum; // used below
+
+  if(mesh->mTextureCoords == nullptr) {
+    std::cerr << "mesh->mTextureCoords == nullptr, fname = " << fname << std::endl;
+    return -1;
+  }
+
+  if(mesh->mTextureCoords[0] == nullptr) {
+    std::cerr << "mesh->mTextureCoords[0] == nullptr, fname = " << fname << std::endl;
+    return -1;
+  }
 
   size_t verticesBufferSize = facesNum*sizeof(GLfloat)* 5 /* coordinates per vertex */ * 3 /* 3 vertices per face */;
   GLfloat* verticesBuffer = (GLfloat*)malloc(verticesBufferSize);
@@ -192,18 +204,16 @@ int main() {
     for(unsigned int j = 0; j < face.mNumIndices; ++j) {
       unsigned int index = face.mIndices[j];
       aiVector3D pos = mesh->mVertices[index];
-//      aiVector3D uv = mesh->mTextureCoords[0][index];
-//      std::cout << "uv = (" << uv.x << "," << uv.y << "," << uv.z << ")" << std::endl;
+      aiVector3D uv = mesh->mTextureCoords[0][index];
 //      aiVector3D normal = mesh->mNormals[index];
+
       verticesBuffer[verticesBufferIndex++] = pos.x;
       verticesBuffer[verticesBufferIndex++] = pos.y;
       verticesBuffer[verticesBufferIndex++] = pos.z;
-      verticesBuffer[verticesBufferIndex++] = (GLfloat) ((float)rand()/RAND_MAX); // U
-      verticesBuffer[verticesBufferIndex++] = (GLfloat) ((float)rand()/RAND_MAX); // V
+      verticesBuffer[verticesBufferIndex++] = uv.x;
+      verticesBuffer[verticesBufferIndex++] = 1.0f - uv.y;
     }
   }
-
-  std::cout << "Load complete!" << std::endl;
 
   // ----------------------------------------
 
@@ -230,7 +240,7 @@ int main() {
   glBufferData(GL_ARRAY_BUFFER, verticesBufferSize, verticesBuffer, GL_STATIC_DRAW);
 
   // === prepare textures ===
-  GLuint textureArray[3];
+  GLuint textureArray[4];
   int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
@@ -238,10 +248,12 @@ int main() {
   GLuint boxTexture = textureArray[0];
   GLuint grassTexture = textureArray[1];
   GLuint skyboxTexture = textureArray[2];
+  GLuint monkeyTexture = textureArray[3];
 
   if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
   if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
+  if(!loadDDSTexture("textures/monkey-texture.dds", monkeyTexture)) return -1;
 
   // see http://gamedev.stackexchange.com/a/11975
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -346,13 +358,11 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
     glDrawElements(GL_TRIANGLES, boxIndicesNumber, boxIndexType, nullptr);
 
-
-
+    glm::mat4 monkeyMVP = boxMVP * glm::translate(0.0f, 2.0f, 0.0f);
+    glBindTexture(GL_TEXTURE_2D, monkeyTexture);
     glBindVertexArray(monkeyVAO);
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 968*3);
-
-
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &monkeyMVP[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, monkeyFacesNumber*3);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
