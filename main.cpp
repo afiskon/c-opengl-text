@@ -25,57 +25,6 @@ static const GLfloat globGrassVertexData[] = {
     10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
 };
 
-//static const GLfloat globSkyboxVertexData[] = {
-////   X    Y     Z     U         V
-//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-//
-//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-//   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
-//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-//
-//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-//    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
-//    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
-//
-//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-//    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
-//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-//
-//   -1.0f,-1.0f, 1.0f, U(0.0f),  V(1.0f/3.0f),
-//   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
-//   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
-//
-//   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
-//   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
-//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-//
-//    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
-//   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
-//    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
-//
-//    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
-//   -1.0f,-1.0f, 1.0f, U(1.0f),  V(1.0f/3.0f),
-//   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
-//
-//   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
-//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-//
-//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-//    1.0f, 1.0f, 1.0f, U(0.5f),  V(1.0f),
-//   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
-//
-//    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
-//   -1.0f,-1.0f,-1.0f, U(0.25f), V(0.0f),
-//   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
-//
-//   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
-//    1.0f,-1.0f, 1.0f, U(0.5f),  V(1.0f/3.0f),
-//    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
-//};
-
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -156,13 +105,6 @@ int main() {
   if(skyboxVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(skyboxVerticesBuffer));
 
-
-  unsigned int monkeyVerticesNumber;
-  size_t monkeyVerticesBufferSize;
-  GLfloat* monkeyVerticesBuffer = importedModelCreate("models/monkey-textured.obj", 0, &monkeyVerticesBufferSize, &monkeyVerticesNumber);
-  if(monkeyVerticesBuffer == nullptr) return -1;
-  defer(importedModelFree(monkeyVerticesBuffer));
-
   unsigned int towerVerticesNumber;
   size_t towerVerticesBufferSize;
   GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
@@ -171,7 +113,7 @@ int main() {
 
 
   // === prepare VBOs ===
-  GLuint vboArray[6];
+  GLuint vboArray[5];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -180,8 +122,7 @@ int main() {
   GLuint grassVBO = vboArray[1];
   GLuint skyboxVBO = vboArray[2];
   GLuint boxIndicesVBO = vboArray[3];
-  GLuint monkeyVBO = vboArray[4];
-  GLuint towerVBO = vboArray[5];
+  GLuint towerVBO = vboArray[4];
 
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
@@ -189,14 +130,11 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, skyboxVerticesBufferSize, skyboxVerticesBuffer, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
-  glBufferData(GL_ARRAY_BUFFER, monkeyVerticesBufferSize, monkeyVerticesBuffer, GL_STATIC_DRAW);
-
   glBindBuffer(GL_ARRAY_BUFFER, towerVBO);
   glBufferData(GL_ARRAY_BUFFER, towerVerticesBufferSize, towerVerticesBuffer, GL_STATIC_DRAW);
 
   // === prepare textures ===
-  GLuint textureArray[5];
+  GLuint textureArray[4];
   int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
@@ -204,8 +142,7 @@ int main() {
   GLuint boxTexture = textureArray[0];
   GLuint grassTexture = textureArray[1];
   GLuint skyboxTexture = textureArray[2];
-  GLuint monkeyTexture = textureArray[3];
-  GLuint towerTexture = textureArray[4];
+  GLuint towerTexture = textureArray[3];
 
   if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
@@ -215,11 +152,10 @@ int main() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  if(!loadDDSTexture("textures/monkey-texture.dds", monkeyTexture)) return -1;
   if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
 
   // === prepare VAOs ===
-  GLuint vaoArray[5];
+  GLuint vaoArray[4];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
   glGenVertexArrays(vaosNum, vaoArray);
   defer(glDeleteVertexArrays(vaosNum, vaoArray));
@@ -227,8 +163,7 @@ int main() {
   GLuint boxVAO = vaoArray[0];
   GLuint grassVAO = vaoArray[1];
   GLuint skyboxVAO = vaoArray[2];
-  GLuint monkeyVAO = vaoArray[3];
-  GLuint towerVAO = vaoArray[4];
+  GLuint towerVAO = vaoArray[3];
 
   GLsizei boxIndicesNumber;
   GLenum boxIndexType;
@@ -247,14 +182,6 @@ int main() {
   glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-
-  glBindVertexArray(monkeyVAO);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
 
@@ -325,12 +252,6 @@ int main() {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
     glDrawElements(GL_TRIANGLES, boxIndicesNumber, boxIndexType, nullptr);
-
-    glm::mat4 monkeyMVP = boxMVP * glm::translate(0.0f, 2.0f, 0.0f);
-    glBindTexture(GL_TEXTURE_2D, monkeyTexture);
-    glBindVertexArray(monkeyVAO);
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &monkeyMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, monkeyVerticesNumber);
 
     glBindTexture(GL_TEXTURE_2D, towerTexture);
     glBindVertexArray(towerVAO);
