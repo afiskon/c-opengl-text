@@ -96,15 +96,15 @@ int main() {
 //  defer(importedModelFree(skyboxVerticesBuffer));
 //  if(!importedModelSave("models/skybox.emd", skyboxVerticesBuffer, skyboxVerticesNumber)) return -1;
 
-  unsigned int towerVerticesNumber;
-  size_t towerVerticesBufferSize;
-  GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
-  if(towerVerticesBuffer == nullptr) return -1;
-  defer(importedModelFree(towerVerticesBuffer));
-  if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
+//  unsigned int towerVerticesNumber;
+//  size_t towerVerticesBufferSize;
+//  GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
+//  if(towerVerticesBuffer == nullptr) return -1;
+//  defer(importedModelFree(towerVerticesBuffer));
+//  if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
 
   // === prepare VBOs ===
-  GLuint vboArray[7];
+  GLuint vboArray[8];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -116,9 +116,7 @@ int main() {
   GLuint towerVBO = vboArray[4];
   GLuint grassIndicesVBO = vboArray[5];
   GLuint skyboxIndicesVBO = vboArray[6];
-
-  glBindBuffer(GL_ARRAY_BUFFER, towerVBO);
-  glBufferData(GL_ARRAY_BUFFER, towerVerticesBufferSize, towerVerticesBuffer, GL_STATIC_DRAW);
+  GLuint towerIndicesVBO = vboArray[7];
 
   // === prepare textures ===
   GLuint textureArray[4];
@@ -133,9 +131,8 @@ int main() {
 
   if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-  if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
 
-  // see http://gamedev.stackexchange.com/a/11975
+  if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -152,35 +149,12 @@ int main() {
   GLuint skyboxVAO = vaoArray[2];
   GLuint towerVAO = vaoArray[3];
 
-  GLsizei boxIndicesNumber, grassIndicesNumber, skyboxIndicesNumber;
-  GLenum boxIndexType, grassIndexType, skyboxIndexType;
+  GLsizei boxIndicesNumber, grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber;
+  GLenum boxIndexType, grassIndexType, skyboxIndexType, towerIndexType;
   if(!modelLoad("models/box-v0.emd", boxVAO, boxVBO, boxIndicesVBO, &boxIndicesNumber, &boxIndexType)) return -1;
   if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
   if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
-
-  glBindVertexArray(grassVAO);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-
-  glBindVertexArray(skyboxVAO);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
-
-  glBindVertexArray(towerVAO);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, towerVBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+  if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;2
 
   glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
@@ -244,7 +218,8 @@ int main() {
     glBindVertexArray(towerVAO);
     glm::mat4 towerMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &towerMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, towerVerticesNumber);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
+    glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
     glBindVertexArray(grassVAO);
