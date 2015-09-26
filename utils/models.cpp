@@ -278,8 +278,6 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
     indices.push_back(foundIndex);
   }
 
-//  std::cout << "importedModelSave - fname = " << fname << ", verticesNumber = " << verticesNumber << ", usedIndices = " << usedIndices << std::endl;
-
   return modelSave(fname, vertices.data(), usedIndices* floatsPerVertex *sizeof(GLfloat), indices.data(), verticesNumber);
 }
 

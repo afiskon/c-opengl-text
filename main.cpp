@@ -222,7 +222,7 @@ int main() {
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
 
-    // TODO: implement modelDraw procedure (Model object?)
+    // TODO: implement modelDraw procedure (or maybe Model object?)
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
     glBindVertexArray(skyboxVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
