@@ -201,27 +201,30 @@ int main() {
 
     glUseProgram(programId);
 
+    glm::mat4 towerMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
+
     glBindTexture(GL_TEXTURE_2D, towerTexture);
     glBindVertexArray(towerVAO);
-    glm::mat4 towerMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &towerMVP[0][0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
     glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
 
+    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);;
+
     glBindTexture(GL_TEXTURE_2D, grassTexture);
     glBindVertexArray(grassVAO);
-    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &grassMVP[0][0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
     glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
-    // TODO: implement modelDraw procedure!
-    glBindTexture(GL_TEXTURE_2D, skyboxTexture);
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
-    glBindVertexArray(skyboxVAO);
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
+
+    // TODO: implement modelDraw procedure (Model object?)
+    glBindTexture(GL_TEXTURE_2D, skyboxTexture);
+    glBindVertexArray(skyboxVAO);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
     glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
