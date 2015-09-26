@@ -10,8 +10,8 @@ Usage:
     cmake ..
     make
     cd ..
-    ./build/models
     ./build/emdconv models/skybox.blend skybox.emd
+    ./build/models
 ```
 
 * WASD + mouse - move camera
