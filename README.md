@@ -10,7 +10,7 @@ Usage:
     cmake ..
     make
     cd ..
-    ./build/skybox
+    ./build/models
 ```
 
 * WASD + mouse - move camera

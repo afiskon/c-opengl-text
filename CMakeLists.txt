@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(skybox)
+project(models)
 
 find_package(OpenGL REQUIRED)
 
@@ -17,6 +17,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -std=c++11 -Wall -Wextra -Werror -Wn
 SET(LIBRARIES glfw glxw assimp ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 
 set(SOURCE_FILES main.cpp utils/camera.cpp utils/camera.h utils/utils.h utils/utils.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)
-add_executable(skybox ${SOURCE_FILES})
+add_executable(models ${SOURCE_FILES})
 
-target_link_libraries(skybox ${LIBRARIES})
+target_link_libraries(models ${LIBRARIES})

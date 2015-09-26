@@ -16,8 +16,8 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-// TODO: переименовать проект, поправить название в README.md
 // TODO: переложить создание .emd файлов в отдельную утилиту + сделать в ней флаг предпросмотра и выбора меша по номеру
+// TODO: удалить ящик, его модель и текстуру
 
 int main() {
   if(glfwInit() == GL_FALSE) {
@@ -154,7 +154,7 @@ int main() {
   if(!modelLoad("models/box-v0.emd", boxVAO, boxVBO, boxIndicesVBO, &boxIndicesNumber, &boxIndexType)) return -1;
   if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
   if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
-  if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;2
+  if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;
 
   glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
