@@ -11,6 +11,7 @@ Usage:
     make
     cd ..
     ./build/models
+    ./build/emdconv models/skybox.blend skybox.emd
 ```
 
 * WASD + mouse - move camera
