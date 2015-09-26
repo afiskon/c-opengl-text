@@ -30,11 +30,6 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
 
   *outVerticesNumber = facesNum*3;
 
-  if(mesh->mTextureCoords == nullptr) {
-    std::cerr << "mesh->mTextureCoords == nullptr, fname = " << fname << std::endl;
-    return nullptr;
-  }
-
   if(mesh->mTextureCoords[0] == nullptr) {
     std::cerr << "mesh->mTextureCoords[0] == nullptr, fname = " << fname << std::endl;
     return nullptr;
