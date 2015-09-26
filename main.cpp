@@ -15,16 +15,6 @@
 #define U(x) (x)
 #define V(x) (1.0f - (x))
 
-static const GLfloat globGrassVertexData[] = {
-//   X     Y     Z       U         V
-    10.0f,-1.0f,-10.0f,  U(10.0f), V(10.0f),
-   -10.0f,-1.0f,-10.0f,  U(10.0f), V( 0.0f),
-   -10.0f,-1.0f, 10.0f,  U( 0.0f), V( 0.0f),
-    10.0f,-1.0f,-10.0f,  U(10.0f), V(10.0f),
-   -10.0f,-1.0f, 10.0f,  U( 0.0f), V( 0.0f),
-    10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
-};
-
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -99,6 +89,13 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
+
+  unsigned int grassVerticesNumber;
+  size_t grassVerticesBufferSize;
+  GLfloat* grassVerticesBuffer = importedModelCreate("models/grass.blend", 0, &grassVerticesBufferSize, &grassVerticesNumber);
+  if(grassVerticesBuffer == nullptr) return -1;
+  defer(importedModelFree(grassVerticesBuffer));
+
   unsigned int skyboxVerticesNumber;
   size_t skyboxVerticesBufferSize;
   GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
@@ -125,7 +122,7 @@ int main() {
   GLuint towerVBO = vboArray[4];
 
   glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, grassVerticesBufferSize, grassVerticesBuffer, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, skyboxVerticesBufferSize, skyboxVerticesBuffer, GL_STATIC_DRAW);
@@ -263,7 +260,7 @@ int main() {
     glBindVertexArray(grassVAO);
     glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &grassMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*2);
+    glDrawArrays(GL_TRIANGLES, 0, grassVerticesNumber /* 3*2 */);
 
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 
