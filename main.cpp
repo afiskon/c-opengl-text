@@ -103,33 +103,16 @@ int main() {
 //  defer(importedModelFree(towerVerticesBuffer));
 //  if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
 
-  // === prepare VBOs ===
-  GLuint vboArray[8];
-  int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
-  glGenBuffers(vbosNum, vboArray);
-  defer(glDeleteBuffers(vbosNum, vboArray));
-
-  GLuint boxVBO = vboArray[0];
-  GLuint grassVBO = vboArray[1];
-  GLuint skyboxVBO = vboArray[2];
-  GLuint boxIndicesVBO = vboArray[3];
-  GLuint towerVBO = vboArray[4];
-  GLuint grassIndicesVBO = vboArray[5];
-  GLuint skyboxIndicesVBO = vboArray[6];
-  GLuint towerIndicesVBO = vboArray[7];
-
   // === prepare textures ===
-  GLuint textureArray[4];
+  GLuint textureArray[3];
   int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
 
-  GLuint boxTexture = textureArray[0];
-  GLuint grassTexture = textureArray[1];
-  GLuint skyboxTexture = textureArray[2];
-  GLuint towerTexture = textureArray[3];
+  GLuint grassTexture = textureArray[0];
+  GLuint skyboxTexture = textureArray[1];
+  GLuint towerTexture = textureArray[2];
 
-  if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
 
   if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
@@ -139,19 +122,32 @@ int main() {
   if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
 
   // === prepare VAOs ===
-  GLuint vaoArray[4];
+  GLuint vaoArray[3];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
   glGenVertexArrays(vaosNum, vaoArray);
   defer(glDeleteVertexArrays(vaosNum, vaoArray));
 
-  GLuint boxVAO = vaoArray[0];
-  GLuint grassVAO = vaoArray[1];
-  GLuint skyboxVAO = vaoArray[2];
-  GLuint towerVAO = vaoArray[3];
+  GLuint grassVAO = vaoArray[0];
+  GLuint skyboxVAO = vaoArray[1];
+  GLuint towerVAO = vaoArray[2];
 
-  GLsizei boxIndicesNumber, grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber;
-  GLenum boxIndexType, grassIndexType, skyboxIndexType, towerIndexType;
-  if(!modelLoad("models/box-v0.emd", boxVAO, boxVBO, boxIndicesVBO, &boxIndicesNumber, &boxIndexType)) return -1;
+  // === prepare VBOs ===
+  GLuint vboArray[6];
+  int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
+  glGenBuffers(vbosNum, vboArray);
+  defer(glDeleteBuffers(vbosNum, vboArray));
+
+  GLuint grassVBO = vboArray[0];
+  GLuint skyboxVBO = vboArray[1];
+  GLuint towerVBO = vboArray[2];
+  GLuint grassIndicesVBO = vboArray[3];
+  GLuint skyboxIndicesVBO = vboArray[4];
+  GLuint towerIndicesVBO = vboArray[5];
+
+  // === load models ===
+
+  GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber;
+  GLenum grassIndexType, skyboxIndexType, towerIndexType;
   if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
   if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
   if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;
@@ -164,8 +160,7 @@ int main() {
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
 
-  // hide cursor
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide cursor
 
   Camera camera(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
 
@@ -206,13 +201,6 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programId);
-
-    glBindTexture(GL_TEXTURE_2D, boxTexture);
-    glBindVertexArray(boxVAO);
-    glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-10.0f, 0.0f, -10.0f);
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
-    glDrawElements(GL_TRIANGLES, boxIndicesNumber, boxIndexType, nullptr);
 
     glBindTexture(GL_TEXTURE_2D, towerTexture);
     glBindVertexArray(towerVAO);
