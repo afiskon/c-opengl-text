@@ -25,56 +25,56 @@ static const GLfloat globGrassVertexData[] = {
     10.0f,-1.0f, 10.0f,  U(10.0f), V( 0.0f),
 };
 
-static const GLfloat globSkyboxVertexData[] = {
-//   X    Y     Z     U         V
-    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-
-   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
-    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-
-    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
-    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
-
-    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
-    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
-    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-
-   -1.0f,-1.0f, 1.0f, U(0.0f),  V(1.0f/3.0f),
-   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
-   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
-
-   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
-   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
-   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-
-    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
-   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
-    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
-
-    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
-   -1.0f,-1.0f, 1.0f, U(1.0f),  V(1.0f/3.0f),
-   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
-
-   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
-   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
-    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-
-    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
-    1.0f, 1.0f, 1.0f, U(0.5f),  V(1.0f),
-   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
-
-    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
-   -1.0f,-1.0f,-1.0f, U(0.25f), V(0.0f),
-   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
-
-   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
-    1.0f,-1.0f, 1.0f, U(0.5f),  V(1.0f/3.0f),
-    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
-};
+//static const GLfloat globSkyboxVertexData[] = {
+////   X    Y     Z     U         V
+//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
+//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
+//
+//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+//   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
+//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
+//
+//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
+//    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
+//    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
+//
+//    1.0f,-1.0f,-1.0f, U(0.5f),  V(1.0f/3.0f),
+//    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
+//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
+//
+//   -1.0f,-1.0f, 1.0f, U(0.0f),  V(1.0f/3.0f),
+//   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
+//   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
+//
+//   -1.0f, 1.0f, 1.0f, U(0.0f),  V(2.0f/3.0f),
+//   -1.0f,-1.0f,-1.0f, U(0.25f), V(1.0f/3.0f),
+//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+//
+//    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
+//   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
+//    1.0f, 1.0f, 1.0f, U(0.75f), V(2.0f/3.0f),
+//
+//    1.0f,-1.0f, 1.0f, U(0.75f), V(1.0f/3.0f),
+//   -1.0f,-1.0f, 1.0f, U(1.0f),  V(1.0f/3.0f),
+//   -1.0f, 1.0f, 1.0f, U(1.0f),  V(2.0f/3.0f),
+//
+//   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
+//   -1.0f, 1.0f,-1.0f, U(0.25f), V(2.0f/3.0f),
+//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
+//
+//    1.0f, 1.0f,-1.0f, U(0.5f),  V(2.0f/3.0f),
+//    1.0f, 1.0f, 1.0f, U(0.5f),  V(1.0f),
+//   -1.0f, 1.0f, 1.0f, U(0.25f), V(1.0f),
+//
+//    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
+//   -1.0f,-1.0f,-1.0f, U(0.25f), V(0.0f),
+//   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
+//
+//   -1.0f,-1.0f, 1.0f, U(0.25f), V(1.0f/3.0f),
+//    1.0f,-1.0f, 1.0f, U(0.5f),  V(1.0f/3.0f),
+//    1.0f,-1.0f,-1.0f, U(0.5f),  V(0.0f),
+//};
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
@@ -84,6 +84,7 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 // TODO: переписать класс сamera на обычные struct
 // TODO: избавиться от схемы с errorFlagPtr
 // TODO: пройтись по исходникам, заменить std::cout на std::cerr для вывода ошибок
+// TODO: переименовать проект, поправить название в README.md
 
 int main() {
 //  bool saved = modelSave("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
@@ -149,6 +150,13 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
+  unsigned int skyboxVerticesNumber;
+  size_t skyboxVerticesBufferSize;
+  GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
+  if(skyboxVerticesBuffer == nullptr) return -1;
+  defer(importedModelFree(skyboxVerticesBuffer));
+
+
   unsigned int monkeyVerticesNumber;
   size_t monkeyVerticesBufferSize;
   GLfloat* monkeyVerticesBuffer = importedModelCreate("models/monkey-textured.obj", 0, &monkeyVerticesBufferSize, &monkeyVerticesNumber);
@@ -158,7 +166,6 @@ int main() {
   unsigned int towerVerticesNumber;
   size_t towerVerticesBufferSize;
   GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
-//  GLfloat* towerVerticesBuffer = importedModelCreate("blendswap_com/watchtower.blend", 2, &towerVerticesBufferSize, &towerVerticesNumber);
   if(towerVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(towerVerticesBuffer));
 
@@ -180,7 +187,7 @@ int main() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(globGrassVertexData), globGrassVertexData, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(globSkyboxVertexData), globSkyboxVertexData, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, skyboxVerticesBufferSize, skyboxVerticesBuffer, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, monkeyVBO);
   glBufferData(GL_ARRAY_BUFFER, monkeyVerticesBufferSize, monkeyVerticesBuffer, GL_STATIC_DRAW);
@@ -202,8 +209,8 @@ int main() {
 
   if(!loadDDSTexture("textures/box.dds", boxTexture)) return -1;
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
-
   if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
+
   // see http://gamedev.stackexchange.com/a/11975
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -346,7 +353,7 @@ int main() {
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3*12);
+    glDrawArrays(GL_TRIANGLES, 0, skyboxVerticesNumber /*3*12*/);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
