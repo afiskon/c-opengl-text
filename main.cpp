@@ -17,6 +17,7 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 }
 
 // TODO: переименовать проект, поправить название в README.md
+// TODO: переложить создание .emd файлов в отдельную утилиту + сделать в ней флаг предпросмотра и выбора меша по номеру
 
 int main() {
   if(glfwInit() == GL_FALSE) {
@@ -88,12 +89,12 @@ int main() {
 //  if(!importedModelSave("models/grass.emd", grassVerticesBuffer, grassVerticesNumber)) return -1;
 //  }
 
-  unsigned int skyboxVerticesNumber;
-  size_t skyboxVerticesBufferSize;
-  GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
-  if(skyboxVerticesBuffer == nullptr) return -1;
-  defer(importedModelFree(skyboxVerticesBuffer));
-  if(!importedModelSave("models/skybox.emd", skyboxVerticesBuffer, skyboxVerticesNumber)) return -1;
+//  unsigned int skyboxVerticesNumber;
+//  size_t skyboxVerticesBufferSize;
+//  GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
+//  if(skyboxVerticesBuffer == nullptr) return -1;
+//  defer(importedModelFree(skyboxVerticesBuffer));
+//  if(!importedModelSave("models/skybox.emd", skyboxVerticesBuffer, skyboxVerticesNumber)) return -1;
 
   unsigned int towerVerticesNumber;
   size_t towerVerticesBufferSize;
@@ -103,7 +104,7 @@ int main() {
   if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
 
   // === prepare VBOs ===
-  GLuint vboArray[6];
+  GLuint vboArray[7];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -114,9 +115,7 @@ int main() {
   GLuint boxIndicesVBO = vboArray[3];
   GLuint towerVBO = vboArray[4];
   GLuint grassIndicesVBO = vboArray[5];
-
-  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-  glBufferData(GL_ARRAY_BUFFER, skyboxVerticesBufferSize, skyboxVerticesBuffer, GL_STATIC_DRAW);
+  GLuint skyboxIndicesVBO = vboArray[6];
 
   glBindBuffer(GL_ARRAY_BUFFER, towerVBO);
   glBufferData(GL_ARRAY_BUFFER, towerVerticesBufferSize, towerVerticesBuffer, GL_STATIC_DRAW);
@@ -153,12 +152,11 @@ int main() {
   GLuint skyboxVAO = vaoArray[2];
   GLuint towerVAO = vaoArray[3];
 
-  GLsizei boxIndicesNumber, grassIndicesNumber;
-  GLenum boxIndexType, grassIndexType;
+  GLsizei boxIndicesNumber, grassIndicesNumber, skyboxIndicesNumber;
+  GLenum boxIndexType, grassIndexType, skyboxIndexType;
   if(!modelLoad("models/box-v0.emd", boxVAO, boxVBO, boxIndicesVBO, &boxIndicesNumber, &boxIndexType)) return -1;
   if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
-
-  std::cout << "DEBUG: grassIndicesNumber = " << grassIndicesNumber << std::endl;
+  if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
 
   glBindVertexArray(grassVAO);
   glEnableVertexAttribArray(0);
@@ -255,6 +253,7 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
     glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
+    // TODO: implement modelDraw procedure!
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
@@ -262,7 +261,8 @@ int main() {
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, skyboxVerticesNumber);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
+    glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
