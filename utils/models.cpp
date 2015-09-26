@@ -209,6 +209,7 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
 }
 
 bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int verticesNumber) {
+  std::vector<GLfloat> vertices;
   std::vector<unsigned int> indices;
   unsigned int usedIndices = 0;
   unsigned const int offsetStepSize = 5; // 3 coordinates + UV
@@ -224,12 +225,12 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
 
     unsigned int foundIndex = 0;
     bool indexFound = false;
-    for(unsigned int idx = 0; !indexFound && idx < verticesNumber; ++idx) {
-      GLfloat idxX = verticesBuffer[idx * offsetStepSize + 0];
-      GLfloat idxY = verticesBuffer[idx * offsetStepSize + 1];
-      GLfloat idxZ = verticesBuffer[idx * offsetStepSize + 2];
-      GLfloat idxU = verticesBuffer[idx * offsetStepSize + 3];
-      GLfloat idxV = verticesBuffer[idx * offsetStepSize + 4];
+    for(unsigned int idx = 0; !indexFound && idx < usedIndices; ++idx) {
+      GLfloat idxX = vertices[idx * offsetStepSize + 0];
+      GLfloat idxY = vertices[idx * offsetStepSize + 1];
+      GLfloat idxZ = vertices[idx * offsetStepSize + 2];
+      GLfloat idxU = vertices[idx * offsetStepSize + 3];
+      GLfloat idxV = vertices[idx * offsetStepSize + 4];
 
       if((fabs(currentX - idxX) < eps) && (fabs(currentY - idxY) < eps) && (fabs(currentZ - idxZ) < eps) &&
             (fabs(currentU - idxU) < eps) && (fabs(currentV - idxV) < eps)) {
@@ -238,9 +239,18 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
       }
     }
 
-//    std::cout << "vtx = " << vtx << ", idx = " << foundIndex << ", indexFound = " << indexFound << std::endl;
+    if(!indexFound) {
+      vertices.push_back(currentX);
+      vertices.push_back(currentY);
+      vertices.push_back(currentZ);
+      vertices.push_back(currentU);
+      vertices.push_back(currentV);
 
-    usedIndices = std::max(usedIndices, foundIndex + 1);
+      foundIndex = usedIndices;
+      usedIndices++;
+    }
+
+//    std::cout << "vtx = " << vtx << ", foundIndex = " << foundIndex << ", indexFound = " << indexFound << std::endl;
     indices.push_back(foundIndex);
   }
 
