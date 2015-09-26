@@ -19,10 +19,8 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-// TODO: полностью перейти на внешние модели
-// TODO: переписать класс сamera на обычные struct
-// TODO: избавиться от схемы с errorFlagPtr
-// TODO: пройтись по исходникам, заменить std::cout на std::cerr для вывода ошибок
+
+
 // TODO: переименовать проект, поправить название в README.md
 
 int main() {
@@ -244,7 +242,7 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, boxTexture);
 
     glBindVertexArray(boxVAO);
-    glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-2.0f, 0.0f, -3.0f);
+    glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-10.0f, 0.0f, -10.0f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
@@ -252,15 +250,16 @@ int main() {
 
     glBindTexture(GL_TEXTURE_2D, towerTexture);
     glBindVertexArray(towerVAO);
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &vp[0][0]);
+    glm::mat4 towerMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &towerMVP[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, towerVerticesNumber);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
     glBindVertexArray(grassVAO);
-    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f);
+    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &grassMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, grassVerticesNumber /* 3*2 */);
+    glDrawArrays(GL_TRIANGLES, 0, grassVerticesNumber);
 
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 
@@ -271,7 +270,7 @@ int main() {
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &skyboxMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, skyboxVerticesNumber /*3*12*/);
+    glDrawArrays(GL_TRIANGLES, 0, skyboxVerticesNumber);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
