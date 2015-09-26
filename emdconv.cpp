@@ -7,7 +7,7 @@
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
-GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) { // TODO: optimize + indices
+GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) {
   *outVerticesBufferSize = 0;
   *outVerticesNumber = 0;
   Assimp::Importer importer;
