@@ -15,12 +15,12 @@ include_directories(deferxx)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -std=c++11 -Wall -Wextra -Werror -Wno-deprecated-register -Wno-shift-op-parentheses")
 
-SET(MAIN_LIBRARIES glfw glxw assimp ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY}) # TODO remove assimp
+SET(MAIN_LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 set(MAIN_SOURCE_FILES utils/camera.cpp utils/camera.h utils/utils.h utils/utils.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)
 add_executable(models main.cpp ${MAIN_SOURCE_FILES})
 target_link_libraries(models ${MAIN_LIBRARIES})
 
-SET(EMDCONV_LIBRARIES assimp)
-set(EMDCONV_SOURCE_FILES emdconv.cpp)
+SET(EMDCONV_LIBRARIES glxw assimp ${GLFW_LIBRARIES})
+set(EMDCONV_SOURCE_FILES emdconv.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)
 add_executable(emdconv ${EMDCONV_SOURCE_FILES})
 target_link_libraries(emdconv ${EMDCONV_LIBRARIES})

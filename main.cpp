@@ -16,8 +16,6 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-// TODO: переложить создание .emd файлов в отдельную утилиту + сделать в ней флаг предпросмотра и выбора меша по номеру
-
 int main() {
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -78,29 +76,6 @@ int main() {
 
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
-
-//  {
-//  unsigned int grassVerticesNumber;
-//  size_t grassVerticesBufferSize;
-//  GLfloat* grassVerticesBuffer = importedModelCreate("models/grass.blend", 0, &grassVerticesBufferSize, &grassVerticesNumber);
-//  if(grassVerticesBuffer == nullptr) return -1;
-//  defer(importedModelFree(grassVerticesBuffer));
-//  if(!importedModelSave("models/grass.emd", grassVerticesBuffer, grassVerticesNumber)) return -1;
-//  }
-
-//  unsigned int skyboxVerticesNumber;
-//  size_t skyboxVerticesBufferSize;
-//  GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
-//  if(skyboxVerticesBuffer == nullptr) return -1;
-//  defer(importedModelFree(skyboxVerticesBuffer));
-//  if(!importedModelSave("models/skybox.emd", skyboxVerticesBuffer, skyboxVerticesNumber)) return -1;
-
-//  unsigned int towerVerticesNumber;
-//  size_t towerVerticesBufferSize;
-//  GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
-//  if(towerVerticesBuffer == nullptr) return -1;
-//  defer(importedModelFree(towerVerticesBuffer));
-//  if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
 
   // === prepare textures ===
   GLuint textureArray[3];
