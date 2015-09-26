@@ -4,10 +4,9 @@
 #include <GLXW/glxw.h>
 #include <cstddef>
 
-bool modelSave(const char *fname, const void *verticesData, size_t verticesDataSize, const void *indicesData, size_t indicesDataSize, unsigned char indexSize);
+bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDataSize, const unsigned int *indices, unsigned int indicesNumber);
 bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO, GLsizei* outIndicesNumber, GLenum* outIndicesType);
 
-// TODO: optimize + indices
 GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber);
 bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int verticesNumber);
 void importedModelFree(GLfloat* model);

@@ -56,12 +56,37 @@ bool checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header, unsi
   return true;
 }
 
-bool modelSave(const char *fname, const void *verticesData, size_t verticesDataSize, const void *indicesData,
-               size_t indicesDataSize, unsigned char indexSize) {
-  if(indexSize != 1 && indexSize != 2 && indexSize != 4) {
-    std::cout << "modelSave - invalid index size " << indexSize << std::endl;
-    return false;
+bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDataSize, const unsigned int *indices, unsigned int indicesNumber) {
+  unsigned char indexSize = 1;
+  if(indicesNumber > 255) indexSize *= 2;
+  if(indicesNumber > 65535) indexSize *= 2;
+
+  void* indicesData = nullptr;
+  uint32_t indicesDataSize = indicesNumber*indexSize;
+
+  if(indexSize == sizeof(unsigned int)) {
+    indicesData = (void*)indices;
+  } else if(indexSize == sizeof(unsigned short)) {
+    indicesData = malloc(indicesDataSize);
+    unsigned short *copyToPtr = (unsigned short*)indicesData;
+    const unsigned int *copyFromPtr = indices;
+    for(unsigned int i = 0; i < indicesNumber; ++i) {
+      *copyToPtr = (unsigned short)*copyFromPtr;
+      copyToPtr++;
+      copyFromPtr++;
+    }
+  } else { // if(indexSize == sizeof(unsigned char))
+    indicesData = malloc(indicesDataSize);
+    unsigned char * copyToPtr = (unsigned char*)indicesData;
+    const unsigned int *copyFromPtr = indices;
+    for(unsigned int i = 0; i < indicesNumber; ++i) {
+      *copyToPtr = (unsigned char)*copyFromPtr;
+      copyToPtr++;
+      copyFromPtr++;
+    }
   }
+
+  defer(if(indicesData != (void*)indices){ free(indicesData); });
 
   FILE* fd = fopen(fname, "wb");
   if(fd == nullptr) {
@@ -212,25 +237,25 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
   std::vector<GLfloat> vertices;
   std::vector<unsigned int> indices;
   unsigned int usedIndices = 0;
-  unsigned const int offsetStepSize = 5; // 3 coordinates + UV
+  unsigned const int floatsPerVertex = 5; // 3 coordinates + UV
 
   const GLfloat eps = 0.00001f;
 
   for(unsigned int vtx = 0; vtx < verticesNumber; ++vtx) {
-    GLfloat currentX = verticesBuffer[vtx*offsetStepSize+0];
-    GLfloat currentY = verticesBuffer[vtx*offsetStepSize+1];
-    GLfloat currentZ = verticesBuffer[vtx*offsetStepSize+2];
-    GLfloat currentU = verticesBuffer[vtx*offsetStepSize+3];
-    GLfloat currentV = verticesBuffer[vtx*offsetStepSize+4];
+    GLfloat currentX = verticesBuffer[vtx* floatsPerVertex +0];
+    GLfloat currentY = verticesBuffer[vtx* floatsPerVertex +1];
+    GLfloat currentZ = verticesBuffer[vtx* floatsPerVertex +2];
+    GLfloat currentU = verticesBuffer[vtx* floatsPerVertex +3];
+    GLfloat currentV = verticesBuffer[vtx* floatsPerVertex +4];
 
     unsigned int foundIndex = 0;
     bool indexFound = false;
     for(unsigned int idx = 0; !indexFound && idx < usedIndices; ++idx) {
-      GLfloat idxX = vertices[idx * offsetStepSize + 0];
-      GLfloat idxY = vertices[idx * offsetStepSize + 1];
-      GLfloat idxZ = vertices[idx * offsetStepSize + 2];
-      GLfloat idxU = vertices[idx * offsetStepSize + 3];
-      GLfloat idxV = vertices[idx * offsetStepSize + 4];
+      GLfloat idxX = vertices[idx * floatsPerVertex + 0];
+      GLfloat idxY = vertices[idx * floatsPerVertex + 1];
+      GLfloat idxZ = vertices[idx * floatsPerVertex + 2];
+      GLfloat idxU = vertices[idx * floatsPerVertex + 3];
+      GLfloat idxV = vertices[idx * floatsPerVertex + 4];
 
       if((fabs(currentX - idxX) < eps) && (fabs(currentY - idxY) < eps) && (fabs(currentZ - idxZ) < eps) &&
             (fabs(currentU - idxU) < eps) && (fabs(currentV - idxV) < eps)) {
@@ -250,16 +275,12 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
       usedIndices++;
     }
 
-//    std::cout << "vtx = " << vtx << ", foundIndex = " << foundIndex << ", indexFound = " << indexFound << std::endl;
     indices.push_back(foundIndex);
   }
 
-//  indices.data()
+//  std::cout << "importedModelSave - fname = " << fname << ", verticesNumber = " << verticesNumber << ", usedIndices = " << usedIndices << std::endl;
 
-  std::cout << "importedModelSave - fname = " << fname << ", verticesNumber = " << verticesNumber << ", usedIndices = " << usedIndices << std::endl;
-
-//  return modelSave(fname, verticesBuffer, )
-  return true;
+  return modelSave(fname, vertices.data(), usedIndices* floatsPerVertex *sizeof(GLfloat), indices.data(), verticesNumber);
 }
 
 void importedModelFree(GLfloat* model) {

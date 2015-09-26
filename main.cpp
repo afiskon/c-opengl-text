@@ -19,9 +19,6 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 // TODO: переименовать проект, поправить название в README.md
 
 int main() {
-//  bool saved = modelSave("models/box.emd", &globBoxVertexData, sizeof(globBoxVertexData), &globBoxIndices, sizeof(globBoxIndices));
-//  std::cout << "Model saved = " << saved << std::endl;
-
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
@@ -82,21 +79,20 @@ int main() {
   glDeleteShader(vertexShaderId);
   glDeleteShader(fragmentShaderId);
 
-
-  unsigned int grassVerticesNumber;
-  size_t grassVerticesBufferSize;
-  GLfloat* grassVerticesBuffer = importedModelCreate("models/grass.blend", 0, &grassVerticesBufferSize, &grassVerticesNumber);
-  if(grassVerticesBuffer == nullptr) return -1;
-  defer(importedModelFree(grassVerticesBuffer));
-
-  if(!importedModelSave("models/grass.emd", grassVerticesBuffer, grassVerticesNumber)) return -1;
+//  {
+//  unsigned int grassVerticesNumber;
+//  size_t grassVerticesBufferSize;
+//  GLfloat* grassVerticesBuffer = importedModelCreate("models/grass.blend", 0, &grassVerticesBufferSize, &grassVerticesNumber);
+//  if(grassVerticesBuffer == nullptr) return -1;
+//  defer(importedModelFree(grassVerticesBuffer));
+//  if(!importedModelSave("models/grass.emd", grassVerticesBuffer, grassVerticesNumber)) return -1;
+//  }
 
   unsigned int skyboxVerticesNumber;
   size_t skyboxVerticesBufferSize;
   GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
   if(skyboxVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(skyboxVerticesBuffer));
-
   if(!importedModelSave("models/skybox.emd", skyboxVerticesBuffer, skyboxVerticesNumber)) return -1;
 
   unsigned int towerVerticesNumber;
@@ -104,11 +100,10 @@ int main() {
   GLfloat* towerVerticesBuffer = importedModelCreate("models/tower.obj", 2, &towerVerticesBufferSize, &towerVerticesNumber);
   if(towerVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(towerVerticesBuffer));
-
   if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
 
   // === prepare VBOs ===
-  GLuint vboArray[5];
+  GLuint vboArray[6];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -118,9 +113,7 @@ int main() {
   GLuint skyboxVBO = vboArray[2];
   GLuint boxIndicesVBO = vboArray[3];
   GLuint towerVBO = vboArray[4];
-
-  glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
-  glBufferData(GL_ARRAY_BUFFER, grassVerticesBufferSize, grassVerticesBuffer, GL_STATIC_DRAW);
+  GLuint grassIndicesVBO = vboArray[5];
 
   glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, skyboxVerticesBufferSize, skyboxVerticesBuffer, GL_STATIC_DRAW);
@@ -160,9 +153,12 @@ int main() {
   GLuint skyboxVAO = vaoArray[2];
   GLuint towerVAO = vaoArray[3];
 
-  GLsizei boxIndicesNumber;
-  GLenum boxIndexType;
+  GLsizei boxIndicesNumber, grassIndicesNumber;
+  GLenum boxIndexType, grassIndexType;
   if(!modelLoad("models/box-v0.emd", boxVAO, boxVBO, boxIndicesVBO, &boxIndicesNumber, &boxIndexType)) return -1;
+  if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
+
+  std::cout << "DEBUG: grassIndicesNumber = " << grassIndicesNumber << std::endl;
 
   glBindVertexArray(grassVAO);
   glEnableVertexAttribArray(0);
@@ -240,11 +236,9 @@ int main() {
     glUseProgram(programId);
 
     glBindTexture(GL_TEXTURE_2D, boxTexture);
-
     glBindVertexArray(boxVAO);
     glm::mat4 boxMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-10.0f, 0.0f, -10.0f);
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &boxMVP[0][0]);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxIndicesVBO);
     glDrawElements(GL_TRIANGLES, boxIndicesNumber, boxIndexType, nullptr);
 
@@ -255,17 +249,15 @@ int main() {
     glDrawArrays(GL_TRIANGLES, 0, towerVerticesNumber);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
-
     glBindVertexArray(grassVAO);
     glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);;
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &grassMVP[0][0]);
-    glDrawArrays(GL_TRIANGLES, 0, grassVerticesNumber);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
+    glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
-
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
-
     glBindVertexArray(skyboxVAO);
     glm::mat4 skyboxMatrix = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxMatrix;
