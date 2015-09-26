@@ -146,7 +146,6 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   return true;
 }
 
-// TODO: import from .blend, join textures to one file, convert UV coordinates, etc...
 GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) { // TODO: optimize + indices
   *outVerticesBufferSize = 0;
   *outVerticesNumber = 0;
@@ -207,6 +206,50 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
   }
 
   return verticesBuffer;
+}
+
+bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int verticesNumber) {
+  std::vector<unsigned int> indices;
+  unsigned int usedIndices = 0;
+  unsigned const int offsetStepSize = 5; // 3 coordinates + UV
+
+  const GLfloat eps = 0.00001f;
+
+  for(unsigned int vtx = 0; vtx < verticesNumber; ++vtx) {
+    GLfloat currentX = verticesBuffer[vtx*offsetStepSize+0];
+    GLfloat currentY = verticesBuffer[vtx*offsetStepSize+1];
+    GLfloat currentZ = verticesBuffer[vtx*offsetStepSize+2];
+    GLfloat currentU = verticesBuffer[vtx*offsetStepSize+3];
+    GLfloat currentV = verticesBuffer[vtx*offsetStepSize+4];
+
+    unsigned int foundIndex = 0;
+    bool indexFound = false;
+    for(unsigned int idx = 0; !indexFound && idx < verticesNumber; ++idx) {
+      GLfloat idxX = verticesBuffer[idx * offsetStepSize + 0];
+      GLfloat idxY = verticesBuffer[idx * offsetStepSize + 1];
+      GLfloat idxZ = verticesBuffer[idx * offsetStepSize + 2];
+      GLfloat idxU = verticesBuffer[idx * offsetStepSize + 3];
+      GLfloat idxV = verticesBuffer[idx * offsetStepSize + 4];
+
+      if((fabs(currentX - idxX) < eps) && (fabs(currentY - idxY) < eps) && (fabs(currentZ - idxZ) < eps) &&
+            (fabs(currentU - idxU) < eps) && (fabs(currentV - idxV) < eps)) {
+        foundIndex = idx;
+        indexFound = true;
+      }
+    }
+
+//    std::cout << "vtx = " << vtx << ", idx = " << foundIndex << ", indexFound = " << indexFound << std::endl;
+
+    usedIndices = std::max(usedIndices, foundIndex + 1);
+    indices.push_back(foundIndex);
+  }
+
+//  indices.data()
+
+  std::cout << "importedModelSave - fname = " << fname << ", verticesNumber = " << verticesNumber << ", usedIndices = " << usedIndices << std::endl;
+
+//  return modelSave(fname, verticesBuffer, )
+  return true;
 }
 
 void importedModelFree(GLfloat* model) {

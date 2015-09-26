@@ -12,14 +12,9 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-#define U(x) (x)
-#define V(x) (1.0f - (x))
-
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
-
-
 
 // TODO: переименовать проект, поправить название в README.md
 
@@ -94,11 +89,15 @@ int main() {
   if(grassVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(grassVerticesBuffer));
 
+  if(!importedModelSave("models/grass.emd", grassVerticesBuffer, grassVerticesNumber)) return -1;
+
   unsigned int skyboxVerticesNumber;
   size_t skyboxVerticesBufferSize;
   GLfloat* skyboxVerticesBuffer = importedModelCreate("models/skybox.blend", 0, &skyboxVerticesBufferSize, &skyboxVerticesNumber);
   if(skyboxVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(skyboxVerticesBuffer));
+
+  if(!importedModelSave("models/skybox.emd", skyboxVerticesBuffer, skyboxVerticesNumber)) return -1;
 
   unsigned int towerVerticesNumber;
   size_t towerVerticesBufferSize;
@@ -106,6 +105,7 @@ int main() {
   if(towerVerticesBuffer == nullptr) return -1;
   defer(importedModelFree(towerVerticesBuffer));
 
+  if(!importedModelSave("models/tower.emd", towerVerticesBuffer, towerVerticesNumber)) return -1;
 
   // === prepare VBOs ===
   GLuint vboArray[5];
