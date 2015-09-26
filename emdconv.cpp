@@ -1,6 +1,7 @@
 #include <GLXW/glxw.h>
 
 #include <iostream>
+#include <vector>
 #include <defer.h>
 #include "../assimp/include/assimp/Importer.hpp"
 #include "../assimp/include/assimp/postprocess.h"
