@@ -17,7 +17,6 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 }
 
 // TODO: переложить создание .emd файлов в отдельную утилиту + сделать в ней флаг предпросмотра и выбора меша по номеру
-// TODO: удалить ящик, его модель и текстуру
 
 int main() {
   if(glfwInit() == GL_FALSE) {
@@ -34,7 +33,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_SAMPLES, 4);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Skybox", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(800, 600, "Models", nullptr, nullptr);
   if(window == nullptr) {
     std::cerr << "Failed to open GLFW window" << std::endl;
     return -1;
