@@ -20,7 +20,7 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
   }
 
   if(scene->mNumMeshes <= meshNumber) {
-    std::cerr << "There is no mesh #" << meshNumber << " in model (" << scene->mNumMeshes << " only)" << fname << std::endl;
+    std::cerr << "There is no mesh #" << meshNumber << " in model (" << scene->mNumMeshes << " only), fname = " << fname << std::endl;
     return nullptr;
   }
 
