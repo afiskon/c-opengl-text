@@ -110,6 +110,16 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
     indices.push_back(foundIndex);
   }
 
+  unsigned char indexSize = 1;
+  if(verticesNumber > 255) indexSize *= 2;
+  if(verticesNumber > 65535) indexSize *= 2;
+
+  unsigned int modelSize = (unsigned int) (verticesNumber*floatsPerVertex*sizeof(GLfloat));
+  unsigned int indexedModelSize = (unsigned int) (usedIndices*floatsPerVertex*sizeof(GLfloat) + verticesNumber*indexSize);
+  float ratio = (float)indexedModelSize*100.0f / (float)modelSize;
+  std::cout << "importedModelSave - fname = " << fname << ", verticesNumber = " << verticesNumber << ", usedIndices = " << usedIndices << std::endl;
+  std::cout << "importedModelSave - modelSize = " << modelSize << ", indexedModelSize = " << indexedModelSize << ", ratio = " << ratio << " %" << std::endl;
+
   return modelSave(fname, vertices.data(), usedIndices* floatsPerVertex *sizeof(GLfloat), indices.data(), verticesNumber);
 }
 
