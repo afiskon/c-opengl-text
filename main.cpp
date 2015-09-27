@@ -184,7 +184,7 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
     glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
 
-    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);;
+    glm::mat4 grassMVP = vp * glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);
 
     glBindTexture(GL_TEXTURE_2D, grassTexture);
     glBindVertexArray(grassVAO);
