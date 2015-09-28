@@ -129,19 +129,25 @@ void importedModelFree(GLfloat* model) {
 
 int main(int argc, char* argv[]) {
   if(argc < 2) {
-    std::cout << "Usage: emdconv <input file> <output file>" << std::endl;
+    std::cout << "Usage: emdconv <input file> <output file> [mesh number]" << std::endl;
     return 1;
   }
 
   char* infile = argv[1];
   char* outfile = argv[2];
 
+  unsigned int meshNumber = 0;
+  if(argc > 3) {
+    meshNumber = (unsigned int) atoi(argv[3]);
+  }
+
   std::cout << "Infile: " << infile << std::endl;
   std::cout << "Outfile: " << outfile << std::endl;
+  std::cout << "Mesh number: " << meshNumber << std::endl;
 
   unsigned int modelVerticesNumber;
   size_t modelVerticesBufferSize;
-  GLfloat * modelVerticesBuffer = importedModelCreate(infile, 0, &modelVerticesBufferSize, &modelVerticesNumber);
+  GLfloat * modelVerticesBuffer = importedModelCreate(infile, meshNumber, &modelVerticesBufferSize, &modelVerticesNumber);
   if(modelVerticesBuffer == nullptr) {
     std::cerr << "importedModelCreate returned null" << std::endl;
     return 2;
