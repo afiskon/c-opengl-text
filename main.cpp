@@ -16,6 +16,10 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
+// TODO: повернуть башню в blender
+// TODO: загрузить в модели нормали
+// TODO: пробрасывать нормали в шейдеры
+
 int main() {
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
