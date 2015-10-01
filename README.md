@@ -1,4 +1,4 @@
-# cpp-opengl-models
+# cpp-opengl-lighting
 
 Usage:
 
