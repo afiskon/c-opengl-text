@@ -56,8 +56,6 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
       aiVector3D uv = mesh->mTextureCoords[0][index];
       aiVector3D normal = mesh->mNormals[index];
 
-      std::cout << "DEBUG: normal = (" << normal.x << ", " << normal.y << ", " << normal.z << ")" << std::endl;
-
       verticesBuffer[verticesBufferIndex++] = pos.x;
       verticesBuffer[verticesBufferIndex++] = pos.y;
       verticesBuffer[verticesBufferIndex++] = pos.z;
@@ -163,16 +161,13 @@ int main(int argc, char* argv[]) {
 
   unsigned int modelVerticesNumber;
   size_t modelVerticesBufferSize;
-  std::cout << "DEBUG 1" << std::endl;
   GLfloat * modelVerticesBuffer = importedModelCreate(infile, meshNumber, &modelVerticesBufferSize, &modelVerticesNumber);
-  std::cout << "DEBUG 2" << std::endl;
   if(modelVerticesBuffer == nullptr) {
     std::cerr << "importedModelCreate returned null" << std::endl;
     return 2;
   }
-  defer(std::cout << "DEBUG - defer importedModelFree" << std::endl; importedModelFree(modelVerticesBuffer));
+  defer(importedModelFree(modelVerticesBuffer));
 
-  std::cout << "DEBUG before imported modelSave" << std::endl;
   if(!importedModelSave(outfile, modelVerticesBuffer, modelVerticesNumber)) {
     std::cerr << "importedModelSave failed" << std::endl;
     return 3;
