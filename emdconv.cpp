@@ -78,45 +78,23 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
   const GLfloat eps = 0.00005f; // real case: 1.0f and 0.999969f should be considered equal
 
   for(unsigned int vtx = 0; vtx < verticesNumber; ++vtx) {
-    GLfloat currentPosX = verticesBuffer[vtx * floatsPerVertex + 0]; // TODO rewrite, use k index!
-    GLfloat currentPosY = verticesBuffer[vtx * floatsPerVertex + 1];
-    GLfloat currentPosZ = verticesBuffer[vtx * floatsPerVertex + 2];
-    GLfloat currentNormX = verticesBuffer[vtx * floatsPerVertex + 3];
-    GLfloat currentNormY = verticesBuffer[vtx * floatsPerVertex + 4];
-    GLfloat currentNormZ = verticesBuffer[vtx * floatsPerVertex + 5];
-    GLfloat currentU = verticesBuffer[vtx * floatsPerVertex + 6];
-    GLfloat currentV = verticesBuffer[vtx * floatsPerVertex + 7];
-
     unsigned int foundIndex = 0;
     bool indexFound = false;
     for(unsigned int idx = 0; !indexFound && idx < usedIndices; ++idx) {
-      GLfloat idxPosX = vertices[idx * floatsPerVertex + 0];
-      GLfloat idxPosY = vertices[idx * floatsPerVertex + 1];
-      GLfloat idxPosZ = vertices[idx * floatsPerVertex + 2];
-      GLfloat idxNormX = vertices[idx * floatsPerVertex + 3];
-      GLfloat idxNormY = vertices[idx * floatsPerVertex + 4];
-      GLfloat idxNormZ = vertices[idx * floatsPerVertex + 5];
-      GLfloat idxU = vertices[idx * floatsPerVertex + 6];
-      GLfloat idxV = vertices[idx * floatsPerVertex + 7];
-
-      if((fabs(currentPosX - idxPosX) < eps) && (fabs(currentPosY - idxPosY) < eps) && (fabs(currentPosZ - idxPosZ) < eps) &&
-         (fabs(currentNormX - idxNormX) < eps) && (fabs(currentNormY - idxNormY) < eps) && (fabs(currentNormZ - idxNormZ) < eps) &&
-         (fabs(currentU - idxU) < eps) && (fabs(currentV - idxV) < eps)) {
-        foundIndex = idx;
-        indexFound = true;
+      indexFound = true;
+      for(unsigned int k = 0; indexFound && k < floatsPerVertex; ++k) { // compare X, Y, Z, NX, NY, NZ, U and V
+        if(fabs(verticesBuffer[vtx * floatsPerVertex + k] - vertices[idx * floatsPerVertex + k]) > eps) {
+          indexFound = false;
+        }
       }
+
+      if(indexFound) foundIndex = idx;
     }
 
     if(!indexFound) {
-      vertices.push_back(currentPosX);
-      vertices.push_back(currentPosY);
-      vertices.push_back(currentPosZ);
-      vertices.push_back(currentNormX);
-      vertices.push_back(currentNormY);
-      vertices.push_back(currentNormZ);
-      vertices.push_back(currentU);
-      vertices.push_back(currentV);
-
+      for(unsigned int k = 0; k < floatsPerVertex; ++k) { // save X, Y, Z, NX, NY, NZ, U and V
+        vertices.push_back(verticesBuffer[vtx * floatsPerVertex + k]);
+      }
       foundIndex = usedIndices;
       usedIndices++;
     }
