@@ -1,5 +1,6 @@
 #version 330 core
 
+in vec3 Norm;
 in vec2 UV;
 
 uniform sampler2D textureSampler;

@@ -22,7 +22,7 @@ struct EaxmodHeader {
 #pragma pack(pop)
 
 static const char eaxmodSignature[] = "EAXMOD";
-static const char eaxmodVersion = 1;
+static const char eaxmodVersion = 2;
 
 bool checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header, unsigned int fileSize) {
   if(fileSize < sizeof(EaxmodHeader)) {
@@ -35,8 +35,8 @@ bool checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header, unsi
     return false;
   }
 
-  if(header->version > eaxmodVersion) {
-    std::cerr << "modelLoad - unsupported version " << header->version << ", fname = " << fname << std::endl;
+  if(header->version != eaxmodVersion) {
+    std::cerr << "modelLoad - unsupported version " << (int)header->version << ", fname = " << fname << std::endl;
     return false;
   }
 
@@ -75,7 +75,7 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
     }
   } else { // if(indexSize == sizeof(unsigned char))
     indicesData = malloc(indicesDataSize);
-    unsigned char * copyToPtr = (unsigned char*)indicesData;
+    unsigned char *copyToPtr = (unsigned char*)indicesData;
     const unsigned int *copyFromPtr = indices;
     for(unsigned int i = 0; i < indicesNumber; ++i) {
       *copyToPtr = (unsigned char)*copyFromPtr;
@@ -122,7 +122,6 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
 bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indicesVBO, GLsizei* outIndicesNumber, GLenum* outIndicesType) {
   *outIndicesNumber = 0;
   *outIndicesType = GL_UNSIGNED_BYTE;
-  unsigned char indexSize = 1; // default, for v0 format
 
   FileMapping* mapping = fileMappingCreate(fname);
   if(mapping == nullptr) return false;
@@ -134,18 +133,16 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   EaxmodHeader * header = (EaxmodHeader *)dataPtr;
   if(!checkFileSizeAndHeader(fname, header, dataSize)) return false;
 
-  if(header->version > 0) {
-    indexSize = header->indexSize;
-    if(indexSize == 1) {
-      *outIndicesType = GL_UNSIGNED_BYTE;
-    } else if(indexSize == 2) {
-      *outIndicesType = GL_UNSIGNED_SHORT;
-    } else if(indexSize == 4) {
-      *outIndicesType = GL_UNSIGNED_INT;
-    } else {
-      std::cerr << "modelLoad - unsupported indexSize: " << indexSize << std::endl;
-      return false;
-    }
+  unsigned char indexSize = header->indexSize;
+  if(indexSize == 1) {
+    *outIndicesType = GL_UNSIGNED_BYTE;
+  } else if(indexSize == 2) {
+    *outIndicesType = GL_UNSIGNED_SHORT;
+  } else if(indexSize == 4) {
+    *outIndicesType = GL_UNSIGNED_INT;
+  } else {
+    std::cerr << "modelLoad - unsupported indexSize: " << indexSize << std::endl;
+    return false;
   }
 
   *outIndicesNumber = header->indicesDataSize / indexSize;
@@ -159,12 +156,15 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   glBindVertexArray(modelVAO);
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
 
   glBindBuffer(GL_ARRAY_BUFFER, modelVBO);
   glBufferData(GL_ARRAY_BUFFER, header->verticesDataSize, verticesPtr, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), nullptr);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (const void*)(3*sizeof(GLfloat)));
+  GLsizei stride = 8*sizeof(GLfloat);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (const void*)(3*sizeof(GLfloat)));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(6*sizeof(GLfloat)));
 
   return true;
 }

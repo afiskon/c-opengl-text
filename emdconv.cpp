@@ -8,6 +8,8 @@
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
+static const unsigned int floatsPerVertex = (3 + 3 + 2); // 3 per position + 3 per normal + UV
+
 GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) {
   *outVerticesBufferSize = 0;
   *outVerticesNumber = 0;
@@ -28,21 +30,21 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
   unsigned int facesNum = mesh->mNumFaces;
 //  unsigned int verticesNum = mesh->mNumVertices;
 
-  *outVerticesNumber = facesNum*3;
-
   if(mesh->mTextureCoords[0] == nullptr) {
     std::cerr << "mesh->mTextureCoords[0] == nullptr, fname = " << fname << std::endl;
     return nullptr;
   }
 
-  *outVerticesBufferSize = facesNum*sizeof(GLfloat)* 5 /* coordinates per vertex */ * 3 /* 3 vertices per face */;
+  unsigned int verticesPerFace = 3;
+  *outVerticesNumber = facesNum*verticesPerFace;
+  *outVerticesBufferSize = *outVerticesNumber * sizeof(GLfloat) * floatsPerVertex;
   GLfloat* verticesBuffer = (GLfloat*)malloc(*outVerticesBufferSize);
 
   unsigned int verticesBufferIndex = 0;
 
   for(unsigned int i = 0; i < facesNum; ++i) {
     const aiFace& face = mesh->mFaces[i];
-    if(face.mNumIndices != 3) {
+    if(face.mNumIndices != verticesPerFace) {
       std::cerr << "face.numIndices = " << face.mNumIndices << " (3 expected), i = " << i << ", fname = " << fname << std::endl;
       free(verticesBuffer);
       return nullptr;
@@ -52,11 +54,16 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
       unsigned int index = face.mIndices[j];
       aiVector3D pos = mesh->mVertices[index];
       aiVector3D uv = mesh->mTextureCoords[0][index];
-//      aiVector3D normal = mesh->mNormals[index];
+      aiVector3D normal = mesh->mNormals[index];
+
+      std::cout << "DEBUG: normal = (" << normal.x << ", " << normal.y << ", " << normal.z << ")" << std::endl;
 
       verticesBuffer[verticesBufferIndex++] = pos.x;
       verticesBuffer[verticesBufferIndex++] = pos.y;
       verticesBuffer[verticesBufferIndex++] = pos.z;
+      verticesBuffer[verticesBufferIndex++] = normal.x;
+      verticesBuffer[verticesBufferIndex++] = normal.y;
+      verticesBuffer[verticesBufferIndex++] = normal.z;
       verticesBuffer[verticesBufferIndex++] = uv.x;
       verticesBuffer[verticesBufferIndex++] = 1.0f - uv.y;
     }
@@ -69,27 +76,33 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
   std::vector<GLfloat> vertices;
   std::vector<unsigned int> indices;
   unsigned int usedIndices = 0;
-  unsigned const int floatsPerVertex = 5; // 3 coordinates + UV
 
-  const GLfloat eps = 0.00001f;
+  const GLfloat eps = 0.00005f; // real case: 1.0f and 0.999969f should be considered equal
 
   for(unsigned int vtx = 0; vtx < verticesNumber; ++vtx) {
-    GLfloat currentX = verticesBuffer[vtx* floatsPerVertex +0];
-    GLfloat currentY = verticesBuffer[vtx* floatsPerVertex +1];
-    GLfloat currentZ = verticesBuffer[vtx* floatsPerVertex +2];
-    GLfloat currentU = verticesBuffer[vtx* floatsPerVertex +3];
-    GLfloat currentV = verticesBuffer[vtx* floatsPerVertex +4];
+    GLfloat currentPosX = verticesBuffer[vtx * floatsPerVertex + 0]; // TODO rewrite, use k index!
+    GLfloat currentPosY = verticesBuffer[vtx * floatsPerVertex + 1];
+    GLfloat currentPosZ = verticesBuffer[vtx * floatsPerVertex + 2];
+    GLfloat currentNormX = verticesBuffer[vtx * floatsPerVertex + 3];
+    GLfloat currentNormY = verticesBuffer[vtx * floatsPerVertex + 4];
+    GLfloat currentNormZ = verticesBuffer[vtx * floatsPerVertex + 5];
+    GLfloat currentU = verticesBuffer[vtx * floatsPerVertex + 6];
+    GLfloat currentV = verticesBuffer[vtx * floatsPerVertex + 7];
 
     unsigned int foundIndex = 0;
     bool indexFound = false;
     for(unsigned int idx = 0; !indexFound && idx < usedIndices; ++idx) {
-      GLfloat idxX = vertices[idx * floatsPerVertex + 0];
-      GLfloat idxY = vertices[idx * floatsPerVertex + 1];
-      GLfloat idxZ = vertices[idx * floatsPerVertex + 2];
-      GLfloat idxU = vertices[idx * floatsPerVertex + 3];
-      GLfloat idxV = vertices[idx * floatsPerVertex + 4];
+      GLfloat idxPosX = vertices[idx * floatsPerVertex + 0];
+      GLfloat idxPosY = vertices[idx * floatsPerVertex + 1];
+      GLfloat idxPosZ = vertices[idx * floatsPerVertex + 2];
+      GLfloat idxNormX = vertices[idx * floatsPerVertex + 3];
+      GLfloat idxNormY = vertices[idx * floatsPerVertex + 4];
+      GLfloat idxNormZ = vertices[idx * floatsPerVertex + 5];
+      GLfloat idxU = vertices[idx * floatsPerVertex + 6];
+      GLfloat idxV = vertices[idx * floatsPerVertex + 7];
 
-      if((fabs(currentX - idxX) < eps) && (fabs(currentY - idxY) < eps) && (fabs(currentZ - idxZ) < eps) &&
+      if((fabs(currentPosX - idxPosX) < eps) && (fabs(currentPosY - idxPosY) < eps) && (fabs(currentPosZ - idxPosZ) < eps) &&
+         (fabs(currentNormX - idxNormX) < eps) && (fabs(currentNormY - idxNormY) < eps) && (fabs(currentNormZ - idxNormZ) < eps) &&
          (fabs(currentU - idxU) < eps) && (fabs(currentV - idxV) < eps)) {
         foundIndex = idx;
         indexFound = true;
@@ -97,9 +110,12 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
     }
 
     if(!indexFound) {
-      vertices.push_back(currentX);
-      vertices.push_back(currentY);
-      vertices.push_back(currentZ);
+      vertices.push_back(currentPosX);
+      vertices.push_back(currentPosY);
+      vertices.push_back(currentPosZ);
+      vertices.push_back(currentNormX);
+      vertices.push_back(currentNormY);
+      vertices.push_back(currentNormZ);
       vertices.push_back(currentU);
       vertices.push_back(currentV);
 
@@ -147,12 +163,16 @@ int main(int argc, char* argv[]) {
 
   unsigned int modelVerticesNumber;
   size_t modelVerticesBufferSize;
+  std::cout << "DEBUG 1" << std::endl;
   GLfloat * modelVerticesBuffer = importedModelCreate(infile, meshNumber, &modelVerticesBufferSize, &modelVerticesNumber);
+  std::cout << "DEBUG 2" << std::endl;
   if(modelVerticesBuffer == nullptr) {
     std::cerr << "importedModelCreate returned null" << std::endl;
     return 2;
   }
-  defer(importedModelFree(modelVerticesBuffer));
+  defer(std::cout << "DEBUG - defer importedModelFree" << std::endl; importedModelFree(modelVerticesBuffer));
+
+  std::cout << "DEBUG before imported modelSave" << std::endl;
   if(!importedModelSave(outfile, modelVerticesBuffer, modelVerticesNumber)) {
     std::cerr << "importedModelSave failed" << std::endl;
     return 3;
