@@ -9,15 +9,12 @@ uniform mat4 M;
 uniform mat4 V;
 uniform vec3 lightPos;
 
-//out vec3 Norm;
 out vec2 UV;
 out vec3 normModel;
 
 void main() {
   UV = vertexUV;
-  //Norm = vertexNorm;
   gl_Position = MVP * vec4(vertexPos, 1);
 
-  // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
-  normModel = (M * vec4(vertexNorm, 1)).xyz;
+  normModel = (M * vec4(vertexNorm, 0)).xyz;
 }

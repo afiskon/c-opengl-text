@@ -1,6 +1,5 @@
 #version 330 core
 
-//in vec3 Norm;
 in vec2 UV;
 in vec3 normModel;
 
@@ -21,6 +20,7 @@ void main() {
   vec4 ambientColor = vec4(directionalLight.Color, 1) * directionalLight.AmbientIntensity;
 
   float diffuseFactor = clamp(dot(normalize(normModel), -directionalLight.Direction), 0, 1);
+
   vec4 diffuseColor = vec4(directionalLight.Color, 1) * directionalLight.DiffuseIntensity * diffuseFactor;
 
   color = texture(textureSampler, UV) * (ambientColor + diffuseColor);
