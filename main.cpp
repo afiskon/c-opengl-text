@@ -134,7 +134,9 @@ int main() {
   GLint uniformTextureSample = glGetUniformLocation(programId, "textureSampler");
   GLint uniformLightPos = glGetUniformLocation(programId, "lightPos");
   GLint uniformDirectionalLightColor = glGetUniformLocation(programId, "directionalLight.Color");
+  GLint uniformDirectionalLightDirection = glGetUniformLocation(programId, "directionalLight.Direction");
   GLint uniformDirectionalLightAmbientIntensity = glGetUniformLocation(programId, "directionalLight.AmbientIntensity");
+  GLint uniformDirectionalLightDiffuseIntensity = glGetUniformLocation(programId, "directionalLight.DiffuseIntensity");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -180,8 +182,14 @@ int main() {
     glm::vec3 directionalLightColor(1.0f, 0.9f, 0.9f);
     glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
 
-    float directionalLightAmbientIntensity = 1.0f;
+    glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, -1.0f));
+    glUniform3f(uniformDirectionalLightDirection, directionalLightDirection.x, directionalLightDirection.y, directionalLightDirection.z);
+
+    float directionalLightAmbientIntensity = 0.0f;
     glUniform1f(uniformDirectionalLightAmbientIntensity, directionalLightAmbientIntensity);
+
+    float directionalLightDiffuseIntensity = 1.0f;
+    glUniform1f(uniformDirectionalLightDiffuseIntensity, directionalLightDiffuseIntensity);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);
