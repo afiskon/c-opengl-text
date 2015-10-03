@@ -132,6 +132,7 @@ int main() {
   GLint uniformM = glGetUniformLocation(programId, "M");
   GLint uniformV = glGetUniformLocation(programId, "V");
   GLint uniformTextureSample = glGetUniformLocation(programId, "textureSampler");
+  GLint uniformLightPos = glGetUniformLocation(programId, "lightPos");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -150,6 +151,7 @@ int main() {
 
   glUniform1i(uniformTextureSample, 0);
 
+  // TODO: вынести glUniform для света за тело цикла + ставить view uniform только один раз в цикле
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
@@ -169,6 +171,9 @@ int main() {
     float rotationTimeMs = 100000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
+
+    glm::vec3 lightPos(0.0f, 5.0f, 0.0f);
+    glUniform3f(uniformLightPos, lightPos.x, lightPos.y, lightPos.z);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);

@@ -7,6 +7,7 @@ layout(location = 2) in vec2 vertexUV;
 uniform mat4 MVP;
 uniform mat4 M;
 uniform mat4 V;
+uniform vec3 lightPos;
 
 out vec3 Norm;
 out vec2 UV;

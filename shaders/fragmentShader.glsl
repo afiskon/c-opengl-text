@@ -4,6 +4,7 @@ in vec3 Norm;
 in vec2 UV;
 
 uniform sampler2D textureSampler;
+uniform vec3 lightPos;
 
 out vec3 color;
 
