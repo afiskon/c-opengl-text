@@ -5,6 +5,8 @@ layout(location = 1) in vec3 vertexNorm;
 layout(location = 2) in vec2 vertexUV;
 
 uniform mat4 MVP;
+uniform mat4 M;
+uniform mat4 V;
 
 out vec3 Norm;
 out vec2 UV;
