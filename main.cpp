@@ -133,6 +133,8 @@ int main() {
   GLint uniformV = glGetUniformLocation(programId, "V");
   GLint uniformTextureSample = glGetUniformLocation(programId, "textureSampler");
   GLint uniformLightPos = glGetUniformLocation(programId, "lightPos");
+  GLint uniformDirectionalLightColor = glGetUniformLocation(programId, "directionalLight.Color");
+  GLint uniformDirectionalLightAmbientIntensity = glGetUniformLocation(programId, "directionalLight.AmbientIntensity");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -172,8 +174,14 @@ int main() {
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
-    glm::vec3 lightPos(0.0f, 5.0f, 0.0f);
+    glm::vec3 lightPos(0.0f, 5.0f, 0.0f); // TODO fixme
     glUniform3f(uniformLightPos, lightPos.x, lightPos.y, lightPos.z);
+
+    glm::vec3 directionalLightColor(1.0f, 0.9f, 0.9f);
+    glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
+
+    float directionalLightAmbientIntensity = 1.0f;
+    glUniform1f(uniformDirectionalLightAmbientIntensity, directionalLightAmbientIntensity);
 
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);

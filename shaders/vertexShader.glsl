@@ -11,9 +11,12 @@ uniform vec3 lightPos;
 
 out vec3 Norm;
 out vec2 UV;
+// out vec3 vertexWorldPos;
 
 void main() {
   UV = vertexUV;
   Norm = vertexNorm;
   gl_Position = MVP * vec4(vertexPos, 1);
+
+  // vertexWorldPos = (M * vec4(vertexPos, 1)).xyz;
 }
