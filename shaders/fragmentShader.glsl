@@ -24,12 +24,12 @@ void main() {
 
   vec4 ambientColor = vec4(directionalLight.Color, 1) * directionalLight.AmbientIntensity;
 
-  float diffuseFactor = clamp(dot(normal, -directionalLight.Direction), 0, 1);
+  float diffuseFactor = max(0.0, dot(normal, -directionalLight.Direction));
   vec4 diffuseColor = vec4(directionalLight.Color, 1) * directionalLight.DiffuseIntensity * diffuseFactor;
 
   vec3 vertexToCamera = normalize(cameraPos - fragmentPos);
   vec3 lightReflect = normalize(reflect(directionalLight.Direction, normal));
-  float specularFactor = pow(clamp(dot(vertexToCamera, lightReflect), 0, 1), materialSpecularFactor);
+  float specularFactor = pow(max(0.0, dot(vertexToCamera, lightReflect)), materialSpecularFactor);
   vec4 specularColor = vec4(directionalLight.Color, 1) * materialSpecularIntensity * specularFactor;
 
   color = texture(textureSampler, fragmentUV) * (ambientColor + diffuseColor + specularColor);
