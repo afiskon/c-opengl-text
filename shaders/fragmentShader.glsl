@@ -27,7 +27,7 @@ void main() {
   float diffuseFactor = clamp(dot(normal, -directionalLight.Direction), 0, 1);
   vec4 diffuseColor = vec4(directionalLight.Color, 1) * directionalLight.DiffuseIntensity * diffuseFactor;
 
-  vec3 vertexToCamera = normalize(cameraPos - fragmentPos);
+  vec3 vertexToCamera = normalize(cameraPos - fragmentPos); // TODO fix this - use cameraDirection instead of cameraPos
   vec3 lightReflect = normalize(reflect(directionalLight.Direction, normal));
   float specularFactor = pow(clamp(dot(vertexToCamera, lightReflect), 0, 1), materialSpecularFactor);
   vec4 specularColor = vec4(directionalLight.Color, 1) * materialSpecularIntensity * specularFactor;
