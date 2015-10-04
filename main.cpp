@@ -130,7 +130,6 @@ int main() {
 
   GLint uniformMVP = glGetUniformLocation(programId, "MVP");
   GLint uniformM = glGetUniformLocation(programId, "M");
-  GLint uniformV = glGetUniformLocation(programId, "V");
   GLint uniformTextureSample = glGetUniformLocation(programId, "textureSampler");
   GLint uniformLightPos = glGetUniformLocation(programId, "lightPos");
   GLint uniformCameraPos = glGetUniformLocation(programId, "cameraPos");
@@ -214,7 +213,6 @@ int main() {
     glBindVertexArray(towerVAO);
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM[0][0]);
-    glUniformMatrix4fv(uniformV, 1, GL_FALSE, &view[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
@@ -227,7 +225,6 @@ int main() {
     glBindVertexArray(grassVAO);
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &grassMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &grassM[0][0]);
-    glUniformMatrix4fv(uniformV, 1, GL_FALSE, &view[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 32.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
@@ -241,7 +238,6 @@ int main() {
     glBindVertexArray(skyboxVAO);
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &skyboxMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &skyboxM[0][0]);
-    glUniformMatrix4fv(uniformV, 1, GL_FALSE, &view[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
