@@ -20,7 +20,7 @@ uniform DirectionalLight directionalLight;
 out vec4 color;
 
 void main() {
-  vec3 normal = normalize(fragmentNormal); // should be normalized after interpolation
+  vec3 normal = normalize(fragmentNormal); // normal should be corrected after interpolation
 
   vec4 ambientColor = vec4(directionalLight.Color, 1) * directionalLight.AmbientIntensity;
 
