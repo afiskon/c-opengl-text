@@ -133,6 +133,9 @@ int main() {
   GLint uniformV = glGetUniformLocation(programId, "V");
   GLint uniformTextureSample = glGetUniformLocation(programId, "textureSampler");
   GLint uniformLightPos = glGetUniformLocation(programId, "lightPos");
+  GLint uniformCameraPos = glGetUniformLocation(programId, "cameraPos");
+  GLint uniformMaterialSpecularFactor = glGetUniformLocation(programId, "materialSpecularFactor");
+  GLint uniformMaterialSpecularIntensity = glGetUniformLocation(programId, "materialSpecularIntensity");
   GLint uniformDirectionalLightColor = glGetUniformLocation(programId, "directionalLight.Color");
   GLint uniformDirectionalLightDirection = glGetUniformLocation(programId, "directionalLight.Direction");
   GLint uniformDirectionalLightAmbientIntensity = glGetUniformLocation(programId, "directionalLight.AmbientIntensity");
@@ -179,13 +182,18 @@ int main() {
     glm::vec3 lightPos(0.0f, 5.0f, 0.0f); // TODO fixme
     glUniform3f(uniformLightPos, lightPos.x, lightPos.y, lightPos.z);
 
+    glm::vec3 cameraPos;
+    camera.getPosition(&cameraPos);
+
+    glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
+
     glm::vec3 directionalLightColor(1.0f, 0.9f, 0.9f);
     glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
 
     glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, -1.0f));
     glUniform3f(uniformDirectionalLightDirection, directionalLightDirection.x, directionalLightDirection.y, directionalLightDirection.z);
 
-    float directionalLightAmbientIntensity = 0.0f;
+    float directionalLightAmbientIntensity = 0.2f;
     glUniform1f(uniformDirectionalLightAmbientIntensity, directionalLightAmbientIntensity);
 
     float directionalLightDiffuseIntensity = 1.0f;
@@ -207,6 +215,8 @@ int main() {
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM[0][0]);
     glUniformMatrix4fv(uniformV, 1, GL_FALSE, &view[0][0]);
+    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
     glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
 
@@ -218,11 +228,11 @@ int main() {
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &grassMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &grassM[0][0]);
     glUniformMatrix4fv(uniformV, 1, GL_FALSE, &view[0][0]);
+    glUniform1f(uniformMaterialSpecularFactor, 32.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
     glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
-    glm::vec3 cameraPos;
-    camera.getPosition(&cameraPos);
     glm::mat4 skyboxM = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxM;
 
@@ -232,6 +242,8 @@ int main() {
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &skyboxMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &skyboxM[0][0]);
     glUniformMatrix4fv(uniformV, 1, GL_FALSE, &view[0][0]);
+    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
     glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
 

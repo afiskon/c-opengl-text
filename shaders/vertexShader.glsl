@@ -6,15 +6,17 @@ layout(location = 2) in vec2 vertexUV;
 
 uniform mat4 MVP;
 uniform mat4 M;
-uniform mat4 V;
+uniform mat4 V; // TODO: not used?
 uniform vec3 lightPos;
 
 out vec2 UV;
 out vec3 normModel;
+out vec3 vertexWorldPos;
 
 void main() {
   UV = vertexUV;
   gl_Position = MVP * vec4(vertexPos, 1);
 
   normModel = (M * vec4(vertexNorm, 0)).xyz;
+  vertexWorldPos = (M * vec4(vertexPos, 1)).xyz;
 }
