@@ -6,7 +6,6 @@ layout(location = 2) in vec2 vertexUV;
 
 uniform mat4 MVP;
 uniform mat4 M;
-uniform vec3 lightPos;
 
 out vec2 UV;
 out vec3 normModel;

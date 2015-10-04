@@ -12,7 +12,6 @@ struct DirectionalLight {
 };
 
 uniform sampler2D textureSampler;
-uniform vec3 lightPos;
 uniform vec3 cameraPos;
 uniform float materialSpecularFactor;
 uniform float materialSpecularIntensity;

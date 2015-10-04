@@ -128,17 +128,16 @@ int main() {
 
   glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
-  GLint uniformMVP = glGetUniformLocation(programId, "MVP");
-  GLint uniformM = glGetUniformLocation(programId, "M");
-  GLint uniformTextureSample = glGetUniformLocation(programId, "textureSampler");
-  GLint uniformLightPos = glGetUniformLocation(programId, "lightPos");
-  GLint uniformCameraPos = glGetUniformLocation(programId, "cameraPos");
-  GLint uniformMaterialSpecularFactor = glGetUniformLocation(programId, "materialSpecularFactor");
-  GLint uniformMaterialSpecularIntensity = glGetUniformLocation(programId, "materialSpecularIntensity");
-  GLint uniformDirectionalLightColor = glGetUniformLocation(programId, "directionalLight.Color");
-  GLint uniformDirectionalLightDirection = glGetUniformLocation(programId, "directionalLight.Direction");
-  GLint uniformDirectionalLightAmbientIntensity = glGetUniformLocation(programId, "directionalLight.AmbientIntensity");
-  GLint uniformDirectionalLightDiffuseIntensity = glGetUniformLocation(programId, "directionalLight.DiffuseIntensity");
+  GLint uniformMVP = getUniformLocation(programId, "MVP");
+  GLint uniformM = getUniformLocation(programId, "M");
+  GLint uniformTextureSample = getUniformLocation(programId, "textureSampler");
+  GLint uniformCameraPos = getUniformLocation(programId, "cameraPos");
+  GLint uniformMaterialSpecularFactor = getUniformLocation(programId, "materialSpecularFactor");
+  GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
+  GLint uniformDirectionalLightColor = getUniformLocation(programId, "directionalLight.Color");
+  GLint uniformDirectionalLightDirection = getUniformLocation(programId, "directionalLight.Direction");
+  GLint uniformDirectionalLightAmbientIntensity = getUniformLocation(programId, "directionalLight.AmbientIntensity");
+  GLint uniformDirectionalLightDiffuseIntensity = getUniformLocation(programId, "directionalLight.DiffuseIntensity");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -177,9 +176,6 @@ int main() {
     float rotationTimeMs = 100000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
-
-    glm::vec3 lightPos(0.0f, 5.0f, 0.0f); // TODO fixme
-    glUniform3f(uniformLightPos, lightPos.x, lightPos.y, lightPos.z);
 
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);

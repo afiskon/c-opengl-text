@@ -164,3 +164,11 @@ GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr) {
 
   return programId;
 }
+
+GLint getUniformLocation(GLuint programId, const char* uniformName) {
+  GLint location = glGetUniformLocation(programId, uniformName);
+  if(location == -1) {
+    std::cerr << "getUniformLocation failed, programId = " << programId << ", uniformName = " << uniformName;
+  }
+  return location;
+}
