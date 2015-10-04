@@ -21,6 +21,7 @@ out vec4 color;
 
 void main() {
   vec3 normal = normalize(fragmentNormal); // normal should be corrected after interpolation
+  vec4 gamma = vec4(vec3(1.0/2.2), 1);
 
   vec4 ambientColor = vec4(directionalLight.Color, 1) * directionalLight.AmbientIntensity;
 
@@ -32,5 +33,6 @@ void main() {
   float specularFactor = pow(max(0.0, dot(vertexToCamera, lightReflect)), materialSpecularFactor);
   vec4 specularColor = vec4(directionalLight.Color, 1) * materialSpecularIntensity * specularFactor;
 
-  color = texture(textureSampler, fragmentUV) * (ambientColor + diffuseColor + specularColor);
+  vec4 temp = texture(textureSampler, fragmentUV) * (ambientColor + diffuseColor + specularColor);
+  color = pow(temp, gamma);
 }

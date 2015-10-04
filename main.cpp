@@ -222,7 +222,7 @@ int main() {
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &grassMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &grassM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 32.0f);
-    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 2.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
     glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
