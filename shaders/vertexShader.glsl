@@ -7,14 +7,14 @@ layout(location = 2) in vec2 vertexUV;
 uniform mat4 MVP;
 uniform mat4 M;
 
-out vec2 UV;
-out vec3 normModel;
-out vec3 vertexWorldPos;
+out vec2 fragmentUV;
+out vec3 fragmentNormal;
+out vec3 fragmentPos;
 
 void main() {
-  UV = vertexUV;
-  gl_Position = MVP * vec4(vertexPos, 1);
+  fragmentUV = vertexUV;
+  fragmentNormal = (M * vec4(vertexNorm, 0)).xyz;
+  fragmentPos = (M * vec4(vertexPos, 1)).xyz;
 
-  normModel = (M * vec4(vertexNorm, 0)).xyz;
-  vertexWorldPos = (M * vec4(vertexPos, 1)).xyz;
+  gl_Position = MVP * vec4(vertexPos, 1);
 }
