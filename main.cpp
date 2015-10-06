@@ -160,11 +160,17 @@ int main() {
   setUniform1f(programId, "directionalLight.diffuseIntensity", 1.0f);
   setUniform1f(programId, "directionalLight.specularIntensity", 1.0f);
 
-  setUniform3f(programId, "pointLight.position", 0.0f, 3.0f, 0.0f);
+  setUniform3f(programId, "pointLight.position", -2.0f, 3.0f, 0.0f);
   setUniform3f(programId, "pointLight.color", 1.0f, 0.0f, 0.0f);
   setUniform1f(programId, "pointLight.ambientIntensity", 0.2f);
   setUniform1f(programId, "pointLight.diffuseIntensity", 10.0f);
   setUniform1f(programId, "pointLight.specularIntensity", 1.0f);
+
+  setUniform3f(programId, "spotLight.position", 2.0f, 3.0f, 0.0f);
+  setUniform3f(programId, "spotLight.color", 0.0f, 0.0f, 1.0f);
+  setUniform1f(programId, "spotLight.ambientIntensity", 0.2f);
+  setUniform1f(programId, "spotLight.diffuseIntensity", 10.0f);
+  setUniform1f(programId, "spotLight.specularIntensity", 1.0f);
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
