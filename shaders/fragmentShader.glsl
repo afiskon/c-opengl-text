@@ -57,20 +57,12 @@ vec4 calcDirectionalLight(vec3 normal, vec3 fragmentToCamera, DirectionalLight l
 }
 
 vec4 calcPointLight(vec3 normal, vec3 fragmentToCamera, PointLight light) {
-  float distance = length(fragmentPos - light.position);
-  float distance2 = 1.0 + pow(distance, 2); // 1.0 constant prevents division by zero
   vec3 lightDirection = normalize(fragmentPos - light.position);
+  float distance = length(fragmentPos - light.position);
+  float pointFactor = 1.0 / (1.0 + pow(distance, 2));
 
-  vec4 ambientColor = vec4(light.color, 1) * light.ambientIntensity / distance2;
-
-  float diffuseFactor = max(0.0, dot(normal, -lightDirection));
-  vec4 diffuseColor = vec4(light.color, 1) * light.diffuseIntensity * diffuseFactor / distance2;
-
-  vec3 lightReflect = normalize(reflect(lightDirection, normal));
-  float specularFactor = pow(max(0.0, dot(fragmentToCamera, lightReflect)), materialSpecularFactor);
-  vec4 specularColor = light.specularIntensity * vec4(light.color, 1) * materialSpecularIntensity * specularFactor / distance2;
-
-  return ambientColor + diffuseColor + specularColor;
+  DirectionalLight tempDirectionalLight = DirectionalLight(lightDirection, light.color, light.ambientIntensity, light.diffuseIntensity, light.specularIntensity);
+  return pointFactor * calcDirectionalLight(normal, fragmentToCamera, tempDirectionalLight);
 }
 
 vec4 calcSpotLight(vec3 normal, vec3 fragmentToCamera, SpotLight light) {
@@ -79,7 +71,7 @@ vec4 calcSpotLight(vec3 normal, vec3 fragmentToCamera, SpotLight light) {
   float spotFactor = float(spotAngleCos > light.cutoff) * (1.0 - 1.0*(1.0 - spotAngleCos) / (1.0 - light.cutoff));
 
   PointLight tempPointLight = PointLight(light.position, light.color, light.ambientIntensity, light.diffuseIntensity, light.ambientIntensity);
-  return spotFactor*calcPointLight(normal, fragmentToCamera, tempPointLight);
+  return spotFactor * calcPointLight(normal, fragmentToCamera, tempPointLight);
 }
 
 void main() {
