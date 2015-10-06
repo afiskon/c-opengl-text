@@ -136,10 +136,7 @@ int main() {
   GLint uniformMaterialSpecularFactor = getUniformLocation(programId, "materialSpecularFactor");
   GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
 
-  GLint uniformDirectionalLightDirection = getUniformLocation(programId, "directionalLight.direction");
-  GLint uniformDirectionalLightColor = getUniformLocation(programId, "directionalLight.color");
-  GLint uniformDirectionalLightAmbientIntensity = getUniformLocation(programId, "directionalLight.ambientIntensity");
-  GLint uniformDirectionalLightDiffuseIntensity = getUniformLocation(programId, "directionalLight.diffuseIntensity");
+
 
 //  GLint uniformPointLightPosition = getUniformLocation(programId, "pointLight.position");
 //  GLint uniformPointLightColor = getUniformLocation(programId, "pointLight.color");
@@ -164,17 +161,10 @@ int main() {
 
   glUniform1i(uniformTextureSample, 0);
 
-  glm::vec3 directionalLightColor(1.0f, 1.0f, 1.0f);
-  glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
-
-  glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
-  glUniform3f(uniformDirectionalLightDirection, directionalLightDirection.x, directionalLightDirection.y, directionalLightDirection.z);
-
-  float directionalLightAmbientIntensity = 0.2f;
-  glUniform1f(uniformDirectionalLightAmbientIntensity, directionalLightAmbientIntensity);
-
-  float directionalLightDiffuseIntensity = 1.0f;
-  glUniform1f(uniformDirectionalLightDiffuseIntensity, directionalLightDiffuseIntensity);
+  setUniform3f(programId, "directionalLight.direction", 0.0f, -1.0f, 1.0f);
+  setUniform3f(programId, "directionalLight.color", 1.0f, 1.0f, 1.0f);
+  setUniform1f(programId, "directionalLight.ambientIntensity", 0.2f);
+  setUniform1f(programId, "directionalLight.diffuseIntensity", 1.0f);
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;

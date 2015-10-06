@@ -172,3 +172,13 @@ GLint getUniformLocation(GLuint programId, const char* uniformName) {
   }
   return location;
 }
+
+void setUniform1f(GLuint programId, const char* uniformName, float value) {
+  GLint uniformId = getUniformLocation(programId, uniformName);
+  glUniform1f(uniformId, value);
+}
+
+void setUniform3f(GLuint programId, const char* uniformName, float v1, float v2, float v3) {
+  GLint uniformId = getUniformLocation(programId, uniformName);
+  glUniform3f(uniformId, v1, v2, v3);
+}
