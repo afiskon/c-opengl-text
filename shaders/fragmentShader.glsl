@@ -10,7 +10,7 @@ struct DirectionalLight {
   vec3 color;
   float ambientIntensity;
   float diffuseIntensity;
-  float specularIntensity; // for debug purposes, set to 1.0 or 0.0
+  float specularIntensity; // for debug purposes, should be set to 1.0
 };
 
 struct PointLight {
@@ -19,7 +19,7 @@ struct PointLight {
   vec3 color;
   float ambientIntensity;
   float diffuseIntensity;
-  float specularIntensity; // for debug purposes, set to 1.0 or 0.0
+  float specularIntensity; // for debug purposes, should be set to 1.0
 };
 
 uniform sampler2D textureSampler;
