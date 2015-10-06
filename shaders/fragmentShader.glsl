@@ -23,16 +23,18 @@ void main() {
   vec3 normal = normalize(fragmentNormal); // normal should be corrected after interpolation
   vec4 gamma = vec4(vec3(1.0/2.2), 1);
 
-  vec4 ambientColor = vec4(directionalLight.Color, 1) * directionalLight.AmbientIntensity;
+  vec4 directAmbientColor = vec4(directionalLight.Color, 1) * directionalLight.AmbientIntensity;
 
   float diffuseFactor = max(0.0, dot(normal, -directionalLight.Direction));
-  vec4 diffuseColor = vec4(directionalLight.Color, 1) * directionalLight.DiffuseIntensity * diffuseFactor;
+  vec4 directDiffuseColor = vec4(directionalLight.Color, 1) * directionalLight.DiffuseIntensity * diffuseFactor;
 
   vec3 vertexToCamera = normalize(cameraPos - fragmentPos);
   vec3 lightReflect = normalize(reflect(directionalLight.Direction, normal));
   float specularFactor = pow(max(0.0, dot(vertexToCamera, lightReflect)), materialSpecularFactor);
-  vec4 specularColor = vec4(directionalLight.Color, 1) * materialSpecularIntensity * specularFactor;
+  vec4 directSpecularColor = vec4(directionalLight.Color, 1) * materialSpecularIntensity * specularFactor;
 
-  vec4 temp = texture(textureSampler, fragmentUV) * (ambientColor + diffuseColor + specularColor);
+  vec4 directColor = directAmbientColor + directDiffuseColor + directSpecularColor;
+
+  vec4 temp = texture(textureSampler, fragmentUV) * directColor;
   color = pow(temp, gamma);
 }
