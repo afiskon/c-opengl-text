@@ -16,6 +16,38 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
+void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLightEnabled, bool spotLightEnabled) {
+  {
+    glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+
+    setUniform3f(programId, "directionalLight.direction", direction.x, direction.y, direction.z);
+    setUniform3f(programId, "directionalLight.color", 1.0f, 1.0f, 1.0f);
+    setUniform1f(programId, "directionalLight.ambientIntensity", float(directionalLightEnabled)*0.1f);
+    setUniform1f(programId, "directionalLight.diffuseIntensity", float(directionalLightEnabled)*0.1f);
+    setUniform1f(programId, "directionalLight.specularIntensity", float(directionalLightEnabled)*1.0f);
+  }
+
+  {
+    setUniform3f(programId, "pointLight.position", -2.0f, 3.0f, 0.0f);
+    setUniform3f(programId, "pointLight.color", 1.0f, 0.0f, 0.0f);
+    setUniform1f(programId, "pointLight.ambientIntensity", float(pointLightEnabled) * 0.2f);
+    setUniform1f(programId, "pointLight.diffuseIntensity", float(pointLightEnabled) * 1.0f);
+    setUniform1f(programId, "pointLight.specularIntensity", float(pointLightEnabled) * 1.0f);
+  }
+
+  {
+    glm::vec3 direction = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f));
+
+    setUniform3f(programId, "spotLight.direction", direction.x, direction.y, direction.z);
+    setUniform3f(programId, "spotLight.position", 2.5f, 1.0f, 0.0f);
+    setUniform1f(programId, "spotLight.cutoff", glm::cos(glm::radians(25.0f)));
+    setUniform3f(programId, "spotLight.color", 0.0f, 0.0f, 1.0f);
+    setUniform1f(programId, "spotLight.ambientIntensity", float(spotLightEnabled)*0.2f);
+    setUniform1f(programId, "spotLight.diffuseIntensity", float(spotLightEnabled)*10.0f);
+    setUniform1f(programId, "spotLight.specularIntensity", float(spotLightEnabled)*1.0f);
+  }
+}
+
 int main() {
   if(glfwInit() == GL_FALSE) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -154,45 +186,18 @@ int main() {
 
   glUniform1i(uniformTextureSample, 0);
 
-  {
-    glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+  bool directionalLightEnabled = true;
+  bool pointLightEnabled = true;
+  bool spotLightEnabled = true;
+  float lastLightsChangeMs = 0.0;
 
-    setUniform3f(programId, "directionalLight.direction", direction.x, direction.y, direction.z);
-    setUniform3f(programId, "directionalLight.color", 1.0f, 1.0f, 1.0f);
-    setUniform1f(programId, "directionalLight.ambientIntensity", 0.1f);
-    setUniform1f(programId, "directionalLight.diffuseIntensity", 0.1f);
-    setUniform1f(programId, "directionalLight.specularIntensity", 1.0f);
-  }
-
-  setUniform3f(programId, "pointLight.position", -2.0f, 3.0f, 0.0f);
-  setUniform3f(programId, "pointLight.color", 1.0f, 0.0f, 0.0f);
-  setUniform1f(programId, "pointLight.ambientIntensity", 0.2f);
-  setUniform1f(programId, "pointLight.diffuseIntensity", 1.0f);
-  setUniform1f(programId, "pointLight.specularIntensity", 1.0f);
-
-  {
-    glm::vec3 direction = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f));
-
-    setUniform3f(programId, "spotLight.direction", direction.x, direction.y, direction.z);
-    setUniform3f(programId, "spotLight.position", 2.5f, 1.0f, 0.0f);
-    setUniform1f(programId, "spotLight.cutoff", glm::cos(glm::radians(25.0f)));
-    setUniform3f(programId, "spotLight.color", 0.0f, 0.0f, 1.0f);
-    setUniform1f(programId, "spotLight.ambientIntensity", 0.2f);
-    setUniform1f(programId, "spotLight.diffuseIntensity", 10.0f);
-    setUniform1f(programId, "spotLight.specularIntensity", 1.0f);
-  }
+  setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
-
-    if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
+    if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    
     auto currentTime = std::chrono::high_resolution_clock::now();
     float startDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count();
     float prevDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - prevTime).count();
@@ -201,6 +206,22 @@ int main() {
     float rotationTimeMs = 100000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
+
+    if((glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) && (startDeltaTimeMs - lastLightsChangeMs > 300.0f)) {
+      directionalLightEnabled = !directionalLightEnabled;
+      lastLightsChangeMs = startDeltaTimeMs;
+      setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+    }
+    if((glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) && (startDeltaTimeMs - lastLightsChangeMs > 300.0f)) {
+      pointLightEnabled = !pointLightEnabled;
+      lastLightsChangeMs = startDeltaTimeMs;
+      setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+    }
+    if((glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) && (startDeltaTimeMs - lastLightsChangeMs > 300.0f)) {
+      spotLightEnabled = !spotLightEnabled;
+      lastLightsChangeMs = startDeltaTimeMs;
+      setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+    }
 
     glm::vec3 cameraPos;
     camera.getPosition(&cameraPos);
