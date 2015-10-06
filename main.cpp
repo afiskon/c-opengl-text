@@ -197,7 +197,7 @@ int main() {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
     if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    
+
     auto currentTime = std::chrono::high_resolution_clock::now();
     float startDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count();
     float prevDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - prevTime).count();

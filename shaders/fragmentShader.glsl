@@ -63,7 +63,7 @@ void main() {
 
   // point light TODO: make procedure
 
-  float pointLightDistance = length(pointLight.position - fragmentPos); // TODO: swap and create temp variable
+  float pointLightDistance = length(fragmentPos - pointLight.position);
   float pointLightDistance2 = 1.0 + pow(pointLightDistance, 2); // 1.0 constant prevents division by zero
   vec3 pointLightDirection = normalize(fragmentPos - pointLight.position);
 
@@ -80,14 +80,12 @@ void main() {
 
   // spot light TODO: make procedure
 
-  vec3 spotLightToFragment = normalize(fragmentPos - spotLight.position);
-  float spotAngleCos = dot(spotLightToFragment, spotLight.direction);
+  vec3 spotLightDirection = normalize(fragmentPos - spotLight.position);
+  float spotAngleCos = dot(spotLightDirection, spotLight.direction);
   float spotFactor = float(spotAngleCos > spotLight.cutoff) *(1.0 - 1.0*(1.0 - spotAngleCos) / (1.0 - spotLight.cutoff));
 
-  float spotLightDistance = length(spotLight.position - fragmentPos);
+  float spotLightDistance = length(fragmentPos - spotLight.position);
   float spotLightDistance2 = 1.0 + pow(spotLightDistance, 2); // 1.0 constant prevents division by zero
-
-  vec3 spotLightDirection = normalize(fragmentPos - spotLight.position);
 
   vec4 spotAmbientColor = vec4(spotLight.color, 1) * spotLight.ambientIntensity / spotLightDistance2;
 
