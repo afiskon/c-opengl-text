@@ -53,7 +53,7 @@ void main() {
   // point light TODO: make procedure
 
   float distance = length(pointLight.position - fragmentPos);
-  float distance2 = distance * distance;
+  float distance2 = 1.0 + pow(distance, 2); // 1.0 constant prevents from division by zero
   vec3 pointLightDirection = normalize(fragmentPos - pointLight.position);
 
   vec4 pointAmbientColor = vec4(pointLight.color, 1) * pointLight.ambientIntensity / distance2;
