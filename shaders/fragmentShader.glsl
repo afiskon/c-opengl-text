@@ -43,32 +43,32 @@ uniform SpotLight spotLight;
 
 out vec4 color;
 
-vec4 calcDirectionalLight(vec3 normal, vec3 fragmentToCamera) {
-  vec4 ambientColor = vec4(directionalLight.color, 1) * directionalLight.ambientIntensity;
+vec4 calcDirectionalLight(vec3 normal, vec3 fragmentToCamera, DirectionalLight light) {
+  vec4 ambientColor = vec4(light.color, 1) * light.ambientIntensity;
 
-  float diffuseFactor = max(0.0, dot(normal, -directionalLight.direction));
-  vec4 diffuseColor = vec4(directionalLight.color, 1) * directionalLight.diffuseIntensity * diffuseFactor;
+  float diffuseFactor = max(0.0, dot(normal, -light.direction));
+  vec4 diffuseColor = vec4(light.color, 1) * light.diffuseIntensity * diffuseFactor;
 
-  vec3 lightReflect = normalize(reflect(directionalLight.direction, normal));
+  vec3 lightReflect = normalize(reflect(light.direction, normal));
   float specularFactor = pow(max(0.0, dot(fragmentToCamera, lightReflect)), materialSpecularFactor);
-  vec4 specularColor = directionalLight.specularIntensity * vec4(directionalLight.color, 1) * materialSpecularIntensity * specularFactor;
+  vec4 specularColor = light.specularIntensity * vec4(light.color, 1) * materialSpecularIntensity * specularFactor;
 
   return ambientColor + diffuseColor + specularColor;
 }
 
-vec4 calcPointLight(vec3 normal, vec3 fragmentToCamera) {
-  float distance = length(fragmentPos - pointLight.position);
+vec4 calcPointLight(vec3 normal, vec3 fragmentToCamera, PointLight light) {
+  float distance = length(fragmentPos - light.position);
   float distance2 = 1.0 + pow(distance, 2); // 1.0 constant prevents division by zero
-  vec3 lightDirection = normalize(fragmentPos - pointLight.position);
+  vec3 lightDirection = normalize(fragmentPos - light.position);
 
-  vec4 ambientColor = vec4(pointLight.color, 1) * pointLight.ambientIntensity / distance2;
+  vec4 ambientColor = vec4(light.color, 1) * light.ambientIntensity / distance2;
 
   float diffuseFactor = max(0.0, dot(normal, -lightDirection));
-  vec4 diffuseColor = vec4(pointLight.color, 1) * pointLight.diffuseIntensity * diffuseFactor / distance2;
+  vec4 diffuseColor = vec4(light.color, 1) * light.diffuseIntensity * diffuseFactor / distance2;
 
   vec3 lightReflect = normalize(reflect(lightDirection, normal));
   float specularFactor = pow(max(0.0, dot(fragmentToCamera, lightReflect)), materialSpecularFactor);
-  vec4 specularColor = pointLight.specularIntensity * vec4(pointLight.color, 1) * materialSpecularIntensity * specularFactor / distance2;
+  vec4 specularColor = light.specularIntensity * vec4(light.color, 1) * materialSpecularIntensity * specularFactor / distance2;
 
   return ambientColor + diffuseColor + specularColor;
 }
@@ -98,8 +98,8 @@ void main() {
   vec3 normal = normalize(fragmentNormal); // normal should be corrected after interpolation
   vec3 fragmentToCamera = normalize(cameraPos - fragmentPos);
 
-  vec4 directColor = calcDirectionalLight(normal, fragmentToCamera);
-  vec4 pointColor = calcPointLight(normal, fragmentToCamera);
+  vec4 directColor = calcDirectionalLight(normal, fragmentToCamera, directionalLight);
+  vec4 pointColor = calcPointLight(normal, fragmentToCamera, pointLight);
   vec4 spotColor = calcSpotLight(normal, fragmentToCamera);
   vec4 linearColor = texture(textureSampler, fragmentUV) * (directColor + pointColor + spotColor);
 

@@ -30,7 +30,7 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
   {
     setUniform3f(programId, "pointLight.position", -2.0f, 3.0f, 0.0f);
     setUniform3f(programId, "pointLight.color", 1.0f, 0.0f, 0.0f);
-    setUniform1f(programId, "pointLight.ambientIntensity", float(pointLightEnabled) * 0.2f);
+    setUniform1f(programId, "pointLight.ambientIntensity", float(pointLightEnabled) * 0.1f);
     setUniform1f(programId, "pointLight.diffuseIntensity", float(pointLightEnabled) * 1.0f);
     setUniform1f(programId, "pointLight.specularIntensity", float(pointLightEnabled) * 1.0f);
   }
@@ -42,7 +42,7 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
     setUniform3f(programId, "spotLight.position", 2.5f, 1.0f, 0.0f);
     setUniform1f(programId, "spotLight.cutoff", glm::cos(glm::radians(25.0f)));
     setUniform3f(programId, "spotLight.color", 0.0f, 0.0f, 1.0f);
-    setUniform1f(programId, "spotLight.ambientIntensity", float(spotLightEnabled)*0.2f);
+    setUniform1f(programId, "spotLight.ambientIntensity", float(spotLightEnabled)*0.1f);
     setUniform1f(programId, "spotLight.diffuseIntensity", float(spotLightEnabled)*10.0f);
     setUniform1f(programId, "spotLight.specularIntensity", float(spotLightEnabled)*1.0f);
   }
