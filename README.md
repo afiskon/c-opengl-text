@@ -11,11 +11,12 @@ Usage:
     make
     cd ..
     ./build/emdconv models/skybox.blend skybox.emd
-    ./build/models
+    ./build/lighting
 ```
 
 * WASD + mouse - move camera
 * Z/X - enable/disable wireframes mode
+* 1/2/3 - turn on/off one of light sources 
 * Q - quit
 
 Tested on Linux, MacOS and Windows.
