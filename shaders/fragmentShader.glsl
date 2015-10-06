@@ -52,15 +52,16 @@ void main() {
 
   vec4 pointAmbientColor = vec4(pointLight.color, 1) * pointLight.ambientIntensity / distance2;
 
-//  float diffuseFactor = max(0.0, dot(normal, -directionalLight.direction));
-//  vec4 directDiffuseColor = vec4(directionalLight.color, 1) * directionalLight.diffuseIntensity * diffuseFactor;
+  vec3 pointLightDirection = normalize(fragmentPos - pointLight.position);
+  float pointDiffuseFactor = max(0.0, dot(normal, -pointLightDirection));
+  vec4 pointDiffuseColor = vec4(pointLight.color, 1) * pointLight.diffuseIntensity * pointDiffuseFactor / distance2;
 //
 //  vec3 vertexToCamera = normalize(cameraPos - fragmentPos);
 //  vec3 lightReflect = normalize(reflect(directionalLight.direction, normal));
 //  float specularFactor = pow(max(0.0, dot(vertexToCamera, lightReflect)), materialSpecularFactor);
 //  vec4 directSpecularColor = vec4(directionalLight.color, 1) * materialSpecularIntensity * specularFactor;
 
-  vec4 pointColor = pointAmbientColor; // + directDiffuseColor + directSpecularColor;
+  vec4 pointColor = pointAmbientColor + pointDiffuseColor; //+ directSpecularColor;
 
 
   vec4 temp = texture(textureSampler, fragmentUV) * (directColor + pointColor);
