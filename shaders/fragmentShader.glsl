@@ -43,13 +43,7 @@ uniform SpotLight spotLight;
 
 out vec4 color;
 
-void main() {
-  vec3 normal = normalize(fragmentNormal); // normal should be corrected after interpolation
-  vec4 gamma = vec4(vec3(1.0/2.2), 1);
-  vec3 fragmentToCamera = normalize(cameraPos - fragmentPos);
-
-  // direct light TODO: make procedure
-
+vec4 calcDirectionalLight(vec3 normal, vec3 fragmentToCamera) {
   vec4 directAmbientColor = vec4(directionalLight.color, 1) * directionalLight.ambientIntensity;
 
   float directDiffuseFactor = max(0.0, dot(normal, -directionalLight.direction));
@@ -59,10 +53,10 @@ void main() {
   float directSpecularFactor = pow(max(0.0, dot(fragmentToCamera, directLightReflect)), materialSpecularFactor);
   vec4 directSpecularColor = directionalLight.specularIntensity * vec4(directionalLight.color, 1) * materialSpecularIntensity * directSpecularFactor;
 
-  vec4 directColor = directAmbientColor + directDiffuseColor + directSpecularColor;
+  return directAmbientColor + directDiffuseColor + directSpecularColor;
+}
 
-  // point light TODO: make procedure
-
+vec4 calcPointLight(vec3 normal, vec3 fragmentToCamera) {
   float pointLightDistance = length(fragmentPos - pointLight.position);
   float pointLightDistance2 = 1.0 + pow(pointLightDistance, 2); // 1.0 constant prevents division by zero
   vec3 pointLightDirection = normalize(fragmentPos - pointLight.position);
@@ -76,10 +70,10 @@ void main() {
   float pointSpecularFactor = pow(max(0.0, dot(fragmentToCamera, pointLightReflect)), materialSpecularFactor);
   vec4 pointSpecularColor = pointLight.specularIntensity * vec4(pointLight.color, 1) * materialSpecularIntensity * pointSpecularFactor / pointLightDistance2;
 
-  vec4 pointColor = pointAmbientColor + pointDiffuseColor + pointSpecularColor;
+  return pointAmbientColor + pointDiffuseColor + pointSpecularColor;
+}
 
-  // spot light TODO: make procedure
-
+vec4 calcSpotLight(vec3 normal, vec3 fragmentToCamera) {
   vec3 spotLightDirection = normalize(fragmentPos - spotLight.position);
   float spotAngleCos = dot(spotLightDirection, spotLight.direction);
   float spotFactor = float(spotAngleCos > spotLight.cutoff) *(1.0 - 1.0*(1.0 - spotAngleCos) / (1.0 - spotLight.cutoff));
@@ -96,8 +90,18 @@ void main() {
   float spotSpecularFactor = pow(max(0.0, dot(fragmentToCamera, spotLightReflect)), materialSpecularFactor);
   vec4 spotSpecularColor = spotLight.specularIntensity * vec4(spotLight.color, 1) * materialSpecularIntensity * spotSpecularFactor / spotLightDistance2;
 
-  vec4 spotColor = spotFactor*(spotAmbientColor + spotDiffuseColor + spotSpecularColor);
+  return spotFactor*(spotAmbientColor + spotDiffuseColor + spotSpecularColor);
+}
 
-  vec4 temp = texture(textureSampler, fragmentUV) * (directColor + pointColor + spotColor);
-  color = pow(temp, gamma);
+void main() {
+  vec3 normal = normalize(fragmentNormal); // normal should be corrected after interpolation
+  vec3 fragmentToCamera = normalize(cameraPos - fragmentPos);
+
+  vec4 directColor = calcDirectionalLight(normal, fragmentToCamera);
+  vec4 pointColor = calcPointLight(normal, fragmentToCamera);
+  vec4 spotColor = calcSpotLight(normal, fragmentToCamera);
+  vec4 linearColor = texture(textureSampler, fragmentUV) * (directColor + pointColor + spotColor);
+
+  vec4 gamma = vec4(vec3(1.0/2.2), 1);
+  color = pow(linearColor, gamma); // gamma-corrected color
 }
