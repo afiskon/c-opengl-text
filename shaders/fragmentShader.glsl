@@ -74,22 +74,22 @@ vec4 calcPointLight(vec3 normal, vec3 fragmentToCamera, PointLight light) {
 }
 
 
-vec4 calcSpotLight(vec3 normal, vec3 fragmentToCamera) {
-  vec3 spotLightDirection = normalize(fragmentPos - spotLight.position);
-  float spotAngleCos = dot(spotLightDirection, spotLight.direction);
-  float spotFactor = float(spotAngleCos > spotLight.cutoff) *(1.0 - 1.0*(1.0 - spotAngleCos) / (1.0 - spotLight.cutoff));
+vec4 calcSpotLight(vec3 normal, vec3 fragmentToCamera, SpotLight light) {
+  vec3 spotLightDirection = normalize(fragmentPos - light.position);
+  float spotAngleCos = dot(spotLightDirection, light.direction);
+  float spotFactor = float(spotAngleCos > light.cutoff) *(1.0 - 1.0*(1.0 - spotAngleCos) / (1.0 - light.cutoff));
 
-  float spotLightDistance = length(fragmentPos - spotLight.position);
+  float spotLightDistance = length(fragmentPos - light.position);
   float spotLightDistance2 = 1.0 + pow(spotLightDistance, 2); // 1.0 constant prevents division by zero
 
-  vec4 spotAmbientColor = vec4(spotLight.color, 1) * spotLight.ambientIntensity / spotLightDistance2;
+  vec4 spotAmbientColor = vec4(light.color, 1) * light.ambientIntensity / spotLightDistance2;
 
   float spotDiffuseFactor = max(0.0, dot(normal, -spotLightDirection));
-  vec4 spotDiffuseColor = vec4(spotLight.color, 1) * spotLight.diffuseIntensity * spotDiffuseFactor / spotLightDistance2;
+  vec4 spotDiffuseColor = vec4(light.color, 1) * light.diffuseIntensity * spotDiffuseFactor / spotLightDistance2;
 
   vec3 spotLightReflect = normalize(reflect(spotLightDirection, normal));
   float spotSpecularFactor = pow(max(0.0, dot(fragmentToCamera, spotLightReflect)), materialSpecularFactor);
-  vec4 spotSpecularColor = spotLight.specularIntensity * vec4(spotLight.color, 1) * materialSpecularIntensity * spotSpecularFactor / spotLightDistance2;
+  vec4 spotSpecularColor = light.specularIntensity * vec4(light.color, 1) * materialSpecularIntensity * spotSpecularFactor / spotLightDistance2;
 
   return spotFactor*(spotAmbientColor + spotDiffuseColor + spotSpecularColor);
 }
@@ -100,7 +100,7 @@ void main() {
 
   vec4 directColor = calcDirectionalLight(normal, fragmentToCamera, directionalLight);
   vec4 pointColor = calcPointLight(normal, fragmentToCamera, pointLight);
-  vec4 spotColor = calcSpotLight(normal, fragmentToCamera);
+  vec4 spotColor = calcSpotLight(normal, fragmentToCamera, spotLight);
   vec4 linearColor = texture(textureSampler, fragmentUV) * (directColor + pointColor + spotColor);
 
   vec4 gamma = vec4(vec3(1.0/2.2), 1);
