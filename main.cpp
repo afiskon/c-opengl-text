@@ -134,10 +134,10 @@ int main() {
   GLint uniformCameraPos = getUniformLocation(programId, "cameraPos");
   GLint uniformMaterialSpecularFactor = getUniformLocation(programId, "materialSpecularFactor");
   GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
-  GLint uniformDirectionalLightColor = getUniformLocation(programId, "directionalLight.Color");
-  GLint uniformDirectionalLightDirection = getUniformLocation(programId, "directionalLight.Direction");
-  GLint uniformDirectionalLightAmbientIntensity = getUniformLocation(programId, "directionalLight.AmbientIntensity");
-  GLint uniformDirectionalLightDiffuseIntensity = getUniformLocation(programId, "directionalLight.DiffuseIntensity");
+  GLint uniformDirectionalLightDirection = getUniformLocation(programId, "directionalLight.direction");
+  GLint uniformDirectionalLightColor = getUniformLocation(programId, "directionalLight.color");
+  GLint uniformDirectionalLightAmbientIntensity = getUniformLocation(programId, "directionalLight.ambientIntensity");
+  GLint uniformDirectionalLightDiffuseIntensity = getUniformLocation(programId, "directionalLight.diffuseIntensity");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -182,10 +182,10 @@ int main() {
 
     glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
-    glm::vec3 directionalLightColor(1.0f, 0.9f, 0.9f);
+    glm::vec3 directionalLightColor(1.0f, 1.0f, 1.0f);
     glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
 
-    glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, -1.0f));
+    glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
     glUniform3f(uniformDirectionalLightDirection, directionalLightDirection.x, directionalLightDirection.y, directionalLightDirection.z);
 
     float directionalLightAmbientIntensity = 0.2f;
