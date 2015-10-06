@@ -132,12 +132,19 @@ int main() {
   GLint uniformM = getUniformLocation(programId, "M");
   GLint uniformTextureSample = getUniformLocation(programId, "textureSampler");
   GLint uniformCameraPos = getUniformLocation(programId, "cameraPos");
+
   GLint uniformMaterialSpecularFactor = getUniformLocation(programId, "materialSpecularFactor");
   GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
+
   GLint uniformDirectionalLightDirection = getUniformLocation(programId, "directionalLight.direction");
   GLint uniformDirectionalLightColor = getUniformLocation(programId, "directionalLight.color");
   GLint uniformDirectionalLightAmbientIntensity = getUniformLocation(programId, "directionalLight.ambientIntensity");
   GLint uniformDirectionalLightDiffuseIntensity = getUniformLocation(programId, "directionalLight.diffuseIntensity");
+
+//  GLint uniformPointLightPosition = getUniformLocation(programId, "pointLight.position");
+//  GLint uniformPointLightColor = getUniformLocation(programId, "pointLight.color");
+//  GLint uniformPointLightAmbientIntensity = getUniformLocation(programId, "pointLight.ambientIntensity");
+//  GLint uniformPointLightDiffuseIntensity = getUniformLocation(programId, "pointLight.diffuseIntensity");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -151,12 +158,24 @@ int main() {
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-
   glClearColor(0, 0, 0, 1);
+
+  glUseProgram(programId);
 
   glUniform1i(uniformTextureSample, 0);
 
-  // TODO: вынести glUniform для света за тело цикла + ставить view uniform только один раз в цикле
+  glm::vec3 directionalLightColor(1.0f, 1.0f, 1.0f);
+  glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
+
+  glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+  glUniform3f(uniformDirectionalLightDirection, directionalLightDirection.x, directionalLightDirection.y, directionalLightDirection.z);
+
+  float directionalLightAmbientIntensity = 0.2f;
+  glUniform1f(uniformDirectionalLightAmbientIntensity, directionalLightAmbientIntensity);
+
+  float directionalLightDiffuseIntensity = 1.0f;
+  glUniform1f(uniformDirectionalLightDiffuseIntensity, directionalLightDiffuseIntensity);
+
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
@@ -182,25 +201,11 @@ int main() {
 
     glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
-    glm::vec3 directionalLightColor(1.0f, 1.0f, 1.0f);
-    glUniform3f(uniformDirectionalLightColor, directionalLightColor.r, directionalLightColor.g, directionalLightColor.b);
-
-    glm::vec3 directionalLightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
-    glUniform3f(uniformDirectionalLightDirection, directionalLightDirection.x, directionalLightDirection.y, directionalLightDirection.z);
-
-    float directionalLightAmbientIntensity = 0.2f;
-    glUniform1f(uniformDirectionalLightAmbientIntensity, directionalLightAmbientIntensity);
-
-    float directionalLightDiffuseIntensity = 1.0f;
-    glUniform1f(uniformDirectionalLightDiffuseIntensity, directionalLightDiffuseIntensity);
-
     glm::mat4 view;
     camera.getViewMatrix(prevDeltaTimeMs, &view);
     glm::mat4 vp = projection * view;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(programId);
 
     glm::mat4 towerM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
     glm::mat4 towerMVP = vp * towerM;
