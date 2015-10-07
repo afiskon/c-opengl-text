@@ -307,6 +307,21 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
     glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
 
+    // point light source
+
+    glm::mat4 pointLightM = glm::translate(pointLightPos);
+    glm::mat4 pointLightMVP = vp * pointLightM;
+
+    glBindTexture(GL_TEXTURE_2D, redTexture);
+    glBindVertexArray(sphereVAO);
+    glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &pointLightMVP[0][0]);
+    glUniformMatrix4fv(uniformM, 1, GL_FALSE, &pointLightM[0][0]);
+    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
+    glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
