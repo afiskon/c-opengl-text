@@ -128,7 +128,7 @@ int main() {
   if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
 
   // === prepare VAOs ===
-  GLuint vaoArray[3];
+  GLuint vaoArray[4];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
   glGenVertexArrays(vaosNum, vaoArray);
   defer(glDeleteVertexArrays(vaosNum, vaoArray));
@@ -136,27 +136,30 @@ int main() {
   GLuint grassVAO = vaoArray[0];
   GLuint skyboxVAO = vaoArray[1];
   GLuint towerVAO = vaoArray[2];
+  GLuint torusVAO = vaoArray[3];
 
   // === prepare VBOs ===
-  GLuint vboArray[6];
+  GLuint vboArray[8];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
 
   GLuint grassVBO = vboArray[0];
-  GLuint skyboxVBO = vboArray[1];
-  GLuint towerVBO = vboArray[2];
-  GLuint grassIndicesVBO = vboArray[3];
-  GLuint skyboxIndicesVBO = vboArray[4];
+  GLuint grassIndicesVBO = vboArray[1];
+  GLuint skyboxVBO = vboArray[2];
+  GLuint skyboxIndicesVBO = vboArray[3];
+  GLuint towerVBO = vboArray[4];
   GLuint towerIndicesVBO = vboArray[5];
-
+  GLuint torusVBO = vboArray[6];
+  GLuint torusIndicesVBO = vboArray[7];
   // === load models ===
 
-  GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber;
-  GLenum grassIndexType, skyboxIndexType, towerIndexType;
+  GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber, torusIndicesNumber;
+  GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType;
   if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
   if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
   if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;
+  if(!modelLoad("models/torus.emd", torusVAO, torusVBO, torusIndicesVBO, &torusIndicesNumber, &torusIndexType)) return -1;
 
   glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
@@ -234,6 +237,8 @@ int main() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // tower
+
     glm::mat4 towerM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
     glm::mat4 towerMVP = vp * towerM;
 
@@ -245,6 +250,22 @@ int main() {
     glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
     glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
+
+    // torus
+
+    glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) * glm::rotate(-3*islandAngle, 0.0f, 0.5f, 0.0f);
+    glm::mat4 torusMVP = vp * torusM;
+
+    glBindTexture(GL_TEXTURE_2D, towerTexture); // TODO use anither texture
+    glBindVertexArray(torusVAO);
+    glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &torusMVP[0][0]);
+    glUniformMatrix4fv(uniformM, 1, GL_FALSE, &torusM[0][0]);
+    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, torusIndicesVBO);
+    glDrawElements(GL_TRIANGLES, torusIndicesNumber, torusIndexType, nullptr);
+
+    // grass
 
     glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);
     glm::mat4 grassMVP = vp * grassM;
@@ -258,10 +279,11 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
     glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
+    // skybox
+
     glm::mat4 skyboxM = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
     glm::mat4 skyboxMVP = vp * skyboxM;
 
-    // TODO: implement modelDraw procedure (or maybe Model object?)
     glBindTexture(GL_TEXTURE_2D, skyboxTexture);
     glBindVertexArray(skyboxVAO);
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &skyboxMVP[0][0]);
