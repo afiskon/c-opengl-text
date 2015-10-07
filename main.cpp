@@ -313,34 +313,36 @@ int main() {
     glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
 
     // point light source
+    if(pointLightEnabled) {
+      glm::mat4 pointLightM = glm::translate(pointLightPos);
+      glm::mat4 pointLightMVP = vp * pointLightM;
 
-    glm::mat4 pointLightM = glm::translate(pointLightPos);
-    glm::mat4 pointLightMVP = vp * pointLightM;
-
-    glBindTexture(GL_TEXTURE_2D, redTexture);
-    glBindVertexArray(sphereVAO);
-    glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &pointLightMVP[0][0]);
-    glUniformMatrix4fv(uniformM, 1, GL_FALSE, &pointLightM[0][0]);
-    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
-    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
-    glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
-    glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+      glBindTexture(GL_TEXTURE_2D, redTexture);
+      glBindVertexArray(sphereVAO);
+      glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &pointLightMVP[0][0]);
+      glUniformMatrix4fv(uniformM, 1, GL_FALSE, &pointLightM[0][0]);
+      glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+      glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+      glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
+      glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+    }
 
     // spot light source
+    if(spotLightEnabled) {
+      glm::mat4 spotLightM = glm::translate(spotLightPos);
+      glm::mat4 spotLightMVP = vp * spotLightM;
 
-    glm::mat4 spotLightM = glm::translate(spotLightPos);
-    glm::mat4 spotLightMVP = vp * spotLightM;
-
-    glBindTexture(GL_TEXTURE_2D, blueTexture);
-    glBindVertexArray(sphereVAO);
-    glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &spotLightMVP[0][0]);
-    glUniformMatrix4fv(uniformM, 1, GL_FALSE, &spotLightM[0][0]);
-    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
-    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
-    glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
-    glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+      glBindTexture(GL_TEXTURE_2D, blueTexture);
+      glBindVertexArray(sphereVAO);
+      glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &spotLightMVP[0][0]);
+      glUniformMatrix4fv(uniformM, 1, GL_FALSE, &spotLightM[0][0]);
+      glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+      glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+      glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
+      glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
