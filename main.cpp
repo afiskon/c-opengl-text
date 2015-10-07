@@ -12,6 +12,9 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
+static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
+static const glm::vec3 spotLightPos(8.0f, 1.0f, 0.0f);
+
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -28,7 +31,7 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
   }
 
   {
-    setUniform3f(programId, "pointLight.position", -2.0f, 3.0f, 0.0f);
+    setUniform3f(programId, "pointLight.position", pointLightPos.x, pointLightPos.y, pointLightPos.z);
     setUniform3f(programId, "pointLight.color", 1.0f, 0.0f, 0.0f);
     setUniform1f(programId, "pointLight.ambientIntensity", float(pointLightEnabled) * 0.1f);
     setUniform1f(programId, "pointLight.diffuseIntensity", float(pointLightEnabled) * 1.0f);
@@ -36,14 +39,14 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
   }
 
   {
-    glm::vec3 direction = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f));
+    glm::vec3 direction = glm::normalize(glm::vec3(-6.0f, -2.0f, 0.0f));
 
     setUniform3f(programId, "spotLight.direction", direction.x, direction.y, direction.z);
-    setUniform3f(programId, "spotLight.position", 2.5f, 1.0f, 0.0f);
-    setUniform1f(programId, "spotLight.cutoff", glm::cos(glm::radians(25.0f)));
+    setUniform3f(programId, "spotLight.position", spotLightPos.x, spotLightPos.y, spotLightPos.z);
+    setUniform1f(programId, "spotLight.cutoff", glm::cos(glm::radians(15.0f)));
     setUniform3f(programId, "spotLight.color", 0.0f, 0.0f, 1.0f);
     setUniform1f(programId, "spotLight.ambientIntensity", float(spotLightEnabled)*0.1f);
-    setUniform1f(programId, "spotLight.diffuseIntensity", float(spotLightEnabled)*10.0f);
+    setUniform1f(programId, "spotLight.diffuseIntensity", float(spotLightEnabled)*20.0f);
     setUniform1f(programId, "spotLight.specularIntensity", float(spotLightEnabled)*1.0f);
   }
 }
@@ -110,7 +113,7 @@ int main() {
   glDeleteShader(fragmentShaderId);
 
   // === prepare textures ===
-  GLuint textureArray[4];
+  GLuint textureArray[6];
   int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
@@ -118,7 +121,9 @@ int main() {
   GLuint grassTexture = textureArray[0];
   GLuint skyboxTexture = textureArray[1];
   GLuint towerTexture = textureArray[2];
-  GLuint torusTexture = textureArray[3];
+  GLuint garkGreenTexture = textureArray[3];
+  GLuint redTexture = textureArray[4];
+  GLuint blueTexture = textureArray[5];
 
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
 
@@ -128,10 +133,12 @@ int main() {
 
   if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
 
-  loadOneColorTexture(0.05f, 0.5f, 0.1f, torusTexture);
+  loadOneColorTexture(0.05f, 0.5f, 0.1f, garkGreenTexture);
+  loadOneColorTexture(1.0f, 0.0f, 0.0f, redTexture);
+  loadOneColorTexture(0.0f, 0.0f, 1.0f, blueTexture);
 
   // === prepare VAOs ===
-  GLuint vaoArray[4];
+  GLuint vaoArray[5];
   int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
   glGenVertexArrays(vaosNum, vaoArray);
   defer(glDeleteVertexArrays(vaosNum, vaoArray));
@@ -140,9 +147,10 @@ int main() {
   GLuint skyboxVAO = vaoArray[1];
   GLuint towerVAO = vaoArray[2];
   GLuint torusVAO = vaoArray[3];
+  GLuint sphereVAO = vaoArray[4];
 
   // === prepare VBOs ===
-  GLuint vboArray[8];
+  GLuint vboArray[10];
   int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
   glGenBuffers(vbosNum, vboArray);
   defer(glDeleteBuffers(vbosNum, vboArray));
@@ -155,14 +163,17 @@ int main() {
   GLuint towerIndicesVBO = vboArray[5];
   GLuint torusVBO = vboArray[6];
   GLuint torusIndicesVBO = vboArray[7];
+  GLuint sphereVBO = vboArray[8];
+  GLuint sphereIndicesVBO = vboArray[9];
   // === load models ===
 
-  GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber, torusIndicesNumber;
-  GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType;
+  GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber, torusIndicesNumber, sphereIndicesNumber;
+  GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType, sphereIndexType;
   if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
   if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
   if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;
   if(!modelLoad("models/torus.emd", torusVAO, torusVBO, torusIndicesVBO, &torusIndicesNumber, &torusIndexType)) return -1;
+  if(!modelLoad("models/sphere.emd", sphereVAO, sphereVBO, sphereIndicesVBO, &sphereIndicesNumber, &sphereIndexType)) return -1;
 
   glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
@@ -259,7 +270,7 @@ int main() {
     glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) * glm::rotate(-3*islandAngle, 0.0f, 0.5f, 0.0f);
     glm::mat4 torusMVP = vp * torusM;
 
-    glBindTexture(GL_TEXTURE_2D, torusTexture);
+    glBindTexture(GL_TEXTURE_2D, garkGreenTexture);
     glBindVertexArray(torusVAO);
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &torusMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &torusM[0][0]);
