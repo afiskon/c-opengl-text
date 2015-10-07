@@ -321,6 +321,19 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
     glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
 
+    // spot light source
+
+    glm::mat4 spotLightM = glm::translate(spotLightPos);
+    glm::mat4 spotLightMVP = vp * spotLightM;
+
+    glBindTexture(GL_TEXTURE_2D, blueTexture);
+    glBindVertexArray(sphereVAO);
+    glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &spotLightMVP[0][0]);
+    glUniformMatrix4fv(uniformM, 1, GL_FALSE, &spotLightM[0][0]);
+    glUniform1f(uniformMaterialSpecularFactor, 1.0f);
+    glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
+    glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
