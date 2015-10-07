@@ -110,7 +110,7 @@ int main() {
   glDeleteShader(fragmentShaderId);
 
   // === prepare textures ===
-  GLuint textureArray[3];
+  GLuint textureArray[4];
   int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
   glGenTextures(texturesNum, textureArray);
   defer(glDeleteTextures(texturesNum, textureArray));
@@ -118,6 +118,7 @@ int main() {
   GLuint grassTexture = textureArray[0];
   GLuint skyboxTexture = textureArray[1];
   GLuint towerTexture = textureArray[2];
+  GLuint torusTexture = textureArray[3];
 
   if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
 
@@ -126,6 +127,8 @@ int main() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
+
+  loadOneColorTexture(0.05f, 0.5f, 0.1f, torusTexture);
 
   // === prepare VAOs ===
   GLuint vaoArray[4];
@@ -256,7 +259,7 @@ int main() {
     glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) * glm::rotate(-3*islandAngle, 0.0f, 0.5f, 0.0f);
     glm::mat4 torusMVP = vp * torusM;
 
-    glBindTexture(GL_TEXTURE_2D, towerTexture); // TODO use anither texture
+    glBindTexture(GL_TEXTURE_2D, torusTexture);
     glBindVertexArray(torusVAO);
     glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &torusMVP[0][0]);
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &torusM[0][0]);

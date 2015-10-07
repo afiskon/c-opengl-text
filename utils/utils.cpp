@@ -92,6 +92,15 @@ bool loadDDSTexture(const char *fname, GLuint textureId) {
   return loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
 }
 
+void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId) {
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  unsigned char textureData[3];
+  textureData[0] = (unsigned char)(r*255.0f);
+  textureData[1] = (unsigned char)(g*255.0f);
+  textureData[2] = (unsigned char)(b*255.0f);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+}
+
 bool checkShaderCompileStatus(GLuint obj) {
   GLint status;
   glGetShaderiv(obj, GL_COMPILE_STATUS, &status);

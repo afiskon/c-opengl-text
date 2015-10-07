@@ -5,6 +5,7 @@
 #include <vector>
 
 bool loadDDSTexture(const char *fname, GLuint textureId);
+void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId);
 
 GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr);
 GLuint loadShader(const char * fname, GLenum shaderType, bool * errorFlagPtr);
