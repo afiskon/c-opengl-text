@@ -184,6 +184,7 @@ int main() {
 
   GLint uniformMaterialSpecularFactor = getUniformLocation(programId, "materialSpecularFactor");
   GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
+  GLint uniformMaterialEmission = getUniformLocation(programId, "materialEmission");
 
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
@@ -262,6 +263,7 @@ int main() {
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
+    glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
     glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
 
@@ -276,6 +278,7 @@ int main() {
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &torusM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, torusIndicesVBO);
     glDrawElements(GL_TRIANGLES, torusIndicesNumber, torusIndexType, nullptr);
 
@@ -290,6 +293,7 @@ int main() {
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &grassM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 32.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 2.0f);
+    glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
     glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
 
@@ -304,6 +308,7 @@ int main() {
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &skyboxM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
+    glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
     glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
 
@@ -318,6 +323,7 @@ int main() {
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &pointLightM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
     glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
 
@@ -332,6 +338,7 @@ int main() {
     glUniformMatrix4fv(uniformM, 1, GL_FALSE, &spotLightM[0][0]);
     glUniform1f(uniformMaterialSpecularFactor, 1.0f);
     glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
+    glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
     glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
 

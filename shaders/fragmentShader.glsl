@@ -37,6 +37,7 @@ uniform sampler2D textureSampler;
 uniform vec3 cameraPos;
 uniform float materialSpecularFactor; // should be >= 1.0
 uniform float materialSpecularIntensity;
+uniform vec3 materialEmission;
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLight;
 uniform SpotLight spotLight;
@@ -81,7 +82,7 @@ void main() {
   vec4 directColor = calcDirectionalLight(normal, fragmentToCamera, directionalLight);
   vec4 pointColor = calcPointLight(normal, fragmentToCamera, pointLight);
   vec4 spotColor = calcSpotLight(normal, fragmentToCamera, spotLight);
-  vec4 linearColor = texture(textureSampler, fragmentUV) * (directColor + pointColor + spotColor);
+  vec4 linearColor = texture(textureSampler, fragmentUV) * (vec4(materialEmission, 1) + directColor + pointColor + spotColor);
 
   vec4 gamma = vec4(vec3(1.0/2.2), 1);
   color = pow(linearColor, gamma); // gamma-corrected color
