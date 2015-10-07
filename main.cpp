@@ -13,7 +13,7 @@
 #include "utils/models.h"
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
-static const glm::vec3 spotLightPos(8.0f, 1.0f, 0.0f);
+static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
@@ -39,7 +39,7 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
   }
 
   {
-    glm::vec3 direction = glm::normalize(glm::vec3(-6.0f, -2.0f, 0.0f));
+    glm::vec3 direction = glm::normalize(glm::vec3(-0.5f, -1.0f, 0.0f));
 
     setUniform3f(programId, "spotLight.direction", direction.x, direction.y, direction.z);
     setUniform3f(programId, "spotLight.position", spotLightPos.x, spotLightPos.y, spotLightPos.z);
