@@ -16,7 +16,9 @@ Usage:
 
 * WASD + mouse - move camera
 * Z/X - enable/disable wireframes mode
-* 1/2/3 - turn on/off one of light sources 
+* 1 - turn on/off directional light
+* 2 - turn on/off red point light
+* 3 - turn on/off blue spot light
 * Q - quit
 
 Tested on Linux, MacOS and Windows.
