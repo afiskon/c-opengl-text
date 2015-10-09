@@ -206,8 +206,8 @@ int main() {
   bool pointLightEnabled = true;
   bool spotLightEnabled = true;
   bool wireframesModeEnabled = false;
-  float lastKeyPress = 0.0;
-  const float keyPressPause = 250.0f;
+  float lastKeyPressCheck = 0.0;
+  const float keyPressCheckIntervalMs = 250.0f;
 
   setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 
@@ -223,34 +223,36 @@ int main() {
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
-    if((glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
-      lastKeyPress = startDeltaTimeMs;
-      wireframesModeEnabled = !wireframesModeEnabled;
-      if(wireframesModeEnabled) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      } else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if(startDeltaTimeMs - lastKeyPressCheck > keyPressCheckIntervalMs) {
+      if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+        lastKeyPressCheck = startDeltaTimeMs;
+        wireframesModeEnabled = !wireframesModeEnabled;
+        if (wireframesModeEnabled) {
+          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
       }
-    }
-    if((glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
-      lastKeyPress = startDeltaTimeMs;
-      bool enabled = camera.getMouseInterception();
-      camera.setMouseInterception(!enabled);
-    }
-    if((glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
-      lastKeyPress = startDeltaTimeMs;
-      directionalLightEnabled = !directionalLightEnabled;
-      setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
-    }
-    if((glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
-      lastKeyPress = startDeltaTimeMs;
-      pointLightEnabled = !pointLightEnabled;
-      setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
-    }
-    if((glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
-      lastKeyPress = startDeltaTimeMs;
-      spotLightEnabled = !spotLightEnabled;
-      setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+      if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        lastKeyPressCheck = startDeltaTimeMs;
+        bool enabled = camera.getMouseInterception();
+        camera.setMouseInterception(!enabled);
+      }
+      if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        lastKeyPressCheck = startDeltaTimeMs;
+        directionalLightEnabled = !directionalLightEnabled;
+        setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+      }
+      if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        lastKeyPressCheck = startDeltaTimeMs;
+        pointLightEnabled = !pointLightEnabled;
+        setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+      }
+      if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        lastKeyPressCheck = startDeltaTimeMs;
+        spotLightEnabled = !spotLightEnabled;
+        setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+      }
     }
 
     glm::vec3 cameraPos;
