@@ -281,7 +281,7 @@ int main() {
 
     // torus
 
-    glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) * glm::rotate(-3*islandAngle, 0.0f, 0.5f, 0.0f);
+    glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) * glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
     glm::mat4 torusMVP = vp * torusM;
 
     glBindTexture(GL_TEXTURE_2D, garkGreenTexture);
