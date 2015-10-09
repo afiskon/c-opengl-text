@@ -205,6 +205,7 @@ int main() {
   bool directionalLightEnabled = true;
   bool pointLightEnabled = true;
   bool spotLightEnabled = true;
+  bool wireframesModeEnabled = false;
   float lastKeyPress = 0.0;
   const float keyPressPause = 250.0f;
 
@@ -212,8 +213,6 @@ int main() {
 
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
-    if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     float startDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count();
@@ -224,6 +223,15 @@ int main() {
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
+    if((glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
+      lastKeyPress = startDeltaTimeMs;
+      wireframesModeEnabled = !wireframesModeEnabled;
+      if(wireframesModeEnabled) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      }
+    }
     if((glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
       lastKeyPress = startDeltaTimeMs;
       bool enabled = camera.getMouseInterception();

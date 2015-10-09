@@ -15,11 +15,11 @@ Usage:
 ```
 
 * WASD + mouse - move camera
-* M - mouse interception on/off
-* Z/X - enable/disable wireframes mode
-* 1 - turn on/off directional light
-* 2 - turn on/off red point light
-* 3 - turn on/off blue spot light
+* M - enable/disable mouse interception
+* X - enable/disable wireframes mode
+* 1 - enable/disable white directional light
+* 2 - enable/disable red point light
+* 3 - enable/disable blue spot light
 * Q - quit
 
 Tested on Linux, MacOS and Windows.
