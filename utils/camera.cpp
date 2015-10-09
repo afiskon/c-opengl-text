@@ -25,11 +25,8 @@ bool Camera::getMouseInterception() {
 
 void Camera::setMouseInterception(bool enabled) {
   mouseInterceptionEnabled = enabled;
-  if(enabled) {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  } else {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-  }
+  if(enabled) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {

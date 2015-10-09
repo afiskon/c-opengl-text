@@ -224,31 +224,28 @@ int main() {
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
     if(startDeltaTimeMs - lastKeyPressCheck > keyPressCheckIntervalMs) {
-      if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+      if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
         lastKeyPressCheck = startDeltaTimeMs;
         wireframesModeEnabled = !wireframesModeEnabled;
-        if (wireframesModeEnabled) {
-          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        } else {
-          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
+        if(wireframesModeEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
-      if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+      if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
         lastKeyPressCheck = startDeltaTimeMs;
         bool enabled = camera.getMouseInterception();
         camera.setMouseInterception(!enabled);
       }
-      if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+      if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         lastKeyPressCheck = startDeltaTimeMs;
         directionalLightEnabled = !directionalLightEnabled;
         setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
       }
-      if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+      if(glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
         lastKeyPressCheck = startDeltaTimeMs;
         pointLightEnabled = !pointLightEnabled;
         setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
       }
-      if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+      if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
         lastKeyPressCheck = startDeltaTimeMs;
         spotLightEnabled = !spotLightEnabled;
         setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
