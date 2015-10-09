@@ -189,8 +189,6 @@ int main() {
   auto startTime = std::chrono::high_resolution_clock::now();
   auto prevTime = startTime;
 
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide cursor
-
   Camera camera(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
 
   glEnable(GL_DOUBLEBUFFER);
@@ -207,7 +205,8 @@ int main() {
   bool directionalLightEnabled = true;
   bool pointLightEnabled = true;
   bool spotLightEnabled = true;
-  float lastLightsChangeMs = 0.0;
+  float lastKeyPress = 0.0;
+  const float keyPressPause = 250.0f;
 
   setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 
@@ -225,19 +224,24 @@ int main() {
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
-    if((glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) && (startDeltaTimeMs - lastLightsChangeMs > 300.0f)) {
+    if((glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
+      lastKeyPress = startDeltaTimeMs;
+      bool enabled = camera.getMouseInterception();
+      camera.setMouseInterception(!enabled);
+    }
+    if((glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
+      lastKeyPress = startDeltaTimeMs;
       directionalLightEnabled = !directionalLightEnabled;
-      lastLightsChangeMs = startDeltaTimeMs;
       setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
     }
-    if((glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) && (startDeltaTimeMs - lastLightsChangeMs > 300.0f)) {
+    if((glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
+      lastKeyPress = startDeltaTimeMs;
       pointLightEnabled = !pointLightEnabled;
-      lastLightsChangeMs = startDeltaTimeMs;
       setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
     }
-    if((glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) && (startDeltaTimeMs - lastLightsChangeMs > 300.0f)) {
+    if((glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) && (startDeltaTimeMs - lastKeyPress > keyPressPause)) {
+      lastKeyPress = startDeltaTimeMs;
       spotLightEnabled = !spotLightEnabled;
-      lastLightsChangeMs = startDeltaTimeMs;
       setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
     }
 

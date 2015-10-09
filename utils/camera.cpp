@@ -9,25 +9,44 @@ Camera::Camera(GLFWwindow* window, const glm::vec3& startPosition, float startHo
   window(window),
   position(startPosition),
   horizontalAngleRad(startHorizontalAngleRad),
-  verticalAngleRad(startVerticalAngleRad) { }
+  verticalAngleRad(startVerticalAngleRad),
+  mouseInterceptionEnabled(true) {
+
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide cursor
+}
 
 void Camera::getPosition(glm::vec3 *pOutVec) {
   *pOutVec = position;
 }
 
+bool Camera::getMouseInterception() {
+  return mouseInterceptionEnabled;
+}
+
+void Camera::setMouseInterception(bool enabled) {
+  mouseInterceptionEnabled = enabled;
+  if(enabled) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  } else {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  }
+}
+
 void Camera::getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix) {
   float deltaTimeSec = deltaTimeMs/1000.0f;
 
-  int windowWidth, windowHeight;
-  glfwGetWindowSize(window, &windowWidth, &windowHeight);
+  if(mouseInterceptionEnabled) {
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
-  double mouseX, mouseY;
-  glfwGetCursorPos(window, &mouseX, &mouseY);
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
 
-  horizontalAngleRad += mouseSpeedRad * (windowWidth/2 - mouseX);
-  verticalAngleRad += mouseSpeedRad * (windowHeight/2 - mouseY);
+    horizontalAngleRad += mouseSpeedRad * (windowWidth/2 - mouseX);
+    verticalAngleRad += mouseSpeedRad * (windowHeight/2 - mouseY);
 
-  glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
+    glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
+  }
 
   glm::vec3 direction(
     cos(verticalAngleRad) * sin(horizontalAngleRad),

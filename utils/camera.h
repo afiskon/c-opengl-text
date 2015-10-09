@@ -10,11 +10,14 @@ private:
   glm::vec3 position;
   float horizontalAngleRad;
   float verticalAngleRad;
+  bool mouseInterceptionEnabled;
 
 public:
   Camera(GLFWwindow* window, const glm::vec3&startPosition, float startHorizontalAngleRad, float startVerticalAngleRad);
   void getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix);
   void getPosition(glm::vec3* pOutVec);
+  bool getMouseInterception();
+  void setMouseInterception(bool enabled);
 
   Camera(Camera const &) = delete;
   void operator=(Camera const &x) = delete;
