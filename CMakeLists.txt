@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(lighting)
+project(text)
 
 find_package(OpenGL REQUIRED)
 
@@ -17,8 +17,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -std=c++11 -Wall -Wextra -Werror -Wn
 
 SET(MAIN_LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 set(MAIN_SOURCE_FILES utils/camera.cpp utils/camera.h utils/utils.h utils/utils.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)
-add_executable(lighting main.cpp ${MAIN_SOURCE_FILES})
-target_link_libraries(lighting ${MAIN_LIBRARIES})
+add_executable(text main.cpp ${MAIN_SOURCE_FILES})
+target_link_libraries(text ${MAIN_LIBRARIES})
 
 SET(EMDCONV_LIBRARIES glfw glxw assimp ${GLFW_LIBRARIES} ${GLXW_LIBRARY})
 set(EMDCONV_SOURCE_FILES emdconv.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)

@@ -1,4 +1,4 @@
-# cpp-opengl-lighting
+# cpp-opengl-text
 
 Usage:
 
