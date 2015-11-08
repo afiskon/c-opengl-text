@@ -211,6 +211,9 @@ int main() {
 
   setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 
+	int fpsCounter = 0;
+	auto lastFpsCounterFlushTime = startTime;
+
   while(glfwWindowShouldClose(window) == GL_FALSE) {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
@@ -222,6 +225,14 @@ int main() {
     float rotationTimeMs = 100000.0f;
     float currentRotation = startDeltaTimeMs / rotationTimeMs;
     float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
+
+		fpsCounter += 1;
+		float fpsFlushDeltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastFpsCounterFlushTime).count();
+		if(fpsFlushDeltaTimeMs > 1000.0f) {
+			std::cout << "FPS: " << fpsCounter << std::endl;
+			lastFpsCounterFlushTime = currentTime;
+			fpsCounter = 0;
+		}
 
     if(startDeltaTimeMs - lastKeyPressCheck > keyPressCheckIntervalMs) {
       if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
