@@ -24,7 +24,9 @@ struct EaxmodHeader {
 static const char eaxmodSignature[] = "EAXMOD";
 static const char eaxmodVersion = 2;
 
-bool checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header, unsigned int fileSize) {
+static bool
+checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header,
+					   unsigned int fileSize) {
   if(fileSize < sizeof(EaxmodHeader)) {
     std::cerr << "modelLoad - file is too small, fname = " << fname << std::endl;
     return false;

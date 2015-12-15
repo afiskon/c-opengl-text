@@ -16,7 +16,9 @@
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
-bool loadDDSTextureCommon(const char* fname, GLuint textureId, unsigned int fsize, unsigned char* dataPtr) {
+static bool
+loadDDSTextureCommon(const char* fname, GLuint textureId,
+					 unsigned int fsize, unsigned char* dataPtr) {
   if(fsize < DDS_HEADER_SIZE) {
     std::cerr << "loadDDSTexture failed, fname = " << fname <<
       ", fsize = " << fsize << ", less then DDS_HEADER_SIZE (" << DDS_HEADER_SIZE << ")" << std::endl;
@@ -101,7 +103,8 @@ void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId) {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 }
 
-bool checkShaderCompileStatus(GLuint obj) {
+static bool
+checkShaderCompileStatus(GLuint obj) {
   GLint status;
   glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
   if(status == GL_FALSE) {
@@ -115,7 +118,8 @@ bool checkShaderCompileStatus(GLuint obj) {
   return false;
 }
 
-bool checkProgramLinkStatus(GLuint obj) {
+static bool
+checkProgramLinkStatus(GLuint obj) {
   GLint status;
   glGetProgramiv(obj, GL_LINK_STATUS, &status);
   if(status == GL_FALSE) {

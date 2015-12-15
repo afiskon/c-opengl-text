@@ -2,6 +2,13 @@
 #include <GLFW/glfw3.h>
 #include "camera.h"
 
+// TODO: rewrite in pure C!
+// cameraCreate
+// cameraGetPosition
+// cameraGetMouseInterception
+// cameraSetMouseInterception
+// cameraGetViewMatrix
+
 static const float speed = 4.0f; // units per second
 static const float mouseSpeedRad = 0.0005f;
 
