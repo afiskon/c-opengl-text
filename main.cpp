@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <defer.h>
-// TODO: get rid of chrono
+// TODO: wrap chrono is comething like uint64_t getCurrentTimeMs()
 #include <chrono>
 
 #include "utils/utils.h"
