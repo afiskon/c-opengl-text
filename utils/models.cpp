@@ -21,6 +21,8 @@ struct EaxmodHeader {
 
 #pragma pack(pop)
 
+// TODO: replace std::cout with printf
+
 static const char eaxmodSignature[] = "EAXMOD";
 static const char eaxmodVersion = 2;
 

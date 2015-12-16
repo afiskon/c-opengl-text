@@ -74,6 +74,8 @@ void fileMappingClose(FileMapping* mapping) {
 #include <unistd.h>
 #include <cstring>
 
+// TODO: replace std::cout with printf
+
 struct FileMapping {
     int fd;
     size_t fsize;

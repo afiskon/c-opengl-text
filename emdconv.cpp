@@ -8,6 +8,8 @@
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
+// TODO: replace std::cout with printf here
+
 static const unsigned int floatsPerVertex = (3 + 3 + 2); // 3 per position + 3 per normal + UV
 
 GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) {

@@ -11,7 +11,6 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: replace std::cout with printf
 // TODO: get rid of vectors too?
 // TODO: also get rid of deferxx?
 

@@ -3,6 +3,7 @@
 #include "camera.h"
 
 // TODO: rewrite in pure C!
+
 // cameraCreate
 // cameraGetPosition
 // cameraGetMouseInterception
