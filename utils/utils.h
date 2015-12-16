@@ -13,4 +13,6 @@ GLint getUniformLocation(GLuint programId, const char* uniformName);
 void setUniform1f(GLuint programId, const char* uniformName, float value);
 void setUniform3f(GLuint programId, const char* uniformName, float v1, float v2, float v3);
 
+long getCurrentTimeMs();
+
 #endif // AFISKON_OPENGL_UTILS_H

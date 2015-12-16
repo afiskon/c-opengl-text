@@ -16,6 +16,23 @@
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
 
+#ifdef _WIN32
+
+// TODO: implement
+#include <please_implement_get_current_time_ms>
+
+#else // Linux, MacOS, etc
+
+#include <sys/time.h>
+
+long getCurrentTimeMs() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+
+	return ((long)tv.tv_sec) * 1000 + ((long)tv.tv_usec) / 1000;
+}
+#endif
+
 static bool
 loadDDSTextureCommon(const char* fname, GLuint textureId,
 					 unsigned int fsize, unsigned char* dataPtr) {
