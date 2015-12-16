@@ -3,8 +3,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <vector>
+#include <stdio.h>
 #include <defer.h>
 
 #include "utils/utils.h"
@@ -12,6 +12,8 @@
 #include "utils/models.h"
 
 // TODO: replace std::cout with printf
+// TODO: get rid of vectors too?
+// TODO: also get rid of deferxx?
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
@@ -54,7 +56,7 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
 
 int main() {
 	if(glfwInit() == GL_FALSE) {
-		std::cerr << "Failed to initialize GLFW" << std::endl;
+		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
 	defer(glfwTerminate());
@@ -69,7 +71,7 @@ int main() {
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Lighting", nullptr, nullptr);
 	if(window == nullptr) {
-		std::cerr << "Failed to open GLFW window" << std::endl;
+		fprintf(stderr, "Failed to open GLFW window\n");
 		return -1;
 	}
 	defer(glfwDestroyWindow(window));
@@ -77,7 +79,7 @@ int main() {
 	glfwMakeContextCurrent(window);
 
 	if(glxwInit()) {
-		std::cerr << "Failed to init GLXW" << std::endl;
+		fprintf(stderr, "Failed to init GLXW\n");
 		return -1;
 	}
 
@@ -90,7 +92,8 @@ int main() {
 
 	GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", GL_VERTEX_SHADER, &errorFlag);
 	if(errorFlag) {
-		std::cerr << "Failed to load vertex shader (invalid working directory?)" << std::endl;
+		fprintf(stderr, "Failed to load vertex shader (invalid working "
+			"directory?)\n");
 		return -1;
 	}
 
@@ -98,14 +101,15 @@ int main() {
 
 	GLuint fragmentShaderId = loadShader("shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER, &errorFlag);
 	if(errorFlag) {
-		std::cerr << "Failed to load fragment shader (invalid working directory?)" << std::endl;
+		fprintf(stderr, "Failed to load fragment shader (invalid working "
+			"directory?)\n");
 		return -1;
 	}
 	shaders.push_back(fragmentShaderId);
 
 	GLuint programId = prepareProgram(shaders, &errorFlag);
 	if(errorFlag) {
-		std::cerr << "Failed to prepare program" << std::endl;
+		fprintf(stderr, "Failed to prepare program\n");
 		return -1;
 	}
 	defer(glDeleteProgram(programId));
@@ -229,7 +233,7 @@ int main() {
 
 		fpsCounter += 1;
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 1000) {
-			std::cout << "FPS: " << fpsCounter << std::endl;
+			printf("FPS: %d\n", fpsCounter);
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 			fpsCounter = 0;
 		}
