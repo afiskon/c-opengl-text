@@ -10,11 +10,11 @@ Usage:
 
     # on *nix:
     cmake ..
-    make
+    make -j4
 
     # on Windows:
     cmake -DASSIMP_BUILD_ASSIMP_TOOLS=OFF -G "MinGW Makefiles" ..
-    mingw32-make
+    mingw32-make -j4
 
     cd ..
     ./build/emdconv models/skybox.blend skybox.emd

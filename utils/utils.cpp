@@ -18,8 +18,13 @@
 
 #ifdef _WIN32
 
-// TODO: implement
-#include <please_implement_get_current_time_ms>
+#include <windows.h>
+
+long getCurrentTimeMs() {
+	SYSTEMTIME time;
+	GetSystemTime(&time);
+	return ((long)time.wSecond * 1000) + (long)time.wMilliseconds;
+}
 
 #else // Linux, MacOS, etc
 
