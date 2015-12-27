@@ -1,4 +1,4 @@
-#include <iostream>
+#include <stdio.h>
 #include <defer.h>
 #include "fileMapping.h"
 
@@ -16,27 +16,27 @@ struct FileMapping {
 FileMapping * fileMappingCreate(const char* fname) {
   HANDLE hFile = CreateFile(fname, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
   if(hFile == INVALID_HANDLE_VALUE) {
-    std::cerr << "fileMappingCreate - CreateFile failed, fname =  " << fname << std::endl;
+    fprintf(stderr, "fileMappingCreate - CreateFile failed, fname =  %s\n", fname);
     return nullptr;
   }
 
   DWORD dwFileSize = GetFileSize(hFile, nullptr);
   if(dwFileSize == INVALID_FILE_SIZE) {
-    std::cerr << "fileMappingCreate - GetFileSize failed, fname =  " << fname << std::endl;
+    fprintf(stderr, "fileMappingCreate - GetFileSize failed, fname =  %s\n", fname);
     CloseHandle(hFile);
     return nullptr;
   }
 
   HANDLE hMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
   if(hMapping == nullptr) { // yes, NULL, not INVALID_HANDLE_VALUE, see MSDN
-    std::cerr << "fileMappingCreate - CreateFileMapping failed, fname =  " << fname << std::endl;
+    fprintf(stderr, "fileMappingCreate - CreateFileMapping failed, fname =  %s\n", fname);
     CloseHandle(hFile);
     return nullptr;
   }
 
   unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, dwFileSize);
   if(dataPtr == nullptr) {
-    std::cerr << "fileMappingCreate - MapViewOfFile failed, fname =  " << fname << std::endl;
+    fprintf(stderr, "fileMappingCreate - MapViewOfFile failed, fname =  %s\n", fname);
     CloseHandle(hMapping);
     CloseHandle(hFile);
     return nullptr;
@@ -44,7 +44,7 @@ FileMapping * fileMappingCreate(const char* fname) {
 
   FileMapping* mapping = (FileMapping*)malloc(sizeof(FileMapping));
   if(mapping == nullptr) {
-    std::cerr << "fileMappingCreate - malloc failed, fname = " << fname << std::endl;
+    fprintf(stderr, "fileMappingCreate - malloc failed, fname = %s\n", fname);
     UnmapViewOfFile(dataPtr);
     CloseHandle(hMapping);
     CloseHandle(hFile);
@@ -72,9 +72,9 @@ void fileMappingClose(FileMapping* mapping) {
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <cstring>
-
-// TODO: replace std::cout with printf
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
 struct FileMapping {
     int fd;
@@ -85,13 +85,13 @@ struct FileMapping {
 FileMapping * fileMappingCreate(const char* fname) {
   int fd = open(fname, O_RDONLY, 0);
   if(fd < 0) {
-    std::cerr << "fileMappingCreate - open failed, fname =  " << fname << ", " << strerror(errno) << std::endl;
+    fprintf(stderr, "fileMappingCreate - open failed, fname =  %s, strerror = %s\n", fname, strerror(errno));
     return nullptr;
   }
 
   struct stat st;
   if(fstat(fd, &st) < 0) {
-    std::cerr << "fileMappingCreate - fstat failed, fname = " << fname << ", " << strerror(errno) << std::endl;
+    fprintf(stderr, "fileMappingCreate - fstat failed, fname = %s, strerror = %s\n", fname, strerror(errno));
     close(fd);
     return nullptr;
   }
@@ -100,14 +100,14 @@ FileMapping * fileMappingCreate(const char* fname) {
 
   unsigned char* dataPtr = (unsigned char*)mmap(nullptr, fsize, PROT_READ, MAP_PRIVATE, fd, 0);
   if(dataPtr == MAP_FAILED) {
-    std::cerr << "fileMappingCreate - mmap failed, fname = " << fname << ", " << strerror(errno) << std::endl;
+    fprintf(stderr, "fileMappingCreate - mmap failed, fname = %s, strerror = %s\n", fname, strerror(errno));
     close(fd);
     return nullptr;
   }
 
   FileMapping * mapping = (FileMapping *)malloc(sizeof(FileMapping));
   if(mapping == nullptr) {
-    std::cerr << "fileMappingCreate - malloc failed, fname = " << fname << std::endl;
+    fprintf(stderr, "fileMappingCreate - malloc failed, fname = %s\n", fname);
     munmap(dataPtr, fsize);
     close(fd);
     return nullptr;
