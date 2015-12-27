@@ -27,11 +27,11 @@ void Camera::getPosition(glm::vec3 *pOutVec) {
   *pOutVec = position;
 }
 
-bool Camera::getMouseInterception() {
+bool Camera::getMouseInterceptionEnabled() {
   return mouseInterceptionEnabled;
 }
 
-void Camera::setMouseInterception(bool enabled) {
+void Camera::setMouseInterceptionEnabled(bool enabled) {
   mouseInterceptionEnabled = enabled;
   if(enabled) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

@@ -11,12 +11,12 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: get rid of vectors too?
-// TODO: also get rid of deferxx?
-// TODO: return int = -1 in case of error, not bool = true!
 // TODO: "compress" repository!
-// TODO: use C interface of Assimp
-// TODO: get rid of glm
+// TODO: get rid of c++ vectors?
+// TODO: also get rid of deferxx?
+// TODO: use C interface of Assimp?
+// TODO: get rid of glm?
+// TODO: move all my sources to demo directory - it makes search much simpler
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
@@ -250,8 +250,8 @@ int main() {
 			}
 			if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
-				bool enabled = camera.getMouseInterception();
-				camera.setMouseInterception(!enabled);
+				bool enabled = camera.getMouseInterceptionEnabled();
+				camera.setMouseInterceptionEnabled(!enabled);
 			}
 			if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
