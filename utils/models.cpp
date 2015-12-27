@@ -1,9 +1,7 @@
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <defer.h>
-#include <cstring>
 #include "utils.h"
 #include "models.h"
 #include "fileMapping.h"
@@ -30,28 +28,28 @@ static bool
 checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header,
 					   unsigned int fileSize) {
   if(fileSize < sizeof(EaxmodHeader)) {
-    std::cerr << "modelLoad - file is too small, fname = " << fname << std::endl;
+    fprintf(stderr, "modelLoad - file is too small, fname = %s\n", fname);
     return false;
   }
 
   if(strncmp(header->signature, eaxmodSignature, sizeof(eaxmodSignature)) != 0) {
-    std::cerr << "modelLoad - invalid signature, fname = " << fname << std::endl;
+    fprintf(stderr, "modelLoad - invalid signature, fname = %s\n", fname);
     return false;
   }
 
   if(header->version != eaxmodVersion) {
-    std::cerr << "modelLoad - unsupported version " << (int)header->version << ", fname = " << fname << std::endl;
+    fprintf(stderr, "modelLoad - unsupported version %d, fname = %s\n", (int)header->version, fname);
     return false;
   }
 
   if(sizeof(eaxmodSignature) > header->headerSize) {
-    std::cerr << "modelLoad - invalid header size, actual: " << header->headerSize << ", expected at least: " << sizeof(eaxmodSignature) << ", fname = " << fname << std::endl;
+    fprintf(stderr, "modelLoad - invalid header size, actual: %d, , expected at least: %d, fname = %s\n", (int)header->headerSize, (int)sizeof(eaxmodSignature), fname);
     return false;
   }
 
   uint32_t expectedSize = header->headerSize + header->verticesDataSize + header->indicesDataSize;
   if(fileSize != expectedSize) {
-    std::cerr << "modelLoad - invalid size, actual: " << fileSize << ", expected: " << expectedSize << ", fname = " << fname << std::endl;
+    fprintf(stderr, "modelLoad - invalid size, actual: %u, expected: %u, fname = %s\n", fileSize, expectedSize, fname);
     return false;
   }
 
@@ -92,7 +90,7 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
 
   FILE* fd = fopen(fname, "wb");
   if(fd == nullptr) {
-    std::cerr << "modelSave - failed to open file, fname = " << fname << std::endl;
+    fprintf(stderr, "modelSave - failed to open file, fname = %s\n", fname);
     return false;
   }
   defer(fclose(fd));
@@ -106,17 +104,17 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
   header.indexSize = indexSize;
 
   if(fwrite(&header, sizeof(header), 1, fd) != 1) {
-    std::cerr << "modelSave - failed to write header, fname = " << fname << std::endl;
+    fprintf(stderr, "modelSave - failed to write header, fname = %s\n", fname);
     return false;
   }
 
   if(fwrite(verticesData, verticesDataSize, 1, fd) != 1) {
-    std::cerr << "modelSave - failed to write verticesData, fname = " << fname << std::endl;
+    fprintf(stderr, "modelSave - failed to write verticesData, fname = %s\n", fname);
     return false;
   }
 
   if(fwrite(indicesData, indicesDataSize, 1, fd) != 1) {
-    std::cerr << "modelSave - failed to write indicesData, fname = " << fname << std::endl;
+    fprintf(stderr, "modelSave - failed to write indicesData, fname = %s\n", fname);
     return false;
   }
 
@@ -145,7 +143,7 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   } else if(indexSize == 4) {
     *outIndicesType = GL_UNSIGNED_INT;
   } else {
-    std::cerr << "modelLoad - unsupported indexSize: " << indexSize << std::endl;
+    fprintf(stderr, "modelLoad - unsupported indexSize: %d, fname = %s\n", (int)indexSize, fname);
     return false;
   }
 
