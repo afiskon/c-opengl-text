@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <stdio.h>
+#include <assert.h>
 #include <defer.h>
 
 #include "utils/utils.h"
@@ -20,6 +21,9 @@
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
+
+static const float fpsSmoothing = 0.9; // larger - more smoothing
+static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing value");
 
 void windowSizeCallback(GLFWwindow *, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -194,9 +198,6 @@ int main() {
 	GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
 	GLint uniformMaterialEmission = getUniformLocation(programId, "materialEmission");
 
-	long startTimeMs = getCurrentTimeMs();
-	long prevTimeMs = startTimeMs;
-
 	Camera* camera = cameraCreate(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
 	if(!camera) return -1;
 	defer(cameraDestroy(camera));
@@ -221,26 +222,34 @@ int main() {
 
 	setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 
-	int fpsCounter = 0;
+	long startTimeMs = getCurrentTimeMs();
+	long currentTimeMs = startTimeMs;
+	long prevTimeMs = startTimeMs;
 	long lastFpsCounterFlushTimeMs = startTimeMs;
-
+	float fps = 0.0;
 	while(glfwWindowShouldClose(window) == GL_FALSE) {
 		if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
-		long currentTimeMs = getCurrentTimeMs();
+		currentTimeMs = getCurrentTimeMs();
+
 		long startDeltaTimeMs = currentTimeMs - startTimeMs;
 		long prevDeltaTimeMs = currentTimeMs - prevTimeMs;
+
 		prevTimeMs = currentTimeMs;
 
 		float rotationTimeMs = 100000.0;
 		float currentRotation = (float)startDeltaTimeMs / rotationTimeMs;
 		float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
-		fpsCounter += 1;
-		if(currentTimeMs - lastFpsCounterFlushTimeMs > 1000) {
-			printf("FPS: %d\n", fpsCounter);
+		// prevent devision by zero and/or very high FPS value right after program start
+		if(prevDeltaTimeMs > 0) {
+			fps = fps*fpsSmoothing + (1.0 - fpsSmoothing)*(1000.0 / (float)prevDeltaTimeMs);
+		}
+
+		// dont update fps to often or no one can read it
+		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200) {
+			printf("FPS: %f\n", fps);
 			lastFpsCounterFlushTimeMs = currentTimeMs;
-			fpsCounter = 0;
 		}
 
 		if(startDeltaTimeMs - lastKeyPressCheckMs > keyPressCheckIntervalMs) {
