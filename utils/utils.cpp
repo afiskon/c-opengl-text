@@ -104,7 +104,7 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 bool loadDDSTexture(const char *fname, GLuint textureId) {
 	FileMapping* mapping = fileMappingCreate(fname);
 	if(mapping == nullptr) return false;
-	defer(fileMappingClose(mapping));
+	defer(fileMappingDestroy(mapping));
 
 	unsigned char* dataPtr = fileMappingGetPointer(mapping);
 	unsigned int fsize = fileMappingGetSize(mapping);
@@ -169,7 +169,7 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
 		*errorFlagPtr = true;
 		return 0;
 	}
-	defer(fileMappingClose(mapping));
+	defer(fileMappingDestroy(mapping));
 
 	GLuint shaderId = glCreateShader(shaderType);
 	GLchar* stringArray[1];

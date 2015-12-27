@@ -59,7 +59,7 @@ FileMapping * fileMappingCreate(const char* fname) {
   return mapping;
 }
 
-void fileMappingClose(FileMapping* mapping) {
+void fileMappingDestroy(FileMapping* mapping) {
   UnmapViewOfFile(mapping->dataPtr);
   CloseHandle(mapping->hMapping);
   CloseHandle(mapping->hFile);
@@ -120,7 +120,7 @@ FileMapping * fileMappingCreate(const char* fname) {
   return mapping;
 }
 
-void fileMappingClose(FileMapping * mapping) {
+void fileMappingDestroy(FileMapping * mapping) {
   munmap(mapping->dataPtr, mapping->fsize);
   close(mapping->fd);
   free(mapping);

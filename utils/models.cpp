@@ -125,7 +125,7 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
 
   FileMapping* mapping = fileMappingCreate(fname);
   if(mapping == nullptr) return false;
-  defer(fileMappingClose(mapping));
+  defer(fileMappingDestroy(mapping));
 
   unsigned char* dataPtr = fileMappingGetPointer(mapping);
   unsigned int dataSize = fileMappingGetSize(mapping);
