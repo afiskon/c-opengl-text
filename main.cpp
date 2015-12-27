@@ -15,6 +15,8 @@
 // TODO: also get rid of deferxx?
 // TODO: return int = -1 in case of error, not bool = true!
 // TODO: "compress" repository!
+// TODO: use C interface of Assimp
+// TODO: get rid of glm
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
