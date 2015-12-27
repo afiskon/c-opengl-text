@@ -20,6 +20,7 @@
 
 #include <windows.h>
 
+// TODO: use GetSystemTimeAsFileTime https://msdn.microsoft.com/en-us/library/ms724397(VS.85).aspx
 long getCurrentTimeMs() {
 	SYSTEMTIME time;
 	GetSystemTime(&time);
