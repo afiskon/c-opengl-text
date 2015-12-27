@@ -3,24 +3,14 @@
 
 #include <glm/core/type.hpp>
 
-class Camera {
+struct Camera;
 
-private:
-  GLFWwindow*window;
-  glm::vec3 position;
-  float horizontalAngleRad;
-  float verticalAngleRad;
-  bool mouseInterceptionEnabled;
+Camera* cameraCreate(GLFWwindow* window, const glm::vec3&startPosition, float startHorizontalAngleRad, float startVerticalAngleRad);
+void cameraGetPosition(Camera* cam, glm::vec3* pOutVec);
+bool cameraGetMouseInterceptionEnabled(Camera* cam);
+void cameraSetMouseInterceptionEnabled(Camera* cam, bool enabled);
+void cameraGetViewMatrix(Camera* cam, float deltaTimeMs, glm::mat4* pOutViewMatrix);
+void cameraDestroy(Camera* cam);
 
-public:
-  Camera(GLFWwindow* window, const glm::vec3&startPosition, float startHorizontalAngleRad, float startVerticalAngleRad);
-  void getViewMatrix(float deltaTimeMs, glm::mat4* pOutViewMatrix);
-  void getPosition(glm::vec3* pOutVec);
-  bool getMouseInterceptionEnabled();
-  void setMouseInterceptionEnabled(bool enabled);
-
-  Camera(Camera const &) = delete;
-  void operator=(Camera const &x) = delete;
-};
 
 #endif // AFISKON_OPENGL_CAMERA_H

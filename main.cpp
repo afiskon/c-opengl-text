@@ -197,7 +197,9 @@ int main() {
 	long startTimeMs = getCurrentTimeMs();
 	long prevTimeMs = startTimeMs;
 
-	Camera camera(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
+	Camera* camera = cameraCreate(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
+	if(!camera) return -1;
+	defer(cameraDestroy(camera));
 
 	glEnable(GL_DOUBLEBUFFER);
 	glEnable(GL_CULL_FACE);
@@ -250,8 +252,8 @@ int main() {
 			}
 			if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
-				bool enabled = camera.getMouseInterceptionEnabled();
-				camera.setMouseInterceptionEnabled(!enabled);
+				bool enabled = cameraGetMouseInterceptionEnabled(camera);
+				cameraSetMouseInterceptionEnabled(camera, !enabled);
 			}
 			if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
@@ -271,12 +273,12 @@ int main() {
 		}
 
 		glm::vec3 cameraPos;
-		camera.getPosition(&cameraPos);
+		cameraGetPosition(camera, &cameraPos);
 
 		glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
 		glm::mat4 view;
-		camera.getViewMatrix(prevDeltaTimeMs, &view);
+		cameraGetViewMatrix(camera, prevDeltaTimeMs, &view);
 		glm::mat4 vp = projection * view;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
