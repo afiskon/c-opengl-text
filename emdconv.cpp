@@ -8,8 +8,6 @@
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
-// TODO: replace std::cout with printf here
-
 static const unsigned int floatsPerVertex = (3 + 3 + 2); // 3 per position + 3 per normal + UV
 
 GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) {
@@ -19,12 +17,12 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
   const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
   if(scene == nullptr) {
-    std::cerr << "Failed to load model " << fname << std::endl;
+    fprintf(stderr, "Failed to load model %s\n", fname);
     return nullptr;
   }
 
   if(scene->mNumMeshes <= meshNumber) {
-    std::cerr << "There is no mesh #" << meshNumber << " in model (" << scene->mNumMeshes << " only), fname = " << fname << std::endl;
+    fprintf(stderr, "There is no mesh #%u in model (%d only), fname = %s\n", meshNumber, scene->mNumMeshes, fname);
     return nullptr;
   }
 
@@ -33,7 +31,7 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
 //  unsigned int verticesNum = mesh->mNumVertices;
 
   if(mesh->mTextureCoords[0] == nullptr) {
-    std::cerr << "mesh->mTextureCoords[0] == nullptr, fname = " << fname << std::endl;
+    fprintf(stderr, "mesh->mTextureCoords[0] == nullptr, fname = %s\n", fname);
     return nullptr;
   }
 
@@ -47,7 +45,7 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
   for(unsigned int i = 0; i < facesNum; ++i) {
     const aiFace& face = mesh->mFaces[i];
     if(face.mNumIndices != verticesPerFace) {
-      std::cerr << "face.numIndices = " << face.mNumIndices << " (3 expected), i = " << i << ", fname = " << fname << std::endl;
+      fprintf(stderr, "face.numIndices = %d (3 expected), i = %u, fname = %s\n", face.mNumIndices, i, fname);
       free(verticesBuffer);
       return nullptr;
     }
@@ -111,8 +109,8 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
   unsigned int modelSize = (unsigned int) (verticesNumber*floatsPerVertex*sizeof(GLfloat));
   unsigned int indexedModelSize = (unsigned int) (usedIndices*floatsPerVertex*sizeof(GLfloat) + verticesNumber*indexSize);
   float ratio = (float)indexedModelSize*100.0f / (float)modelSize;
-  std::cout << "importedModelSave - fname = " << fname << ", verticesNumber = " << verticesNumber << ", usedIndices = " << usedIndices << std::endl;
-  std::cout << "importedModelSave - modelSize = " << modelSize << ", indexedModelSize = " << indexedModelSize << ", ratio = " << ratio << " %" << std::endl;
+  fprintf(stderr, "importedModelSave - fname = %s, verticesNumber = %u, usedIndices = %u\n", fname, verticesNumber, usedIndices);
+  fprintf(stderr, "importedModelSave - modelSize = %u, indexedModelSize = %u, ratio = %f%%\n", modelSize, indexedModelSize, ratio);
 
   return modelSave(fname, vertices.data(), usedIndices* floatsPerVertex *sizeof(GLfloat), indices.data(), verticesNumber);
 }
@@ -123,7 +121,7 @@ void importedModelFree(GLfloat* model) {
 
 int main(int argc, char* argv[]) {
   if(argc < 2) {
-    std::cout << "Usage: emdconv <input file> <output file> [mesh number]" << std::endl;
+    printf("Usage: emdconv <input file> <output file> [mesh number]\n");
     return 1;
   }
 
@@ -135,25 +133,25 @@ int main(int argc, char* argv[]) {
     meshNumber = (unsigned int) atoi(argv[3]);
   }
 
-  std::cout << "Infile: " << infile << std::endl;
-  std::cout << "Outfile: " << outfile << std::endl;
-  std::cout << "Mesh number: " << meshNumber << std::endl;
+  printf("Infile: %s\n", infile);
+  printf("Outfile: %s\n", outfile);
+  printf("Mesh number: %u\n", meshNumber);
 
   unsigned int modelVerticesNumber;
   size_t modelVerticesBufferSize;
   GLfloat * modelVerticesBuffer = importedModelCreate(infile, meshNumber, &modelVerticesBufferSize, &modelVerticesNumber);
   if(modelVerticesBuffer == nullptr) {
-    std::cerr << "importedModelCreate returned null" << std::endl;
+    fprintf(stderr, "importedModelCreate returned null\n");
     return 2;
   }
   defer(importedModelFree(modelVerticesBuffer));
 
   if(!importedModelSave(outfile, modelVerticesBuffer, modelVerticesNumber)) {
-    std::cerr << "importedModelSave failed" << std::endl;
+    fprintf(stderr, "importedModelSave failed\n");
     return 3;
   }
 
-  std::cout << "Done!" << std::endl;
+  printf("Done!\n");
 
   return 0;
 }
