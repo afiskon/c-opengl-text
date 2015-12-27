@@ -7,8 +7,15 @@ Usage:
     git submodule update
     mkdir build
     cd build
+
+    # on *nix:
     cmake ..
     make
+
+    # on Windows:
+    cmake -DASSIMP_BUILD_ASSIMP_TOOLS=OFF -G "MinGW Makefiles" ..
+    mingw32-make
+
     cd ..
     ./build/emdconv models/skybox.blend skybox.emd
     ./build/demo
