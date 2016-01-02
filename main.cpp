@@ -389,8 +389,12 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			printf("FPS: %f, currentTimeMs = %ld\n",
-				fps, currentTimeMs);
+			// see http://stackoverflow.com/q/6299083/1565238 :(
+			printf("FPS: %f, currentTimeMs = 0x%08x%08x\n",
+					fps,
+					(uint32_t)(currentTimeMs >> 32),
+					(uint32_t)(currentTimeMs & 0xFFFFFFFF)
+				);
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
 
