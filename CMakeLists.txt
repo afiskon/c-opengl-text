@@ -14,12 +14,12 @@ include_directories(glm)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror -Wno-deprecated-register -Wno-shift-op-parentheses")
 
-SET(MAIN_LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
+SET(MAIN_LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY} ${CMAKE_DL_LIBS})
 set(MAIN_SOURCE_FILES utils/camera.cpp utils/camera.h utils/utils.h utils/utils.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)
 add_executable(demo main.cpp ${MAIN_SOURCE_FILES})
 target_link_libraries(demo ${MAIN_LIBRARIES})
 
-SET(EMDCONV_LIBRARIES glfw glxw assimp ${GLFW_LIBRARIES} ${GLXW_LIBRARY})
+SET(EMDCONV_LIBRARIES glfw glxw assimp ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${CMAKE_DL_LIBS})
 set(EMDCONV_SOURCE_FILES emdconv.cpp utils/models.cpp utils/models.h utils/fileMapping.cpp utils/fileMapping.h)
 add_executable(emdconv ${EMDCONV_SOURCE_FILES})
 target_link_libraries(emdconv ${EMDCONV_LIBRARIES})
