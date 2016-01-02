@@ -34,7 +34,7 @@ long getCurrentTimeMs()
 	LONGLONG nowUnix = nowWindows; // - 116444736000000000LL;
 	LONGLONG nowUnixMs = nowUnix / 10000LL;
 
-	return (long)nowMs
+	return (long)nowUnixMs;
 }
 
 #else // Linux, MacOS, etc
