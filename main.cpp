@@ -27,6 +27,10 @@ void windowSizeCallback(GLFWwindow *, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
+void errorCallback(int code, const char* descr) {
+	printf("ERROR: code = %d, descr = %s\n", code, descr);
+}
+
 void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLightEnabled, bool spotLightEnabled) {
 	{
 		glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
@@ -68,6 +72,8 @@ int main() {
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
+
+	glfwSetErrorCallback(errorCallback);
 
 	glfwDefaultWindowHints();
 
