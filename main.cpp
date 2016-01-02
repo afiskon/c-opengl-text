@@ -23,51 +23,28 @@ static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
 static const float fpsSmoothing = 0.9; // larger - more smoothing
 static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing value");
 
-void windowSizeCallback(GLFWwindow *, int width, int height) {
+struct CommonResources
+{
+	GLFWwindow* window;
+};
+
+static void
+windowSizeCallback(GLFWwindow *, int width, int height)
+{
 	glViewport(0, 0, width, height);
 }
 
-void errorCallback(int code, const char* descr) {
+static void
+errorCallback(int code, const char* descr)
+{
 	fprintf(stderr, "ERROR: code = %d, descr = %s\n", code, descr);
 }
 
-void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLightEnabled, bool spotLightEnabled) {
-	{
-		glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+static int
+commonResourcesCreate(CommonResources* resources)
+{
+	resources->window = NULL;
 
-		setUniform3f(programId, "directionalLight.direction", direction.x, direction.y, direction.z);
-		setUniform3f(programId, "directionalLight.color", 1.0f, 1.0f, 1.0f);
-		setUniform1f(programId, "directionalLight.ambientIntensity", float(directionalLightEnabled)*0.1f);
-		setUniform1f(programId, "directionalLight.diffuseIntensity", float(directionalLightEnabled)*0.1f);
-		setUniform1f(programId, "directionalLight.specularIntensity", float(directionalLightEnabled)*1.0f);
-	}
-
-	{
-		setUniform3f(programId, "pointLight.position", pointLightPos.x, pointLightPos.y, pointLightPos.z);
-		setUniform3f(programId, "pointLight.color", 1.0f, 0.0f, 0.0f);
-		setUniform1f(programId, "pointLight.ambientIntensity", float(pointLightEnabled) * 0.1f);
-		setUniform1f(programId, "pointLight.diffuseIntensity", float(pointLightEnabled) * 1.0f);
-		setUniform1f(programId, "pointLight.specularIntensity", float(pointLightEnabled) * 1.0f);
-	}
-
-	{
-		glm::vec3 direction = glm::normalize(glm::vec3(-0.5f, -1.0f, 0.0f));
-
-		setUniform3f(programId, "spotLight.direction", direction.x, direction.y, direction.z);
-		setUniform3f(programId, "spotLight.position", spotLightPos.x, spotLightPos.y, spotLightPos.z);
-		setUniform1f(programId, "spotLight.cutoff", glm::cos(glm::radians(15.0f)));
-		setUniform3f(programId, "spotLight.color", 0.0f, 0.0f, 1.0f);
-		setUniform1f(programId, "spotLight.ambientIntensity", float(spotLightEnabled)*0.1f);
-		setUniform1f(programId, "spotLight.diffuseIntensity", float(spotLightEnabled)*20.0f);
-		setUniform1f(programId, "spotLight.specularIntensity", float(spotLightEnabled)*1.0f);
-	}
-}
-
-// TODO: refactore resource (VAOs, VBOs, Textures) creation and releasing
-// 1) allocate common resources + set boolean flags __allocated = true,
-// 2) pass object with all resources
-// 3) release resources on return
-int main() {
 	if(glfwInit() == GL_FALSE) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
@@ -83,27 +60,107 @@ int main() {
 	
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Demo",
-		NULL, NULL);
+	resources->window = glfwCreateWindow(800, 600, "Demo", NULL, NULL);
 
-	if(window == NULL) {
+	if(resources->window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window\n");
-		glfwTerminate();
 		return -1;
 	}
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(resources->window);
 
 	if(glxwInit()) {
 		fprintf(stderr, "Failed to init GLXW\n");
-		glfwDestroyWindow(window);
-		glfwTerminate();
 		return -1;
 	}
 
 	glfwSwapInterval(1);
-	glfwSetWindowSizeCallback(window, windowSizeCallback);
-	glfwShowWindow(window);
+	glfwSetWindowSizeCallback(resources->window, windowSizeCallback);
+	glfwShowWindow(resources->window);
+
+	return 0;
+}
+
+static void
+commonResourcesDestroy(CommonResources* resources)
+{
+	if(resources->window != NULL)
+		glfwDestroyWindow(resources->window);
+
+	glfwTerminate();
+}
+
+
+static void
+setupLights(GLuint programId, bool directionalLightEnabled,
+	bool pointLightEnabled, bool spotLightEnabled)
+{
+	{
+		glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+
+		setUniform3f(programId, "directionalLight.direction",
+			direction.x, direction.y, direction.z);
+		setUniform3f(programId, "directionalLight.color",
+			1.0f, 1.0f, 1.0f);
+		setUniform1f(programId, "directionalLight.ambientIntensity",
+			float(directionalLightEnabled)*0.1f);
+		setUniform1f(programId, "directionalLight.diffuseIntensity",
+			float(directionalLightEnabled)*0.1f);
+		setUniform1f(programId, "directionalLight.specularIntensity",
+			float(directionalLightEnabled)*1.0f);
+	}
+
+	{
+		setUniform3f(programId, "pointLight.position",
+			pointLightPos.x, pointLightPos.y, pointLightPos.z);
+		setUniform3f(programId, "pointLight.color",
+			1.0f, 0.0f, 0.0f);
+		setUniform1f(programId, "pointLight.ambientIntensity",
+			float(pointLightEnabled) * 0.1f);
+		setUniform1f(programId, "pointLight.diffuseIntensity",
+			float(pointLightEnabled) * 1.0f);
+		setUniform1f(programId, "pointLight.specularIntensity",
+			float(pointLightEnabled) * 1.0f);
+	}
+
+	{
+		glm::vec3 direction = glm::normalize(glm::vec3(-0.5f, -1.0f, 0.0f));
+
+		setUniform3f(programId, "spotLight.direction",
+			direction.x, direction.y, direction.z);
+		setUniform3f(programId, "spotLight.position",
+			spotLightPos.x, spotLightPos.y, spotLightPos.z);
+		setUniform1f(programId, "spotLight.cutoff",
+			glm::cos(glm::radians(15.0f)));
+		setUniform3f(programId, "spotLight.color",
+			0.0f, 0.0f, 1.0f);
+		setUniform1f(programId, "spotLight.ambientIntensity",
+			float(spotLightEnabled)*0.1f);
+		setUniform1f(programId, "spotLight.diffuseIntensity",
+			float(spotLightEnabled)*20.0f);
+		setUniform1f(programId, "spotLight.specularIntensity",
+			float(spotLightEnabled)*1.0f);
+	}
+}
+
+// TODO: refactore resource (VAOs, VBOs, Textures) creation and releasing
+// 1) allocate common resources + set boolean flags __allocated = true,
+// 2) pass object with all resources
+// 3) release resources on return
+int main()
+{
+	CommonResources resources;
+
+	if(commonResourcesCreate(&resources) == -1)
+	{
+		commonResourcesDestroy(&resources);
+		return 1;
+	}
+
+
+
+
+
 
 	bool errorFlag = false;
 	std::vector<GLuint> shaders;
@@ -112,7 +169,7 @@ int main() {
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load vertex shader (invalid working "
 			"directory?)\n");
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -123,7 +180,7 @@ int main() {
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load fragment shader (invalid working "
 			"directory?)\n");
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -132,7 +189,7 @@ int main() {
 	GLuint programId = prepareProgram(shaders, &errorFlag);
 	if(errorFlag) {
 		fprintf(stderr, "Failed to prepare program\n");
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -155,7 +212,7 @@ int main() {
 	if(!loadDDSTexture("textures/grass.dds", grassTexture)) {
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -163,7 +220,7 @@ int main() {
 	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) {
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -174,7 +231,7 @@ int main() {
 	if(!loadDDSTexture("textures/tower.dds", towerTexture)) {
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -219,7 +276,7 @@ int main() {
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -230,7 +287,7 @@ int main() {
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -241,7 +298,7 @@ int main() {
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -252,7 +309,7 @@ int main() {
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -263,7 +320,7 @@ int main() {
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -280,7 +337,7 @@ int main() {
 	GLint uniformMaterialEmission = getUniformLocation(programId, "materialEmission");
 
 	Camera* camera = cameraCreate(
-		window, glm::vec3(0, 0, 5),
+		resources.window, glm::vec3(0, 0, 5),
 		3.14f /* toward -Z */,
 		0.0f /* look at the horizon */
 		);
@@ -291,7 +348,7 @@ int main() {
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
 		glDeleteProgram(programId);
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
 	}
@@ -321,8 +378,8 @@ int main() {
 	long prevTimeMs = startTimeMs;
 	long lastFpsCounterFlushTimeMs = startTimeMs;
 	float fps = 0.0;
-	while(glfwWindowShouldClose(window) == GL_FALSE) {
-		if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) break;
+	while(glfwWindowShouldClose(resources.window) == GL_FALSE) {
+		if(glfwGetKey(resources.window, GLFW_KEY_Q) == GLFW_PRESS) break;
 
 		currentTimeMs = getCurrentTimeMs();
 
@@ -348,28 +405,28 @@ int main() {
 		}
 
 		if(startDeltaTimeMs - lastKeyPressCheckMs > keyPressCheckIntervalMs) {
-			if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+			if(glfwGetKey(resources.window, GLFW_KEY_X) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				wireframesModeEnabled = !wireframesModeEnabled;
 				if(wireframesModeEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
-			if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+			if(glfwGetKey(resources.window, GLFW_KEY_M) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				bool enabled = cameraGetMouseInterceptionEnabled(camera);
 				cameraSetMouseInterceptionEnabled(camera, !enabled);
 			}
-			if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+			if(glfwGetKey(resources.window, GLFW_KEY_1) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				directionalLightEnabled = !directionalLightEnabled;
 				setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 			}
-			if(glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+			if(glfwGetKey(resources.window, GLFW_KEY_2) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				pointLightEnabled = !pointLightEnabled;
 				setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 			}
-			if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+			if(glfwGetKey(resources.window, GLFW_KEY_3) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				spotLightEnabled = !spotLightEnabled;
 				setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
@@ -481,7 +538,7 @@ int main() {
 			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, NULL);
 		}
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(resources.window);
 		glfwPollEvents();
 	}
 
@@ -490,7 +547,7 @@ int main() {
 	glDeleteBuffers(vbosNum, vboArray);
 	glDeleteTextures(texturesNum, textureArray);
 	glDeleteProgram(programId);
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(resources.window);
 	glfwTerminate();
 	return 0;
 }
