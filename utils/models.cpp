@@ -58,7 +58,7 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
   if(indicesNumber > 255) indexSize *= 2;
   if(indicesNumber > 65535) indexSize *= 2;
 
-  void* indicesData = nullptr;
+  void* indicesData = NULL;
   uint32_t indicesDataSize = indicesNumber*indexSize;
 
   if(indexSize == sizeof(unsigned int)) {
@@ -84,7 +84,7 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
   }
 
   FILE* fd = fopen(fname, "wb");
-  if(fd == nullptr) {
+  if(fd == NULL) {
     fprintf(stderr, "modelSave - failed to open file, fname = %s\n", fname);
     if(indicesData != (void*)indices) free(indicesData);
     return false;
@@ -129,7 +129,7 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   *outIndicesType = GL_UNSIGNED_BYTE;
 
   FileMapping* mapping = fileMappingCreate(fname);
-  if(mapping == nullptr) return false;
+  if(mapping == NULL) return false;
 
   unsigned char* dataPtr = fileMappingGetPointer(mapping);
   unsigned int dataSize = fileMappingGetSize(mapping);
@@ -172,7 +172,7 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
 
   GLsizei stride = 8*sizeof(GLfloat);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
-    nullptr);
+    NULL);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
     (const void*)(3*sizeof(GLfloat)));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,

@@ -15,7 +15,7 @@ struct Camera {
 
 Camera* cameraCreate(GLFWwindow* window, const glm::vec3& startPosition, float startHorizontalAngleRad, float startVerticalAngleRad) {
   Camera* cam = (Camera*)malloc(sizeof(Camera));
-  if(!cam) return nullptr; // malloc failed
+  if(!cam) return NULL; // malloc failed
 
   cam->window = window;
   cam->position = startPosition;

@@ -14,23 +14,23 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(fname, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-  if(scene == nullptr) {
+  if(scene == NULL) {
     fprintf(stderr, "Failed to load model %s\n", fname);
-    return nullptr;
+    return NULL;
   }
 
   if(scene->mNumMeshes <= meshNumber) {
     fprintf(stderr, "There is no mesh #%u in model (%d only), fname = %s\n", meshNumber, scene->mNumMeshes, fname);
-    return nullptr;
+    return NULL;
   }
 
   aiMesh* mesh = scene->mMeshes[meshNumber];
   unsigned int facesNum = mesh->mNumFaces;
 //  unsigned int verticesNum = mesh->mNumVertices;
 
-  if(mesh->mTextureCoords[0] == nullptr) {
-    fprintf(stderr, "mesh->mTextureCoords[0] == nullptr, fname = %s\n", fname);
-    return nullptr;
+  if(mesh->mTextureCoords[0] == NULL) {
+    fprintf(stderr, "mesh->mTextureCoords[0] == NULL, fname = %s\n", fname);
+    return NULL;
   }
 
   unsigned int verticesPerFace = 3;
@@ -45,7 +45,7 @@ GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t*
     if(face.mNumIndices != verticesPerFace) {
       fprintf(stderr, "face.numIndices = %d (3 expected), i = %u, fname = %s\n", face.mNumIndices, i, fname);
       free(verticesBuffer);
-      return nullptr;
+      return NULL;
     }
 
     for(unsigned int j = 0; j < face.mNumIndices; ++j) {
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
   unsigned int modelVerticesNumber;
   size_t modelVerticesBufferSize;
   GLfloat * modelVerticesBuffer = importedModelCreate(infile, meshNumber, &modelVerticesBufferSize, &modelVerticesNumber);
-  if(modelVerticesBuffer == nullptr) {
+  if(modelVerticesBuffer == NULL) {
     fprintf(stderr, "importedModelCreate returned null\n");
     return 2;
   }

@@ -108,7 +108,7 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 
 bool loadDDSTexture(const char *fname, GLuint textureId) {
 	FileMapping* mapping = fileMappingCreate(fname);
-	if(mapping == nullptr) return false;
+	if(mapping == NULL) return false;
 
 	unsigned char* dataPtr = fileMappingGetPointer(mapping);
 	unsigned int fsize = fileMappingGetSize(mapping);
@@ -173,7 +173,7 @@ checkProgramLinkStatus(GLuint obj) {
 
 GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
 	FileMapping* mapping = fileMappingCreate(fname);
-	if(mapping == nullptr) {
+	if(mapping == NULL) {
 		*errorFlagPtr = true;
 		return 0;
 	}

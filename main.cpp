@@ -84,9 +84,9 @@ int main() {
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Demo",
-		nullptr, nullptr);
+		NULL, NULL);
 
-	if(window == nullptr) {
+	if(window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window\n");
 		glfwTerminate();
 		return -1;
@@ -402,7 +402,7 @@ int main() {
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
-		glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, nullptr);
+		glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, NULL);
 
 		// torus
 
@@ -417,7 +417,7 @@ int main() {
 		glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, torusIndicesVBO);
-		glDrawElements(GL_TRIANGLES, torusIndicesNumber, torusIndexType, nullptr);
+		glDrawElements(GL_TRIANGLES, torusIndicesNumber, torusIndexType, NULL);
 
 		// grass
 
@@ -432,7 +432,7 @@ int main() {
 		glUniform1f(uniformMaterialSpecularIntensity, 2.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
-		glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, nullptr);
+		glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, NULL);
 
 		// skybox
 
@@ -447,7 +447,7 @@ int main() {
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
-		glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, nullptr);
+		glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, NULL);
 
 		// point light source
 		if(pointLightEnabled) {
@@ -462,7 +462,7 @@ int main() {
 			glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 			glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
-			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, NULL);
 		}
 
 		// spot light source
@@ -478,7 +478,7 @@ int main() {
 			glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 			glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
-			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, nullptr);
+			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, NULL);
 		}
 
 		glfwSwapBuffers(window);
