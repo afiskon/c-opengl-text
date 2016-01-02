@@ -76,23 +76,14 @@ int main() {
 	glfwSetErrorCallback(errorCallback);
 
 	glfwDefaultWindowHints();
-
-	// causes "ERROR: code = 65543, descr = GLX: An OpenGL profile requested
-	//  but GLX_ARB_create_context_profile is unavailable"
-	//  error on Raspberry Pi
-	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	
-	// causes "ERROR: code = 65543, descr = GLX: Forward compatibility 
-	//   requested but GLX_ARB_create_context_profile is unavailable"
-	//   error on Raspberry Pi
-	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	GLFWwindow* window = glfwCreateWindow(600, 400, "Demo",
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Demo",
 		nullptr, nullptr);
 
 	if(window == nullptr) {
