@@ -19,40 +19,30 @@
 
 #include <windows.h>
 
-// TODO: rewrite to uint64_t
-long getCurrentTimeMs()
+uint64_t getCurrentTimeMs()
 {
-	// SYSTEMTIME time;
-	// GetSystemTime(&time);
-	// return ((long)time.wSecond * 1000) + (long)time.wMilliseconds;
-
 	FILETIME filetime;
 	GetSystemTimeAsFileTime(&filetime);
 
 	unsigned long long nowWindows = (unsigned long long)filetime.dwLowDateTime
 		+ ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
 
-	// printf("dwLowDateTime = %lu\n", filetime.dwLowDateTime);
-	// printf("dwHighDateTime = %lu\n", filetime.dwHighDateTime);
-	// printf("sizeof(long), sizeof(long long), sizeof(LONGLONG) = %d, %d, %d\n", sizeof(long), sizeof(long long), sizeof(LONGLONG));
-	// exit(1);
-
 	unsigned long long nowUnix = nowWindows - 116444736000000000ULL;
 	unsigned long long nowUnixMs = nowUnix / 10000ULL;
 
-	return (long)nowUnixMs;
+	return (uint64_t)nowUnixMs;
 }
 
 #else // Linux, MacOS, etc
 
 #include <sys/time.h>
 
-long getCurrentTimeMs()
+uint64_t getCurrentTimeMs()
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 
-	return ((long)tv.tv_sec) * 1000 + ((long)tv.tv_usec) / 1000;
+	return ((uint64_t)tv.tv_sec) * 1000 + ((uint64_t)tv.tv_usec) / 1000;
 }
 #endif
 

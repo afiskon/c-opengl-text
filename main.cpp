@@ -19,7 +19,7 @@
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
-static const long keyPressCheckIntervalMs = 250;
+static const uint64_t keyPressCheckIntervalMs = 250;
 static const float fpsSmoothing = 0.9; // larger - more smoothing
 
 static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0,
@@ -353,24 +353,26 @@ mainInternal(CommonResources* resources)
 	bool pointLightEnabled = true;
 	bool spotLightEnabled = true;
 	bool wireframesModeEnabled = false;
-	long lastKeyPressCheckMs = 0;
 
 	setupLights(resources->programId, directionalLightEnabled, 
 		pointLightEnabled, spotLightEnabled);
 
-	long startTimeMs = getCurrentTimeMs();
-	long currentTimeMs = startTimeMs;
-	long prevTimeMs = startTimeMs;
-	long lastFpsCounterFlushTimeMs = startTimeMs;
+	uint64_t startTimeMs = getCurrentTimeMs();
+	uint64_t currentTimeMs = startTimeMs;
+	uint64_t prevTimeMs = startTimeMs;
+	uint64_t lastFpsCounterFlushTimeMs = startTimeMs;
+	uint64_t lastKeyPressCheckMs = 0;
 	float fps = 0.0;
-	while(glfwWindowShouldClose(resources->window) == GL_FALSE) {
+
+	while(glfwWindowShouldClose(resources->window) == GL_FALSE)
+	{
 		if(glfwGetKey(resources->window, GLFW_KEY_Q) == GLFW_PRESS)
 			break;
 
 		currentTimeMs = getCurrentTimeMs();
 
-		long startDeltaTimeMs = currentTimeMs - startTimeMs;
-		long prevDeltaTimeMs = currentTimeMs - prevTimeMs;
+		uint64_t startDeltaTimeMs = currentTimeMs - startTimeMs;
+		uint64_t prevDeltaTimeMs = currentTimeMs - prevTimeMs;
 
 		prevTimeMs = currentTimeMs;
 
@@ -381,7 +383,8 @@ mainInternal(CommonResources* resources)
 		// prevent devision by zero and/or very high FPS value right
 		// after program start
 		if(prevDeltaTimeMs > 0)
-			fps = fps*fpsSmoothing + (1.0 - fpsSmoothing)*(1000.0 / (float)prevDeltaTimeMs);
+			fps = fps*fpsSmoothing + (1.0 - fpsSmoothing) *
+				(1000.0 / (float)prevDeltaTimeMs);
 
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
