@@ -23,13 +23,17 @@ static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
 static const float fpsSmoothing = 0.9; // larger - more smoothing
 static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing value");
 
+#define TEXTURES_NUM 6
+
 struct CommonResources
 {
 	bool windowInitialized;
 	bool programIdInitialized;
+	bool textureArrayInitialized;
 
 	GLFWwindow* window;
 	GLuint programId;
+	GLuint textureArray[TEXTURES_NUM];
 };
 
 static void
@@ -47,6 +51,8 @@ errorCallback(int code, const char* descr)
 static int
 commonResourcesCreate(CommonResources* resources)
 {
+	// set *Initialized fileds to false
+
 	memset(resources, 0, sizeof(CommonResources));
 
 	// initialize window
@@ -121,6 +127,12 @@ commonResourcesCreate(CommonResources* resources)
 
 	resources->programIdInitialized = true;
 
+	// initialize textureArray
+
+	glGenTextures(TEXTURES_NUM, resources->textureArray);
+
+	resources->textureArrayInitialized = true;
+
 	return 0;
 }
 
@@ -132,6 +144,10 @@ commonResourcesDestroy(CommonResources* resources)
 
 	if(resources->programIdInitialized)
 		glDeleteProgram(resources->programId);
+
+	if(resources->textureArrayInitialized)
+		glDeleteTextures(TEXTURES_NUM, resources->textureArray);
+	
 
 	glfwTerminate();
 }
@@ -204,20 +220,17 @@ int main()
 	}
 
 
-	// === prepare textures ===
-	GLuint textureArray[6];
-	int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
-	glGenTextures(texturesNum, textureArray);
+	// prepare textures
 
-	GLuint grassTexture = textureArray[0];
-	GLuint skyboxTexture = textureArray[1];
-	GLuint towerTexture = textureArray[2];
-	GLuint garkGreenTexture = textureArray[3];
-	GLuint redTexture = textureArray[4];
-	GLuint blueTexture = textureArray[5];
+	GLuint grassTexture = resources.textureArray[0];
+	GLuint skyboxTexture = resources.textureArray[1];
+	GLuint towerTexture = resources.textureArray[2];
+	GLuint garkGreenTexture = resources.textureArray[3];
+	GLuint redTexture = resources.textureArray[4];
+	GLuint blueTexture = resources.textureArray[5];
 
 	if(!loadDDSTexture("textures/grass.dds", grassTexture)) {
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -225,7 +238,7 @@ int main()
 	}
 
 	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) {
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -236,7 +249,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if(!loadDDSTexture("textures/tower.dds", towerTexture)) {
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -281,7 +294,7 @@ int main()
 	{
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -292,7 +305,7 @@ int main()
 	{
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -303,7 +316,7 @@ int main()
 	{
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -314,7 +327,7 @@ int main()
 	{
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -325,7 +338,7 @@ int main()
 	{
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -353,7 +366,7 @@ int main()
 	{
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
-		glDeleteTextures(texturesNum, textureArray);
+		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
@@ -552,7 +565,7 @@ int main()
 	cameraDestroy(camera);
 	glDeleteVertexArrays(vaosNum, vaoArray);
 	glDeleteBuffers(vbosNum, vboArray);
-	glDeleteTextures(texturesNum, textureArray);
+	glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 	glDeleteProgram(resources.programId);
 	glfwDestroyWindow(resources.window);
 	glfwTerminate();
