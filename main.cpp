@@ -77,7 +77,11 @@ int main() {
 
 	glfwDefaultWindowHints();
 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	// causes "ERROR: code = 65543, descr = GLX: An OpenGL profile requested
+	//  but GLX_ARB_create_context_profile is unavailable"
+	//  error on Raspberry Pi
+	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	
