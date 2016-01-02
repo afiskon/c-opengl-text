@@ -19,18 +19,30 @@
 
 #include <windows.h>
 
-// TODO: use GetSystemTimeAsFileTime https://msdn.microsoft.com/en-us/library/ms724397(VS.85).aspx
-long getCurrentTimeMs() {
-	SYSTEMTIME time;
-	GetSystemTime(&time);
-	return ((long)time.wSecond * 1000) + (long)time.wMilliseconds;
+long getCurrentTimeMs()
+{
+	// SYSTEMTIME time;
+	// GetSystemTime(&time);
+	// return ((long)time.wSecond * 1000) + (long)time.wMilliseconds;
+
+	FILETIME filetime;
+	GetSystemTimeAsFileTime(&filetime);
+
+	LONGLONG nowWindows = (LONGLONG)filetime.dwLowDateTime
+		+ ((LONGLONG)(filetime.dwHighDateTime) << 32LL);
+
+	LONGLONG nowUnix = nowWindows; // - 116444736000000000LL;
+	LONGLONG nowUnixMs = nowUnix / 10000LL;
+
+	return (long)nowMs
 }
 
 #else // Linux, MacOS, etc
 
 #include <sys/time.h>
 
-long getCurrentTimeMs() {
+long getCurrentTimeMs()
+{
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 
@@ -40,9 +52,12 @@ long getCurrentTimeMs() {
 
 static bool
 loadDDSTextureCommon(const char* fname, GLuint textureId,
-					 unsigned int fsize, unsigned char* dataPtr) {
-	if(fsize < DDS_HEADER_SIZE) {
-		fprintf(stderr, "loadDDSTexture failed, fname = %s, fsize = %u, less then"
+					 unsigned int fsize, unsigned char* dataPtr)
+{
+	if(fsize < DDS_HEADER_SIZE)
+	{
+		fprintf(stderr, "loadDDSTexture failed, fname = %s, "
+					"fsize = %u, less then"
 					" DDS_HEADER_SIZE ( %d )\n",
 				fname, fsize,  DDS_HEADER_SIZE);
 		return false;
@@ -54,8 +69,10 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 	unsigned int mipMapNumber = *(unsigned int*)&(dataPtr[28]);
 	unsigned int formatCode   = *(unsigned int*)&(dataPtr[84]);
 
-	if(signature != DDS_SIGNATURE) {
-		fprintf(stderr, "loadDDSTexture failed, fname = %s, invalid signature: "
+	if(signature != DDS_SIGNATURE)
+	{
+		fprintf(stderr, "loadDDSTexture failed, fname = %s,"
+			" invalid signature: "
 			"0x%08X\n", fname, signature);
 		return false;
 	}
@@ -73,14 +90,16 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 			format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
 			break;
 		default:
-			fprintf(stderr, "loadDDSTexture failed, fname = %s, unknown formatCode:"
+			fprintf(stderr, "loadDDSTexture failed, fname = %s,"
+				" unknown formatCode:"
 				" 0x%08X\n", fname, formatCode);
 			return false;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, textureId);
 
-	unsigned int blockSize = (format == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) ? 8 : 16;
+	unsigned int blockSize = (format ==
+		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) ? 8 : 16;
 	unsigned int offset = DDS_HEADER_SIZE;
 
 	// load mipmaps
@@ -88,25 +107,30 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 	{
 		unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
 		if(fsize < offset + size) {
-			fprintf(stderr, "loadDDSTexture failed, fname = %s, fsize = %u, level ="
+			fprintf(stderr, "loadDDSTexture failed, fname = %s,"
+						" fsize = %u, level ="
 						" %u, offset = %u, size = %u\n",
 					fname, fsize, level, offset, size);
 			return false;
 		}
-		glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, dataPtr + offset);
+		glCompressedTexImage2D(GL_TEXTURE_2D,
+			level, format, width, height, 0, size, dataPtr + offset);
 
 		width = width > 1 ? width >> 1 : 1;
 		height = height > 1 ? height >> 1 : 1;
 		offset += size;
 	}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,
+		GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,
+		GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	return true;
 }
 
-bool loadDDSTexture(const char *fname, GLuint textureId) {
+bool loadDDSTexture(const char *fname, GLuint textureId)
+{
 	FileMapping* mapping = fileMappingCreate(fname);
 	if(mapping == NULL) return false;
 
@@ -120,17 +144,20 @@ bool loadDDSTexture(const char *fname, GLuint textureId) {
 	return res;
 }
 
-void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId) {
+void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId)
+{
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	unsigned char textureData[3];
 	textureData[0] = (unsigned char)(r*255.0f);
 	textureData[1] = (unsigned char)(g*255.0f);
 	textureData[2] = (unsigned char)(b*255.0f);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0,
+		GL_RGB, GL_UNSIGNED_BYTE, textureData);
 }
 
 static bool
-checkShaderCompileStatus(GLuint obj) {
+checkShaderCompileStatus(GLuint obj)
+{
 	GLint status;
 	glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
 	if(status == GL_FALSE) {
@@ -151,7 +178,8 @@ checkShaderCompileStatus(GLuint obj) {
 }
 
 static bool
-checkProgramLinkStatus(GLuint obj) {
+checkProgramLinkStatus(GLuint obj)
+{
 	GLint status;
 	glGetProgramiv(obj, GL_LINK_STATUS, &status);
 	if(status == GL_FALSE) {
@@ -171,7 +199,8 @@ checkProgramLinkStatus(GLuint obj) {
 	return false;
 }
 
-GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
+GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
+{
 	FileMapping* mapping = fileMappingCreate(fname);
 	if(mapping == NULL) {
 		*errorFlagPtr = true;
@@ -185,7 +214,8 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
 	stringArray[0] = (GLchar*)fileMappingGetPointer(mapping);
 	lengthArray[0] = fileMappingGetSize(mapping);
 
-	glShaderSource(shaderId, 1, (GLchar const * const *)stringArray, lengthArray);
+	glShaderSource(shaderId, 1,
+		(GLchar const * const *)stringArray, lengthArray);
 	glCompileShader(shaderId);
 
 	fileMappingDestroy(mapping);
@@ -199,7 +229,8 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
 	return shaderId;
 }
 
-GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr) {
+GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr)
+{
 	*errorFlagPtr = false;
 
 	GLuint programId = glCreateProgram();
@@ -217,7 +248,8 @@ GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr) {
 	return programId;
 }
 
-GLint getUniformLocation(GLuint programId, const char* uniformName) {
+GLint getUniformLocation(GLuint programId, const char* uniformName)
+{
 	GLint location = glGetUniformLocation(programId, uniformName);
 	if(location == -1) {
 		fprintf(stderr, "getUniformLocation failed, programId = %u, "
@@ -227,12 +259,15 @@ GLint getUniformLocation(GLuint programId, const char* uniformName) {
 	return location;
 }
 
-void setUniform1f(GLuint programId, const char* uniformName, float value) {
+void setUniform1f(GLuint programId, const char* uniformName, float value)
+{
 	GLint uniformId = getUniformLocation(programId, uniformName);
 	glUniform1f(uniformId, value);
 }
 
-void setUniform3f(GLuint programId, const char* uniformName, float v1, float v2, float v3) {
+void setUniform3f(GLuint programId, const char* uniformName,
+	float v1, float v2, float v3)
+{
 	GLint uniformId = getUniformLocation(programId, uniformName);
 	glUniform3f(uniformId, v1, v2, v3);
 }
