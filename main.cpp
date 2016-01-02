@@ -25,7 +25,11 @@ static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing 
 
 struct CommonResources
 {
+	bool windowInitialized;
+	bool programIdInitialized;
+
 	GLFWwindow* window;
+	GLuint programId;
 };
 
 static void
@@ -43,7 +47,9 @@ errorCallback(int code, const char* descr)
 static int
 commonResourcesCreate(CommonResources* resources)
 {
-	resources->window = NULL;
+	memset(resources, 0, sizeof(CommonResources));
+
+	// initialize window
 
 	if(glfwInit() == GL_FALSE) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
@@ -66,6 +72,7 @@ commonResourcesCreate(CommonResources* resources)
 		fprintf(stderr, "Failed to open GLFW window\n");
 		return -1;
 	}
+	resources->windowInitialized = true;
 
 	glfwMakeContextCurrent(resources->window);
 
@@ -78,14 +85,53 @@ commonResourcesCreate(CommonResources* resources)
 	glfwSetWindowSizeCallback(resources->window, windowSizeCallback);
 	glfwShowWindow(resources->window);
 
+	// initialize programId
+
+	bool errorFlag = false;
+	std::vector<GLuint> shaders;
+
+	GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", 
+		GL_VERTEX_SHADER, &errorFlag);
+	if(errorFlag) {
+		fprintf(stderr, "Failed to load vertex shader (invalid working "
+			"directory?)\n");
+		return -1;
+	}
+
+	shaders.push_back(vertexShaderId);
+
+	GLuint fragmentShaderId = loadShader("shaders/fragmentShader.glsl", 
+		GL_FRAGMENT_SHADER, &errorFlag);
+	if(errorFlag) {
+		fprintf(stderr, "Failed to load fragment shader (invalid working "
+			"directory?)\n");
+		return -1;
+	}
+
+	shaders.push_back(fragmentShaderId);
+
+	resources->programId = prepareProgram(shaders, &errorFlag);
+	if(errorFlag) {
+		fprintf(stderr, "Failed to prepare program\n");
+		return -1;
+	}
+
+	glDeleteShader(vertexShaderId);
+	glDeleteShader(fragmentShaderId);
+
+	resources->programIdInitialized = true;
+
 	return 0;
 }
 
 static void
 commonResourcesDestroy(CommonResources* resources)
 {
-	if(resources->window != NULL)
+	if(resources->windowInitialized)
 		glfwDestroyWindow(resources->window);
+
+	if(resources->programIdInitialized)
+		glDeleteProgram(resources->programId);
 
 	glfwTerminate();
 }
@@ -158,45 +204,6 @@ int main()
 	}
 
 
-
-
-
-
-	bool errorFlag = false;
-	std::vector<GLuint> shaders;
-
-	GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", GL_VERTEX_SHADER, &errorFlag);
-	if(errorFlag) {
-		fprintf(stderr, "Failed to load vertex shader (invalid working "
-			"directory?)\n");
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
-		return -1;
-	}
-
-	shaders.push_back(vertexShaderId);
-
-	GLuint fragmentShaderId = loadShader("shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER, &errorFlag);
-	if(errorFlag) {
-		fprintf(stderr, "Failed to load fragment shader (invalid working "
-			"directory?)\n");
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
-		return -1;
-	}
-	shaders.push_back(fragmentShaderId);
-
-	GLuint programId = prepareProgram(shaders, &errorFlag);
-	if(errorFlag) {
-		fprintf(stderr, "Failed to prepare program\n");
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
-		return -1;
-	}
-
-	glDeleteShader(vertexShaderId);
-	glDeleteShader(fragmentShaderId);
-
 	// === prepare textures ===
 	GLuint textureArray[6];
 	int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
@@ -211,7 +218,7 @@ int main()
 
 	if(!loadDDSTexture("textures/grass.dds", grassTexture)) {
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -219,7 +226,7 @@ int main()
 
 	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) {
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -230,7 +237,7 @@ int main()
 
 	if(!loadDDSTexture("textures/tower.dds", towerTexture)) {
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -275,7 +282,7 @@ int main()
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -286,7 +293,7 @@ int main()
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -297,7 +304,7 @@ int main()
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -308,7 +315,7 @@ int main()
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -319,7 +326,7 @@ int main()
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -327,14 +334,14 @@ int main()
 
 	glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
-	GLint uniformMVP = getUniformLocation(programId, "MVP");
-	GLint uniformM = getUniformLocation(programId, "M");
-	GLint uniformTextureSample = getUniformLocation(programId, "textureSampler");
-	GLint uniformCameraPos = getUniformLocation(programId, "cameraPos");
+	GLint uniformMVP = getUniformLocation(resources.programId, "MVP");
+	GLint uniformM = getUniformLocation(resources.programId, "M");
+	GLint uniformTextureSample = getUniformLocation(resources.programId, "textureSampler");
+	GLint uniformCameraPos = getUniformLocation(resources.programId, "cameraPos");
 
-	GLint uniformMaterialSpecularFactor = getUniformLocation(programId, "materialSpecularFactor");
-	GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
-	GLint uniformMaterialEmission = getUniformLocation(programId, "materialEmission");
+	GLint uniformMaterialSpecularFactor = getUniformLocation(resources.programId, "materialSpecularFactor");
+	GLint uniformMaterialSpecularIntensity = getUniformLocation(resources.programId, "materialSpecularIntensity");
+	GLint uniformMaterialEmission = getUniformLocation(resources.programId, "materialEmission");
 
 	Camera* camera = cameraCreate(
 		resources.window, glm::vec3(0, 0, 5),
@@ -347,7 +354,7 @@ int main()
 		glDeleteVertexArrays(vaosNum, vaoArray);
 		glDeleteBuffers(vbosNum, vboArray);
 		glDeleteTextures(texturesNum, textureArray);
-		glDeleteProgram(programId);
+		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
 		glfwTerminate();
 		return -1;
@@ -360,7 +367,7 @@ int main()
 	glDepthFunc(GL_LESS);
 	glClearColor(0, 0, 0, 1);
 
-	glUseProgram(programId);
+	glUseProgram(resources.programId);
 
 	glUniform1i(uniformTextureSample, 0);
 
@@ -371,7 +378,7 @@ int main()
 	long lastKeyPressCheckMs = 0;
 	const long keyPressCheckIntervalMs = 250;
 
-	setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+	setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 
 	long startTimeMs = getCurrentTimeMs();
 	long currentTimeMs = startTimeMs;
@@ -419,17 +426,17 @@ int main()
 			if(glfwGetKey(resources.window, GLFW_KEY_1) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				directionalLightEnabled = !directionalLightEnabled;
-				setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+				setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 			}
 			if(glfwGetKey(resources.window, GLFW_KEY_2) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				pointLightEnabled = !pointLightEnabled;
-				setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+				setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 			}
 			if(glfwGetKey(resources.window, GLFW_KEY_3) == GLFW_PRESS) {
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				spotLightEnabled = !spotLightEnabled;
-				setupLights(programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+				setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
 			}
 		}
 
@@ -546,7 +553,7 @@ int main()
 	glDeleteVertexArrays(vaosNum, vaoArray);
 	glDeleteBuffers(vbosNum, vboArray);
 	glDeleteTextures(texturesNum, textureArray);
-	glDeleteProgram(programId);
+	glDeleteProgram(resources.programId);
 	glfwDestroyWindow(resources.window);
 	glfwTerminate();
 	return 0;
