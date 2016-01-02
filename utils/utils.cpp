@@ -33,8 +33,8 @@ long getCurrentTimeMs()
 		+ ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
 
 
-	printf("dwLowDateTime = %u\n", filetime.dwLowDateTime);
-	printf("dwHighDateTime = %u\n", filetime.dwHighDateTime);
+	printf("dwLowDateTime = %lu\n", filetime.dwLowDateTime);
+	printf("dwHighDateTime = %lu\n", filetime.dwHighDateTime);
 	// printf("nowWindows = %ld\n", nowWindows);
 	printf("sizeof(long), sizeof(long long), sizeof(LONGLONG) = %d, %d, %d\n", sizeof(long), sizeof(long long), sizeof(LONGLONG));
 
