@@ -31,7 +31,7 @@ long getCurrentTimeMs()
 	LONGLONG nowWindows = (LONGLONG)filetime.dwLowDateTime
 		+ ((LONGLONG)(filetime.dwHighDateTime) << 32LL);
 
-	LONGLONG nowUnix = nowWindows; // - 116444736000000000LL;
+	LONGLONG nowUnix = nowWindows - 116444736000000000LL;
 	LONGLONG nowUnixMs = nowUnix / 10000LL;
 
 	return (long)nowUnixMs;
