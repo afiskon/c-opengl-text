@@ -11,7 +11,6 @@ include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(glxw/include)
 include_directories(glfw/include)
 include_directories(glm)
-include_directories(deferxx)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror -Wno-deprecated-register -Wno-shift-op-parentheses")
 
