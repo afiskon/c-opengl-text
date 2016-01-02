@@ -1,7 +1,6 @@
 #include <GLXW/glxw.h>
 
 #include <vector>
-#include <defer.h>
 #include "../assimp/include/assimp/Importer.hpp"
 #include "../assimp/include/assimp/postprocess.h"
 #include "../assimp/include/assimp/scene.h"
@@ -143,14 +142,15 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "importedModelCreate returned null\n");
     return 2;
   }
-  defer(importedModelFree(modelVerticesBuffer));
 
   if(!importedModelSave(outfile, modelVerticesBuffer, modelVerticesNumber)) {
     fprintf(stderr, "importedModelSave failed\n");
+    importedModelFree(modelVerticesBuffer);
     return 3;
   }
 
   printf("Done!\n");
 
+  importedModelFree(modelVerticesBuffer);
   return 0;
 }

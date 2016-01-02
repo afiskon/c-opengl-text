@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <defer.h>
 #include "fileMapping.h"
 
 #ifdef _WIN32

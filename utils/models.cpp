@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <defer.h>
 #include "utils.h"
 #include "models.h"
 #include "fileMapping.h"
@@ -84,14 +83,12 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
     }
   }
 
-  defer(if(indicesData != (void*)indices){ free(indicesData); });
-
   FILE* fd = fopen(fname, "wb");
   if(fd == nullptr) {
     fprintf(stderr, "modelSave - failed to open file, fname = %s\n", fname);
+    if(indicesData != (void*)indices) free(indicesData);
     return false;
   }
-  defer(fclose(fd));
 
   EaxmodHeader header;
   strcpy(&(header.signature[0]), eaxmodSignature);
@@ -103,19 +100,27 @@ bool modelSave(const char *fname, const GLfloat *verticesData, size_t verticesDa
 
   if(fwrite(&header, sizeof(header), 1, fd) != 1) {
     fprintf(stderr, "modelSave - failed to write header, fname = %s\n", fname);
+    if(indicesData != (void*)indices) free(indicesData);
+    fclose(fd);
     return false;
   }
 
   if(fwrite(verticesData, verticesDataSize, 1, fd) != 1) {
     fprintf(stderr, "modelSave - failed to write verticesData, fname = %s\n", fname);
+    if(indicesData != (void*)indices) free(indicesData);
+    fclose(fd);
     return false;
   }
 
   if(fwrite(indicesData, indicesDataSize, 1, fd) != 1) {
     fprintf(stderr, "modelSave - failed to write indicesData, fname = %s\n", fname);
+    if(indicesData != (void*)indices) free(indicesData);
+    fclose(fd);
     return false;
   }
 
+  if(indicesData != (void*)indices) free(indicesData);
+  fclose(fd);
   return true;
 }
 
@@ -125,13 +130,15 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
 
   FileMapping* mapping = fileMappingCreate(fname);
   if(mapping == nullptr) return false;
-  defer(fileMappingDestroy(mapping));
 
   unsigned char* dataPtr = fileMappingGetPointer(mapping);
   unsigned int dataSize = fileMappingGetSize(mapping);
 
   EaxmodHeader * header = (EaxmodHeader *)dataPtr;
-  if(!checkFileSizeAndHeader(fname, header, dataSize)) return false;
+  if(!checkFileSizeAndHeader(fname, header, dataSize)) {
+    fileMappingDestroy(mapping);
+    return false;
+  } 
 
   unsigned char indexSize = header->indexSize;
   if(indexSize == 1) {
@@ -141,7 +148,9 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   } else if(indexSize == 4) {
     *outIndicesType = GL_UNSIGNED_INT;
   } else {
-    fprintf(stderr, "modelLoad - unsupported indexSize: %d, fname = %s\n", (int)indexSize, fname);
+    fprintf(stderr, "modelLoad - unsupported indexSize: %d, fname = %s\n",
+      (int)indexSize, fname);
+    fileMappingDestroy(mapping);
     return false;
   }
 
@@ -162,9 +171,13 @@ bool modelLoad(const char *fname, GLuint modelVAO, GLuint modelVBO, GLuint indic
   glBufferData(GL_ARRAY_BUFFER, header->verticesDataSize, verticesPtr, GL_STATIC_DRAW);
 
   GLsizei stride = 8*sizeof(GLfloat);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (const void*)(3*sizeof(GLfloat)));
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(6*sizeof(GLfloat)));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
+    nullptr);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
+    (const void*)(3*sizeof(GLfloat)));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
+    (const void*)(6*sizeof(GLfloat)));
 
+  fileMappingDestroy(mapping);
   return true;
 }

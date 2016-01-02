@@ -7,7 +7,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <defer.h>
 #include <stdio.h>
 
 #define DDS_HEADER_SIZE 128
@@ -110,12 +109,15 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 bool loadDDSTexture(const char *fname, GLuint textureId) {
 	FileMapping* mapping = fileMappingCreate(fname);
 	if(mapping == nullptr) return false;
-	defer(fileMappingDestroy(mapping));
 
 	unsigned char* dataPtr = fileMappingGetPointer(mapping);
 	unsigned int fsize = fileMappingGetSize(mapping);
 
-	return loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
+	bool res = loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
+
+	fileMappingDestroy(mapping);
+
+	return res;
 }
 
 void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId) {
@@ -175,7 +177,6 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
 		*errorFlagPtr = true;
 		return 0;
 	}
-	defer(fileMappingDestroy(mapping));
 
 	GLuint shaderId = glCreateShader(shaderType);
 	GLchar* stringArray[1];
@@ -186,6 +187,8 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr) {
 
 	glShaderSource(shaderId, 1, (GLchar const * const *)stringArray, lengthArray);
 	glCompileShader(shaderId);
+
+	fileMappingDestroy(mapping);
 
 	*errorFlagPtr = checkShaderCompileStatus(shaderId);
 	if(*errorFlagPtr) {

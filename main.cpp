@@ -6,13 +6,11 @@
 #include <vector>
 #include <stdio.h>
 #include <assert.h>
-#include <defer.h>
 
 #include "utils/utils.h"
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: GET RID OF DEFERXX - doesn't work at Raspberry Pi
 // TODO: "compress" repository
 // TODO: get rid of c++ vectors?
 // TODO: use C interface of Assimp?
@@ -61,12 +59,15 @@ void setupLights(GLuint programId, bool directionalLightEnabled, bool pointLight
 	}
 }
 
+// TODO: refactore resource (VAOs, VBOs, Textures) creation and releasing
+// 1) allocate common resources + set boolean flags __allocated = true,
+// 2) pass object with all resources
+// 3) release resources on return
 int main() {
 	if(glfwInit() == GL_FALSE) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
-	defer(glfwTerminate());
 
 	glfwDefaultWindowHints();
 
@@ -76,17 +77,21 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Lighting", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Lighting",
+		nullptr, nullptr);
+
 	if(window == nullptr) {
 		fprintf(stderr, "Failed to open GLFW window\n");
+		glfwTerminate();
 		return -1;
 	}
-	defer(glfwDestroyWindow(window));
 
 	glfwMakeContextCurrent(window);
 
 	if(glxwInit()) {
 		fprintf(stderr, "Failed to init GLXW\n");
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return -1;
 	}
 
@@ -101,6 +106,8 @@ int main() {
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load vertex shader (invalid working "
 			"directory?)\n");
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return -1;
 	}
 
@@ -110,6 +117,8 @@ int main() {
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load fragment shader (invalid working "
 			"directory?)\n");
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return -1;
 	}
 	shaders.push_back(fragmentShaderId);
@@ -117,9 +126,10 @@ int main() {
 	GLuint programId = prepareProgram(shaders, &errorFlag);
 	if(errorFlag) {
 		fprintf(stderr, "Failed to prepare program\n");
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return -1;
 	}
-	defer(glDeleteProgram(programId));
 
 	glDeleteShader(vertexShaderId);
 	glDeleteShader(fragmentShaderId);
@@ -128,7 +138,6 @@ int main() {
 	GLuint textureArray[6];
 	int texturesNum = sizeof(textureArray)/sizeof(textureArray[0]);
 	glGenTextures(texturesNum, textureArray);
-	defer(glDeleteTextures(texturesNum, textureArray));
 
 	GLuint grassTexture = textureArray[0];
 	GLuint skyboxTexture = textureArray[1];
@@ -137,13 +146,32 @@ int main() {
 	GLuint redTexture = textureArray[4];
 	GLuint blueTexture = textureArray[5];
 
-	if(!loadDDSTexture("textures/grass.dds", grassTexture)) return -1;
+	if(!loadDDSTexture("textures/grass.dds", grassTexture)) {
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
 
-	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) return -1;
+	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) {
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	if(!loadDDSTexture("textures/tower.dds", towerTexture)) return -1;
+	if(!loadDDSTexture("textures/tower.dds", towerTexture)) {
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
 
 	loadOneColorTexture(0.05f, 0.5f, 0.1f, garkGreenTexture);
 	loadOneColorTexture(1.0f, 0.0f, 0.0f, redTexture);
@@ -153,7 +181,6 @@ int main() {
 	GLuint vaoArray[5];
 	int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
 	glGenVertexArrays(vaosNum, vaoArray);
-	defer(glDeleteVertexArrays(vaosNum, vaoArray));
 
 	GLuint grassVAO = vaoArray[0];
 	GLuint skyboxVAO = vaoArray[1];
@@ -165,7 +192,6 @@ int main() {
 	GLuint vboArray[10];
 	int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
 	glGenBuffers(vbosNum, vboArray);
-	defer(glDeleteBuffers(vbosNum, vboArray));
 
 	GLuint grassVBO = vboArray[0];
 	GLuint grassIndicesVBO = vboArray[1];
@@ -181,11 +207,60 @@ int main() {
 
 	GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber, torusIndicesNumber, sphereIndicesNumber;
 	GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType, sphereIndexType;
-	if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType)) return -1;
-	if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType)) return -1;
-	if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType)) return -1;
-	if(!modelLoad("models/torus.emd", torusVAO, torusVBO, torusIndicesVBO, &torusIndicesNumber, &torusIndexType)) return -1;
-	if(!modelLoad("models/sphere.emd", sphereVAO, sphereVBO, sphereIndicesVBO, &sphereIndicesNumber, &sphereIndexType)) return -1;
+	if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType))
+	{
+		glDeleteVertexArrays(vaosNum, vaoArray);
+		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
+
+	if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType))
+	{
+		glDeleteVertexArrays(vaosNum, vaoArray);
+		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
+
+	if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType))
+	{
+		glDeleteVertexArrays(vaosNum, vaoArray);
+		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
+
+	if(!modelLoad("models/torus.emd", torusVAO, torusVBO, torusIndicesVBO, &torusIndicesNumber, &torusIndexType))
+	{
+		glDeleteVertexArrays(vaosNum, vaoArray);
+		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
+
+	if(!modelLoad("models/sphere.emd", sphereVAO, sphereVBO, sphereIndicesVBO, &sphereIndicesNumber, &sphereIndexType))
+	{
+		glDeleteVertexArrays(vaosNum, vaoArray);
+		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
 
 	glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
@@ -198,9 +273,22 @@ int main() {
 	GLint uniformMaterialSpecularIntensity = getUniformLocation(programId, "materialSpecularIntensity");
 	GLint uniformMaterialEmission = getUniformLocation(programId, "materialEmission");
 
-	Camera* camera = cameraCreate(window, glm::vec3(0, 0, 5), 3.14f /* toward -Z */, 0.0f /* look at the horizon */);
-	if(!camera) return -1;
-	defer(cameraDestroy(camera));
+	Camera* camera = cameraCreate(
+		window, glm::vec3(0, 0, 5),
+		3.14f /* toward -Z */,
+		0.0f /* look at the horizon */
+		);
+
+	if(!camera)
+	{
+		glDeleteVertexArrays(vaosNum, vaoArray);
+		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteTextures(texturesNum, textureArray);
+		glDeleteProgram(programId);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return -1;
+	}
 
 	glEnable(GL_DOUBLEBUFFER);
 	glEnable(GL_CULL_FACE);
@@ -241,7 +329,8 @@ int main() {
 		float currentRotation = (float)startDeltaTimeMs / rotationTimeMs;
 		float islandAngle = 360.0f*(currentRotation - (long)currentRotation);
 
-		// prevent devision by zero and/or very high FPS value right after program start
+		// prevent devision by zero and/or very high FPS value right
+		// after program start
 		if(prevDeltaTimeMs > 0) {
 			fps = fps*fpsSmoothing + (1.0 - fpsSmoothing)*(1000.0 / (float)prevDeltaTimeMs);
 		}
@@ -390,5 +479,12 @@ int main() {
 		glfwPollEvents();
 	}
 
+	cameraDestroy(camera);
+	glDeleteVertexArrays(vaosNum, vaoArray);
+	glDeleteBuffers(vbosNum, vboArray);
+	glDeleteTextures(texturesNum, textureArray);
+	glDeleteProgram(programId);
+	glfwDestroyWindow(window);
+	glfwTerminate();
 	return 0;
 }
