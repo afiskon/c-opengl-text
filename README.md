@@ -1,9 +1,10 @@
 # cpp-opengl-text
 
-Dependencies:
+On Linux you will need these packages:
 
 ```
-    g++-4.8 libgl1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libglu1-mesa-dev
+    g++-4.8 git cmake libgl1-mesa-dev libxrandr-dev libxinerama-dev
+    libxcursor-dev libglu1-mesa-dev
 ```
 
 Usage:
