@@ -12,9 +12,9 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: "compress" repository!
+// TODO: GET RID OF DEFERXX - doesn't work at Raspberry Pi
+// TODO: "compress" repository
 // TODO: get rid of c++ vectors?
-// TODO: also get rid of deferxx?
 // TODO: use C interface of Assimp?
 // TODO: get rid of glm?
 // TODO: move all my sources to demo directory - it makes search much simpler

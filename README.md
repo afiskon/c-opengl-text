@@ -1,5 +1,11 @@
 # cpp-opengl-text
 
+Dependencies:
+
+```
+    g++-4.8 libgl1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libglu1-mesa-dev
+```
+
 Usage:
 
 ```
