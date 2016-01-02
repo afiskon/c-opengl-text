@@ -6,7 +6,8 @@
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
-static const unsigned int floatsPerVertex = (3 + 3 + 2); // 3 per position + 3 per normal + UV
+// 3 per position + 3 per normal + UV
+static const unsigned int floatsPerVertex = (3 + 3 + 2); 
 
 GLfloat* importedModelCreate(const char* fname, unsigned int meshNumber, size_t* outVerticesBufferSize, unsigned int* outVerticesNumber) {
   *outVerticesBufferSize = 0;
@@ -110,7 +111,9 @@ bool importedModelSave(const char* fname, GLfloat* verticesBuffer, unsigned int 
   fprintf(stderr, "importedModelSave - fname = %s, verticesNumber = %u, usedIndices = %u\n", fname, verticesNumber, usedIndices);
   fprintf(stderr, "importedModelSave - modelSize = %u, indexedModelSize = %u, ratio = %f%%\n", modelSize, indexedModelSize, ratio);
 
-  return modelSave(fname, vertices.data(), usedIndices* floatsPerVertex *sizeof(GLfloat), indices.data(), verticesNumber);
+  return modelSave(fname, vertices.data(),
+    usedIndices * floatsPerVertex * sizeof(GLfloat),
+    indices.data(), verticesNumber);
 }
 
 void importedModelFree(GLfloat* model) {

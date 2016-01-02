@@ -11,11 +11,12 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: "compress" repository
 // TODO: get rid of c++ vectors?
-// TODO: use C interface of Assimp?
 // TODO: get rid of glm?
+// TODO: use C interface of Assimp?
+// TODO: "compress" repository
 // TODO: move all my sources to demo directory - it makes search much simpler
+// TODO: convert project to one codestyle
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
@@ -123,6 +124,8 @@ commonResourcesCreate(CommonResources* resources)
 	// initialize programId
 
 	bool errorFlag = false;
+
+	// TODO: use an array!
 	std::vector<GLuint> shaders;
 
 	GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", 
@@ -195,7 +198,6 @@ commonResourcesDestroy(CommonResources* resources)
 
 	glfwTerminate();
 }
-
 
 static void
 setupLights(GLuint programId, bool directionalLightEnabled,

@@ -225,6 +225,7 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
 	return shaderId;
 }
 
+// TODO: pass an array!
 GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr)
 {
 	*errorFlagPtr = false;
