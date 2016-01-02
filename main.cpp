@@ -24,16 +24,22 @@ static const float fpsSmoothing = 0.9; // larger - more smoothing
 static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing value");
 
 #define TEXTURES_NUM 6
+#define VAOS_NUM 5
+#define VBOS_NUM 10
 
 struct CommonResources
 {
 	bool windowInitialized;
 	bool programIdInitialized;
 	bool textureArrayInitialized;
+	bool vaoArrayInitialized;
+	bool vboArrayInitialized;
 
 	GLFWwindow* window;
 	GLuint programId;
 	GLuint textureArray[TEXTURES_NUM];
+	GLuint vaoArray[VAOS_NUM];
+	GLuint vboArray[VBOS_NUM];
 };
 
 static void
@@ -128,10 +134,16 @@ commonResourcesCreate(CommonResources* resources)
 	resources->programIdInitialized = true;
 
 	// initialize textureArray
-
 	glGenTextures(TEXTURES_NUM, resources->textureArray);
-
 	resources->textureArrayInitialized = true;
+
+	// initialize vaoArray
+	glGenVertexArrays(VAOS_NUM, resources->vaoArray);
+	resources->vaoArrayInitialized = true;
+
+	// initialize vboArray
+	glGenBuffers(VBOS_NUM, resources->vboArray);
+	resources->vboArrayInitialized = true;
 
 	return 0;
 }
@@ -148,6 +160,11 @@ commonResourcesDestroy(CommonResources* resources)
 	if(resources->textureArrayInitialized)
 		glDeleteTextures(TEXTURES_NUM, resources->textureArray);
 	
+	if(resources->vaoArrayInitialized)
+		glDeleteVertexArrays(VAOS_NUM, resources->vaoArray);
+
+	if(resources->vboArrayInitialized)
+		glDeleteBuffers(VBOS_NUM, resources->vboArray);
 
 	glfwTerminate();
 }
@@ -219,7 +236,6 @@ int main()
 		return 1;
 	}
 
-
 	// prepare textures
 
 	GLuint grassTexture = resources.textureArray[0];
@@ -260,40 +276,30 @@ int main()
 	loadOneColorTexture(1.0f, 0.0f, 0.0f, redTexture);
 	loadOneColorTexture(0.0f, 0.0f, 1.0f, blueTexture);
 
-	// === prepare VAOs ===
-	GLuint vaoArray[5];
-	int vaosNum = sizeof(vaoArray)/sizeof(vaoArray[0]);
-	glGenVertexArrays(vaosNum, vaoArray);
+	GLuint grassVAO = resources.vaoArray[0];
+	GLuint skyboxVAO = resources.vaoArray[1];
+	GLuint towerVAO = resources.vaoArray[2];
+	GLuint torusVAO = resources.vaoArray[3];
+	GLuint sphereVAO = resources.vaoArray[4];
 
-	GLuint grassVAO = vaoArray[0];
-	GLuint skyboxVAO = vaoArray[1];
-	GLuint towerVAO = vaoArray[2];
-	GLuint torusVAO = vaoArray[3];
-	GLuint sphereVAO = vaoArray[4];
-
-	// === prepare VBOs ===
-	GLuint vboArray[10];
-	int vbosNum = sizeof(vboArray)/sizeof(vboArray[0]);
-	glGenBuffers(vbosNum, vboArray);
-
-	GLuint grassVBO = vboArray[0];
-	GLuint grassIndicesVBO = vboArray[1];
-	GLuint skyboxVBO = vboArray[2];
-	GLuint skyboxIndicesVBO = vboArray[3];
-	GLuint towerVBO = vboArray[4];
-	GLuint towerIndicesVBO = vboArray[5];
-	GLuint torusVBO = vboArray[6];
-	GLuint torusIndicesVBO = vboArray[7];
-	GLuint sphereVBO = vboArray[8];
-	GLuint sphereIndicesVBO = vboArray[9];
+	GLuint grassVBO = resources.vboArray[0];
+	GLuint grassIndicesVBO = resources.vboArray[1];
+	GLuint skyboxVBO = resources.vboArray[2];
+	GLuint skyboxIndicesVBO = resources.vboArray[3];
+	GLuint towerVBO = resources.vboArray[4];
+	GLuint towerIndicesVBO = resources.vboArray[5];
+	GLuint torusVBO = resources.vboArray[6];
+	GLuint torusIndicesVBO = resources.vboArray[7];
+	GLuint sphereVBO = resources.vboArray[8];
+	GLuint sphereIndicesVBO = resources.vboArray[9];
 	// === load models ===
 
 	GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber, torusIndicesNumber, sphereIndicesNumber;
 	GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType, sphereIndexType;
 	if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType))
 	{
-		glDeleteVertexArrays(vaosNum, vaoArray);
-		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+		glDeleteBuffers(VBOS_NUM, resources.vboArray);
 		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
@@ -303,8 +309,8 @@ int main()
 
 	if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType))
 	{
-		glDeleteVertexArrays(vaosNum, vaoArray);
-		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+		glDeleteBuffers(VBOS_NUM, resources.vboArray);
 		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
@@ -314,8 +320,8 @@ int main()
 
 	if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType))
 	{
-		glDeleteVertexArrays(vaosNum, vaoArray);
-		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+		glDeleteBuffers(VBOS_NUM, resources.vboArray);
 		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
@@ -325,8 +331,8 @@ int main()
 
 	if(!modelLoad("models/torus.emd", torusVAO, torusVBO, torusIndicesVBO, &torusIndicesNumber, &torusIndexType))
 	{
-		glDeleteVertexArrays(vaosNum, vaoArray);
-		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+		glDeleteBuffers(VBOS_NUM, resources.vboArray);
 		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
@@ -336,8 +342,8 @@ int main()
 
 	if(!modelLoad("models/sphere.emd", sphereVAO, sphereVBO, sphereIndicesVBO, &sphereIndicesNumber, &sphereIndexType))
 	{
-		glDeleteVertexArrays(vaosNum, vaoArray);
-		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+		glDeleteBuffers(VBOS_NUM, resources.vboArray);
 		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
@@ -364,8 +370,8 @@ int main()
 
 	if(!camera)
 	{
-		glDeleteVertexArrays(vaosNum, vaoArray);
-		glDeleteBuffers(vbosNum, vboArray);
+		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+		glDeleteBuffers(VBOS_NUM, resources.vboArray);
 		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 		glDeleteProgram(resources.programId);
 		glfwDestroyWindow(resources.window);
@@ -563,8 +569,8 @@ int main()
 	}
 
 	cameraDestroy(camera);
-	glDeleteVertexArrays(vaosNum, vaoArray);
-	glDeleteBuffers(vbosNum, vboArray);
+	glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
+	glDeleteBuffers(VBOS_NUM, resources.vboArray);
 	glDeleteTextures(TEXTURES_NUM, resources.textureArray);
 	glDeleteProgram(resources.programId);
 	glfwDestroyWindow(resources.window);
