@@ -32,16 +32,13 @@ long getCurrentTimeMs()
 	unsigned long long nowWindows = (unsigned long long)filetime.dwLowDateTime
 		+ ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
 
+	// printf("dwLowDateTime = %lu\n", filetime.dwLowDateTime);
+	// printf("dwHighDateTime = %lu\n", filetime.dwHighDateTime);
+	// printf("sizeof(long), sizeof(long long), sizeof(LONGLONG) = %d, %d, %d\n", sizeof(long), sizeof(long long), sizeof(LONGLONG));
+	// exit(1);
 
-	printf("dwLowDateTime = %lu\n", filetime.dwLowDateTime);
-	printf("dwHighDateTime = %lu\n", filetime.dwHighDateTime);
-	// printf("nowWindows = %ld\n", nowWindows);
-	printf("sizeof(long), sizeof(long long), sizeof(LONGLONG) = %d, %d, %d\n", sizeof(long), sizeof(long long), sizeof(LONGLONG));
-
-	exit(1);
-
-	unsigned long long nowUnix = nowWindows; // - 116444736000000000LL;
-	unsigned long long nowUnixMs = nowUnix / 10000LL;
+	unsigned long long nowUnix = nowWindows - 116444736000000000ULL;
+	unsigned long long nowUnixMs = nowUnix / 10000ULL;
 
 	return (long)nowUnixMs;
 }
