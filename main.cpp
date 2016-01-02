@@ -19,9 +19,11 @@
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
-
+static const long keyPressCheckIntervalMs = 250;
 static const float fpsSmoothing = 0.9; // larger - more smoothing
-static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing value");
+
+static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0,
+	"Invalid fpsSmoothing value");
 
 #define TEXTURES_NUM 6
 #define VAOS_NUM 5
@@ -30,12 +32,14 @@ static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0, "Invalid fpsSmoothing 
 struct CommonResources
 {
 	bool windowInitialized;
+	bool cameraInitialized;
 	bool programIdInitialized;
 	bool textureArrayInitialized;
 	bool vaoArrayInitialized;
 	bool vboArrayInitialized;
 
 	GLFWwindow* window;
+	Camera* camera;
 	GLuint programId;
 	GLuint textureArray[TEXTURES_NUM];
 	GLuint vaoArray[VAOS_NUM];
@@ -57,13 +61,14 @@ errorCallback(int code, const char* descr)
 static int
 commonResourcesCreate(CommonResources* resources)
 {
-	// set *Initialized fileds to false
+	// set *Initialized fields to false
 
 	memset(resources, 0, sizeof(CommonResources));
 
 	// initialize window
 
-	if(glfwInit() == GL_FALSE) {
+	if(glfwInit() == GL_FALSE)
+	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
@@ -80,7 +85,8 @@ commonResourcesCreate(CommonResources* resources)
 
 	resources->window = glfwCreateWindow(800, 600, "Demo", NULL, NULL);
 
-	if(resources->window == NULL) {
+	if(resources->window == NULL)
+	{
 		fprintf(stderr, "Failed to open GLFW window\n");
 		return -1;
 	}
@@ -88,7 +94,8 @@ commonResourcesCreate(CommonResources* resources)
 
 	glfwMakeContextCurrent(resources->window);
 
-	if(glxwInit()) {
+	if(glxwInit())
+	{
 		fprintf(stderr, "Failed to init GLXW\n");
 		return -1;
 	}
@@ -96,6 +103,22 @@ commonResourcesCreate(CommonResources* resources)
 	glfwSwapInterval(1);
 	glfwSetWindowSizeCallback(resources->window, windowSizeCallback);
 	glfwShowWindow(resources->window);
+
+	// initialize camera
+	resources->camera = cameraCreate(
+			resources->window,
+			glm::vec3(0, 0, 5),
+			3.14f, // toward -Z
+			0.0f // look at the horizon
+		);
+
+	if(!resources->camera)
+	{
+		fprintf(stderr, "Failed to create camera\n");
+		return -1;
+	}
+
+	resources->cameraInitialized = true;
 
 	// initialize programId
 
@@ -145,6 +168,7 @@ commonResourcesCreate(CommonResources* resources)
 	glGenBuffers(VBOS_NUM, resources->vboArray);
 	resources->vboArrayInitialized = true;
 
+
 	return 0;
 }
 
@@ -153,6 +177,9 @@ commonResourcesDestroy(CommonResources* resources)
 {
 	if(resources->windowInitialized)
 		glfwDestroyWindow(resources->window);
+
+	if(resources->cameraInitialized)
+		cameraDestroy(resources->camera);
 
 	if(resources->programIdInitialized)
 		glDeleteProgram(resources->programId);
@@ -222,162 +249,94 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 }
 
-// TODO: refactore resource (VAOs, VBOs, Textures) creation and releasing
-// 1) allocate common resources + set boolean flags __allocated = true,
-// 2) pass object with all resources
-// 3) release resources on return
-int main()
+static int
+mainInternal(CommonResources* resources)
 {
-	CommonResources resources;
+	// load textures
 
-	if(commonResourcesCreate(&resources) == -1)
-	{
-		commonResourcesDestroy(&resources);
-		return 1;
-	}
+	GLuint grassTexture = resources->textureArray[0];
+	GLuint skyboxTexture = resources->textureArray[1];
+	GLuint towerTexture = resources->textureArray[2];
+	GLuint garkGreenTexture = resources->textureArray[3];
+	GLuint redTexture = resources->textureArray[4];
+	GLuint blueTexture = resources->textureArray[5];
 
-	// prepare textures
-
-	GLuint grassTexture = resources.textureArray[0];
-	GLuint skyboxTexture = resources.textureArray[1];
-	GLuint towerTexture = resources.textureArray[2];
-	GLuint garkGreenTexture = resources.textureArray[3];
-	GLuint redTexture = resources.textureArray[4];
-	GLuint blueTexture = resources.textureArray[5];
-
-	if(!loadDDSTexture("textures/grass.dds", grassTexture)) {
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
+	if(!loadDDSTexture("textures/grass.dds", grassTexture))
 		return -1;
-	}
 
-	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture)) {
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
+	if(!loadDDSTexture("textures/skybox.dds", skyboxTexture))
 		return -1;
-	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	if(!loadDDSTexture("textures/tower.dds", towerTexture)) {
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
+	if(!loadDDSTexture("textures/tower.dds", towerTexture))
 		return -1;
-	}
 
 	loadOneColorTexture(0.05f, 0.5f, 0.1f, garkGreenTexture);
 	loadOneColorTexture(1.0f, 0.0f, 0.0f, redTexture);
 	loadOneColorTexture(0.0f, 0.0f, 1.0f, blueTexture);
 
-	GLuint grassVAO = resources.vaoArray[0];
-	GLuint skyboxVAO = resources.vaoArray[1];
-	GLuint towerVAO = resources.vaoArray[2];
-	GLuint torusVAO = resources.vaoArray[3];
-	GLuint sphereVAO = resources.vaoArray[4];
+	// load models
 
-	GLuint grassVBO = resources.vboArray[0];
-	GLuint grassIndicesVBO = resources.vboArray[1];
-	GLuint skyboxVBO = resources.vboArray[2];
-	GLuint skyboxIndicesVBO = resources.vboArray[3];
-	GLuint towerVBO = resources.vboArray[4];
-	GLuint towerIndicesVBO = resources.vboArray[5];
-	GLuint torusVBO = resources.vboArray[6];
-	GLuint torusIndicesVBO = resources.vboArray[7];
-	GLuint sphereVBO = resources.vboArray[8];
-	GLuint sphereIndicesVBO = resources.vboArray[9];
-	// === load models ===
+	GLuint grassVAO = resources->vaoArray[0];
+	GLuint skyboxVAO = resources->vaoArray[1];
+	GLuint towerVAO = resources->vaoArray[2];
+	GLuint torusVAO = resources->vaoArray[3];
+	GLuint sphereVAO = resources->vaoArray[4];
 
-	GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber, torusIndicesNumber, sphereIndicesNumber;
-	GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType, sphereIndexType;
+	GLuint grassVBO = resources->vboArray[0];
+	GLuint grassIndicesVBO = resources->vboArray[1];
+	GLuint skyboxVBO = resources->vboArray[2];
+	GLuint skyboxIndicesVBO = resources->vboArray[3];
+	GLuint towerVBO = resources->vboArray[4];
+	GLuint towerIndicesVBO = resources->vboArray[5];
+	GLuint torusVBO = resources->vboArray[6];
+	GLuint torusIndicesVBO = resources->vboArray[7];
+	GLuint sphereVBO = resources->vboArray[8];
+	GLuint sphereIndicesVBO = resources->vboArray[9];
+
+	GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber,
+		torusIndicesNumber, sphereIndicesNumber;
+	GLenum grassIndexType, skyboxIndexType, towerIndexType, torusIndexType, 
+		sphereIndexType;
+
 	if(!modelLoad("models/grass.emd", grassVAO, grassVBO, grassIndicesVBO, &grassIndicesNumber, &grassIndexType))
-	{
-		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-		glDeleteBuffers(VBOS_NUM, resources.vboArray);
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
 		return -1;
-	}
 
 	if(!modelLoad("models/skybox.emd", skyboxVAO, skyboxVBO, skyboxIndicesVBO, &skyboxIndicesNumber, &skyboxIndexType))
-	{
-		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-		glDeleteBuffers(VBOS_NUM, resources.vboArray);
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
 		return -1;
-	}
 
 	if(!modelLoad("models/tower.emd", towerVAO, towerVBO, towerIndicesVBO, &towerIndicesNumber, &towerIndexType))
-	{
-		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-		glDeleteBuffers(VBOS_NUM, resources.vboArray);
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
 		return -1;
-	}
 
 	if(!modelLoad("models/torus.emd", torusVAO, torusVBO, torusIndicesVBO, &torusIndicesNumber, &torusIndexType))
-	{
-		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-		glDeleteBuffers(VBOS_NUM, resources.vboArray);
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
 		return -1;
-	}
 
 	if(!modelLoad("models/sphere.emd", sphereVAO, sphereVBO, sphereIndicesVBO, &sphereIndicesNumber, &sphereIndexType))
-	{
-		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-		glDeleteBuffers(VBOS_NUM, resources.vboArray);
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
 		return -1;
-	}
 
 	glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
-	GLint uniformMVP = getUniformLocation(resources.programId, "MVP");
-	GLint uniformM = getUniformLocation(resources.programId, "M");
-	GLint uniformTextureSample = getUniformLocation(resources.programId, "textureSampler");
-	GLint uniformCameraPos = getUniformLocation(resources.programId, "cameraPos");
+	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
+	GLint uniformM = getUniformLocation(resources->programId, "M");
+	GLint uniformTextureSample = getUniformLocation(resources->programId, 
+		"textureSampler");
+	GLint uniformCameraPos = getUniformLocation(resources->programId, 
+		"cameraPos");
 
-	GLint uniformMaterialSpecularFactor = getUniformLocation(resources.programId, "materialSpecularFactor");
-	GLint uniformMaterialSpecularIntensity = getUniformLocation(resources.programId, "materialSpecularIntensity");
-	GLint uniformMaterialEmission = getUniformLocation(resources.programId, "materialEmission");
-
-	Camera* camera = cameraCreate(
-		resources.window, glm::vec3(0, 0, 5),
-		3.14f /* toward -Z */,
-		0.0f /* look at the horizon */
+	GLint uniformMaterialSpecularFactor = getUniformLocation(
+			resources->programId,
+			"materialSpecularFactor"
 		);
-
-	if(!camera)
-	{
-		glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-		glDeleteBuffers(VBOS_NUM, resources.vboArray);
-		glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-		glDeleteProgram(resources.programId);
-		glfwDestroyWindow(resources.window);
-		glfwTerminate();
-		return -1;
-	}
+	GLint uniformMaterialSpecularIntensity = getUniformLocation(
+			resources->programId,
+			"materialSpecularIntensity"
+		);
+	GLint uniformMaterialEmission = getUniformLocation(
+			resources->programId,
+			"materialEmission"
+		);
 
 	glEnable(GL_DOUBLEBUFFER);
 	glEnable(GL_CULL_FACE);
@@ -386,7 +345,7 @@ int main()
 	glDepthFunc(GL_LESS);
 	glClearColor(0, 0, 0, 1);
 
-	glUseProgram(resources.programId);
+	glUseProgram(resources->programId);
 
 	glUniform1i(uniformTextureSample, 0);
 
@@ -395,17 +354,18 @@ int main()
 	bool spotLightEnabled = true;
 	bool wireframesModeEnabled = false;
 	long lastKeyPressCheckMs = 0;
-	const long keyPressCheckIntervalMs = 250;
 
-	setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+	setupLights(resources->programId, directionalLightEnabled, 
+		pointLightEnabled, spotLightEnabled);
 
 	long startTimeMs = getCurrentTimeMs();
 	long currentTimeMs = startTimeMs;
 	long prevTimeMs = startTimeMs;
 	long lastFpsCounterFlushTimeMs = startTimeMs;
 	float fps = 0.0;
-	while(glfwWindowShouldClose(resources.window) == GL_FALSE) {
-		if(glfwGetKey(resources.window, GLFW_KEY_Q) == GLFW_PRESS) break;
+	while(glfwWindowShouldClose(resources->window) == GL_FALSE) {
+		if(glfwGetKey(resources->window, GLFW_KEY_Q) == GLFW_PRESS)
+			break;
 
 		currentTimeMs = getCurrentTimeMs();
 
@@ -420,52 +380,69 @@ int main()
 
 		// prevent devision by zero and/or very high FPS value right
 		// after program start
-		if(prevDeltaTimeMs > 0) {
+		if(prevDeltaTimeMs > 0)
 			fps = fps*fpsSmoothing + (1.0 - fpsSmoothing)*(1000.0 / (float)prevDeltaTimeMs);
-		}
 
-		// dont update fps to often or no one can read it
-		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200) {
+		// don't update fps to often or no one can read it
+		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
+		{
 			printf("FPS: %f\n", fps);
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
 
-		if(startDeltaTimeMs - lastKeyPressCheckMs > keyPressCheckIntervalMs) {
-			if(glfwGetKey(resources.window, GLFW_KEY_X) == GLFW_PRESS) {
+		if(startDeltaTimeMs - lastKeyPressCheckMs > keyPressCheckIntervalMs)
+		{
+			if(glfwGetKey(resources->window, GLFW_KEY_X) == GLFW_PRESS)
+			{
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				wireframesModeEnabled = !wireframesModeEnabled;
-				if(wireframesModeEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				if(wireframesModeEnabled)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
-			if(glfwGetKey(resources.window, GLFW_KEY_M) == GLFW_PRESS) {
+
+			if(glfwGetKey(resources->window, GLFW_KEY_M) == GLFW_PRESS)
+			{
 				lastKeyPressCheckMs = startDeltaTimeMs;
-				bool enabled = cameraGetMouseInterceptionEnabled(camera);
-				cameraSetMouseInterceptionEnabled(camera, !enabled);
+				bool enabled = cameraGetMouseInterceptionEnabled(
+						resources->camera
+					);
+				cameraSetMouseInterceptionEnabled(resources->camera, !enabled);
 			}
-			if(glfwGetKey(resources.window, GLFW_KEY_1) == GLFW_PRESS) {
+
+			if(glfwGetKey(resources->window, GLFW_KEY_1) == GLFW_PRESS)
+			{
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				directionalLightEnabled = !directionalLightEnabled;
-				setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+				setupLights(resources->programId, directionalLightEnabled, 
+					pointLightEnabled, spotLightEnabled);
 			}
-			if(glfwGetKey(resources.window, GLFW_KEY_2) == GLFW_PRESS) {
+
+			if(glfwGetKey(resources->window, GLFW_KEY_2) == GLFW_PRESS)
+			{
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				pointLightEnabled = !pointLightEnabled;
-				setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+				setupLights(resources->programId, directionalLightEnabled, 
+					pointLightEnabled, spotLightEnabled);
 			}
-			if(glfwGetKey(resources.window, GLFW_KEY_3) == GLFW_PRESS) {
+
+			if(glfwGetKey(resources->window, GLFW_KEY_3) == GLFW_PRESS)
+			{
 				lastKeyPressCheckMs = startDeltaTimeMs;
 				spotLightEnabled = !spotLightEnabled;
-				setupLights(resources.programId, directionalLightEnabled, pointLightEnabled, spotLightEnabled);
+				setupLights(resources->programId, directionalLightEnabled, 
+					pointLightEnabled, spotLightEnabled);
 			}
 		}
 
 		glm::vec3 cameraPos;
-		cameraGetPosition(camera, &cameraPos);
+		cameraGetPosition(resources->camera, &cameraPos);
 
 		glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
 		glm::mat4 view;
-		cameraGetViewMatrix(camera, prevDeltaTimeMs, &view);
+		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &view);
 		glm::mat4 vp = projection * view;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -485,7 +462,8 @@ int main()
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, towerIndicesVBO);
-		glDrawElements(GL_TRIANGLES, towerIndicesNumber, towerIndexType, NULL);
+		glDrawElements(GL_TRIANGLES, towerIndicesNumber, 
+			towerIndexType, NULL);
 
 		// torus
 
@@ -500,7 +478,8 @@ int main()
 		glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, torusIndicesVBO);
-		glDrawElements(GL_TRIANGLES, torusIndicesNumber, torusIndexType, NULL);
+		glDrawElements(GL_TRIANGLES, torusIndicesNumber, 
+			torusIndexType, NULL);
 
 		// grass
 
@@ -515,7 +494,8 @@ int main()
 		glUniform1f(uniformMaterialSpecularIntensity, 2.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grassIndicesVBO);
-		glDrawElements(GL_TRIANGLES, grassIndicesNumber, grassIndexType, NULL);
+		glDrawElements(GL_TRIANGLES, grassIndicesNumber, 
+			grassIndexType, NULL);
 
 		// skybox
 
@@ -530,7 +510,8 @@ int main()
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIndicesVBO);
-		glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, skyboxIndexType, NULL);
+		glDrawElements(GL_TRIANGLES, skyboxIndicesNumber, 
+			skyboxIndexType, NULL);
 
 		// point light source
 		if(pointLightEnabled) {
@@ -545,7 +526,8 @@ int main()
 			glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 			glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
-			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, NULL);
+			glDrawElements(GL_TRIANGLES, sphereIndicesNumber,
+				sphereIndexType, NULL);
 		}
 
 		// spot light source
@@ -561,19 +543,28 @@ int main()
 			glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 			glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereIndicesVBO);
-			glDrawElements(GL_TRIANGLES, sphereIndicesNumber, sphereIndexType, NULL);
+			glDrawElements(GL_TRIANGLES, sphereIndicesNumber,
+				sphereIndexType, NULL);
 		}
 
-		glfwSwapBuffers(resources.window);
+		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
 	}
 
-	cameraDestroy(camera);
-	glDeleteVertexArrays(VAOS_NUM, resources.vaoArray);
-	glDeleteBuffers(VBOS_NUM, resources.vboArray);
-	glDeleteTextures(TEXTURES_NUM, resources.textureArray);
-	glDeleteProgram(resources.programId);
-	glfwDestroyWindow(resources.window);
-	glfwTerminate();
 	return 0;
+}
+
+int
+main()
+{
+	int code;
+	CommonResources resources;
+
+	if(commonResourcesCreate(&resources) == -1)
+		code = 1;
+	else
+		code = mainInternal(&resources);
+
+	commonResourcesDestroy(&resources);
+	return code;
 }
