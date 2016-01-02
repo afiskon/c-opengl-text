@@ -28,11 +28,11 @@ long getCurrentTimeMs()
 	FILETIME filetime;
 	GetSystemTimeAsFileTime(&filetime);
 
-	LONGLONG nowWindows = (LONGLONG)filetime.dwLowDateTime
-		+ ((LONGLONG)(filetime.dwHighDateTime) << 32LL);
+	long long nowWindows = (long long)filetime.dwLowDateTime
+		+ ((long long)(filetime.dwHighDateTime) << 32LL);
 
-	LONGLONG nowUnix = nowWindows - 116444736000000000LL;
-	LONGLONG nowUnixMs = nowUnix / 10000LL;
+	long long nowUnix = nowWindows; // - 116444736000000000LL;
+	long long nowUnixMs = nowUnix / 10000LL;
 
 	return (long)nowUnixMs;
 }
