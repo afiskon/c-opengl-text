@@ -19,6 +19,7 @@
 
 #include <windows.h>
 
+// TODO: rewrite to uint64_t
 long getCurrentTimeMs()
 {
 	// SYSTEMTIME time;
@@ -28,11 +29,19 @@ long getCurrentTimeMs()
 	FILETIME filetime;
 	GetSystemTimeAsFileTime(&filetime);
 
-	long long nowWindows = (long long)filetime.dwLowDateTime
-		+ ((long long)(filetime.dwHighDateTime) << 32LL);
+	unsigned long long nowWindows = (unsigned long long)filetime.dwLowDateTime
+		+ ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
 
-	long long nowUnix = nowWindows; // - 116444736000000000LL;
-	long long nowUnixMs = nowUnix / 10000LL;
+
+	printf("dwLowDateTime = %lld\n", (unsigned long long)filetime.dwLowDateTime);
+	printf("dwHighDateTime = %lld\n", (unsigned long long)filetime.dwHighDateTime);
+	printf("nowWindows = %lld\n", nowWindows);
+	printf("sizeof(long), sizeof(long long), sizeof(LONGLONG) = %d, %d, %d\n", sizeof(long), sizeof(long long), sizeof(LONGLONG));
+
+	exit(1);
+
+	unsigned long long nowUnix = nowWindows; // - 116444736000000000LL;
+	unsigned long long nowUnixMs = nowUnix / 10000LL;
 
 	return (long)nowUnixMs;
 }
