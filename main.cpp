@@ -386,7 +386,8 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			printf("FPS: %f\n", fps);
+			printf("FPS: %f, currentTimeMs = %ld\n",
+				fps, currentTimeMs);
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
 
