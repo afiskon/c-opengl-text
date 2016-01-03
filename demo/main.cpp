@@ -561,14 +561,22 @@ mainInternal(CommonResources* resources)
 
 		// skybox
 
-		glm::mat4 skyboxM = glm::translate(cameraPosOld) *
-			glm::scale(100.0f,100.0f,100.0f);
-		glm::mat4 skyboxMVP = vpOld * skyboxM;
+		//glm::mat4 skyboxM = glm::translate(cameraPosOld) *
+		//	glm::scale(100.0f,100.0f,100.0f);
+		//glm::mat4 skyboxMVP = vpOld * skyboxM;
+		Matrix tempSkyboxM = identitymat();
+		Matrix skyboxM = identitymat();
+		translate(&skyboxM,
+			cameraPosNew.m[0], cameraPosNew.m[1], cameraPosNew.m[2]);
+		scale(&tempSkyboxM, 100.0f, 100.0f, 100.0f);
+		skyboxM = multiplymat4(&tempSkyboxM, &skyboxM);
+
+		Matrix skyboxMVP = multiplymat4(&skyboxM, &vpNew);
 
 		glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 		glBindVertexArray(skyboxVAO);
-		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &skyboxMVP[0][0]);
-		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &skyboxM[0][0]);
+		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &skyboxMVP.m[0]);
+		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &skyboxM.m[0]);
 		glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
