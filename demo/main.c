@@ -4,7 +4,6 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-#include <assert.h>
 
 #include "utils/constants.h"
 #include "utils/linearalg.h"
@@ -21,10 +20,8 @@ static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 
 #define KEY_PRESS_CHECK_INTERVAL 250 // ms
 
-#define FPS_SMOOTHING 0.9f // larger - more smoothing
-
-static_assert(FPS_SMOOTHING >= 0.0 && FPS_SMOOTHING <= 1.0,
-	"Invalid FPS_SMOOTHING value");
+// [0.0, 1.0], larger - more smoothing
+#define FPS_SMOOTHING 0.9f 
 
 #define TEXTURES_NUM 6
 #define VAOS_NUM 5
