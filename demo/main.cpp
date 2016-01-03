@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <assert.h>
-#include <math.h>
 
+#include "utils/constants.h"
 #include "utils/utils.h"
 #include "utils/camera.h"
 #include "utils/models.h"
