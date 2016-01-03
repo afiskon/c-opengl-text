@@ -1,9 +1,6 @@
 [submodule "glfw"]
 	path = glfw
 	url = https://github.com/glfw/glfw
-[submodule "glm"]
-	path = glm
-	url = https://github.com/Groovounet/glm
 [submodule "glxw"]
 	path = glxw
 	url = http://glxw.dav1d.de/glxw.git
