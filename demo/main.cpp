@@ -495,13 +495,9 @@ mainInternal(CommonResources* resources)
 
 		// tower
 
-		// glm::mat4 towerMOld = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
-			// glm::translate(-1.5f, -1.0f, -1.5f);
-		// glm::mat4 towerMVPOld = vpOld * towerMOld;
-
 		Matrix tempTowerM = identitymat();
-		Matrix towerMNew = rotate(&tempTowerM /* identity */,
-							islandAngle, { 0.0f, 1.0f, 0.0f, 0.0f });
+		Matrix towerMNew = rotate(&tempTowerM, islandAngle,
+									{ 0.0f, 1.0f, 0.0f, 0.0f });
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerMNew = multiplymat4(&tempTowerM, &towerMNew); // OK!
 
@@ -522,13 +518,9 @@ mainInternal(CommonResources* resources)
 
 		// torus
 
-		// glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) *
-			// glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
-		// glm::mat4 torusMVP = vpOld * torusM;
-
 		Matrix tempTorusM = identitymat();
 		Matrix torusM = rotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
-							{ 0.0f, 1.0f, 0.0f, 0.0f});
+								{ 0.0f, 1.0f, 0.0f, 0.0f});
 		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
 		torusM = multiplymat4(&tempTorusM, &torusM);
 
@@ -547,14 +539,22 @@ mainInternal(CommonResources* resources)
 
 		// grass
 
-		glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
-			glm::translate(0.0f, -1.0f, 0.0f);
-		glm::mat4 grassMVP = vpOld * grassM;
+		// glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
+		// 	glm::translate(0.0f, -1.0f, 0.0f);
+		// glm::mat4 grassMVP = vpOld * grassM;
+
+		Matrix tempGrassM = identitymat();
+		Matrix grassM = rotate(&tempGrassM, islandAngle,
+								{ 0.0f, 1.0f, 0.0f, 0.0f});
+		translate(&tempGrassM, 0.0f, -1.0f, 0.0f);
+		grassM = multiplymat4(&tempGrassM, &grassM);
+
+		Matrix grassMVP = multiplymat4(&grassM, &vpNew);
 
 		glBindTexture(GL_TEXTURE_2D, grassTexture);
 		glBindVertexArray(grassVAO);
-		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &grassMVP[0][0]);
-		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &grassM[0][0]);
+		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &grassMVP.m[0]);
+		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &grassM.m[0]);
 		glUniform1f(uniformMaterialSpecularFactor, 32.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 2.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
