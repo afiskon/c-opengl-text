@@ -12,7 +12,7 @@ include_directories(glxw/include)
 include_directories(glfw/include)
 include_directories(assimp/include)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -Wextra -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -O2 -Wall -Wextra -Werror")
 
 SET(MAIN_LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY}
                     ${OPENGL_LIBRARY} ${CMAKE_DL_LIBS})
