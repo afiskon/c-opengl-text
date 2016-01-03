@@ -18,7 +18,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror -Wno-de
 SET(MAIN_LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY}
                     ${OPENGL_LIBRARY} ${CMAKE_DL_LIBS})
 set(MAIN_SOURCE_FILES demo/utils/camera.cpp demo/utils/camera.h 
-                    demo/utils/linearalg.c demo/utils/linearalg.h
+                    demo/utils/linearalg.cpp demo/utils/linearalg.h
                     demo/utils/utils.cpp demo/utils/utils.h 
                     demo/utils/models.cpp demo/utils/models.h 
                     demo/utils/fileMapping.cpp demo/utils/fileMapping.h)

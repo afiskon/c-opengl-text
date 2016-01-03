@@ -1,5 +1,6 @@
 #include <GLXW/glxw.h>
 
+// TODO: clean code + delete link to glm repository
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
@@ -9,10 +10,7 @@
 #include <assert.h>
 
 #include "utils/constants.h"
-
-extern "C" {
 #include "utils/linearalg.h"
-}
 
 #include "utils/utils.h"
 #include "utils/camera.h"
@@ -25,7 +23,7 @@ static const glm::vec3 SPOT_LIGHT_POS(4.0f, 5.0f, 0.0f);
 
 // static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
 // static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
-// static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
+static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 
 static const uint64_t KEY_PRESS_CHECK_INTERVAL_MS = 250;
 static const float FPS_SMOOTHING = 0.9; // larger - more smoothing
@@ -115,8 +113,8 @@ commonResourcesCreate(CommonResources* resources)
 	// initialize camera
 	resources->camera = cameraCreate(
 			resources->window,
-			glm::vec3(0, 0, 5),
-			// CAMERA_START_POS,
+			// glm::vec3(0, 0, 5),
+			CAMERA_START_POS,
 			3.14f, // toward -Z
 			0.0f // look at the horizon
 		);
@@ -458,13 +456,23 @@ mainInternal(CommonResources* resources)
 			}
 		}
 
-		glm::vec3 cameraPos;
-		cameraGetPosition(resources->camera, &cameraPos);
+		Vector4 cameraPosTemp;
+		cameraGetPosition(resources->camera, &cameraPosTemp);
+
+		glm::vec3 cameraPos(cameraPosTemp.x, cameraPosTemp.y, cameraPosTemp.z);
 
 		glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
+		
+		Matrix viewTemp;
+		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &viewTemp);
+
 		glm::mat4 view;
-		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &view);
+		for(int ti = 0; ti < 4; ti++)
+			for(int tj = 0; tj < 4; tj++)
+				view[ti][tj] = viewTemp.m[ti*4 + tj];
+
+
 		glm::mat4 vp = projection * view;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

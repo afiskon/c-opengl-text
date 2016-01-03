@@ -1,3 +1,6 @@
+#ifndef AFISKON_OPENGL_LINEARALG_H
+#define AFISKON_OPENGL_LINEARALG_H
+
 // based on https://github.com/shua/jams/tree/master/ld26
 
 typedef struct Matrix
@@ -12,6 +15,7 @@ typedef struct Matrix
 C D E F
 */
 
+// TODO: rename to Vector + corresponding procedures refactorings
 typedef union Vector4
 {
     float m[4];
@@ -29,6 +33,8 @@ static const Vector4 INV_Y_AXIS = {{0, -1, 0, 0}};
 static const Vector4 INV_Z_AXIS = {{0, 0, -1, 0}};
 */
 
+Vector4 addvec4(Vector4 v1, Vector4 v2);
+Vector4 mulvec4(Vector4 v, float n);
 Matrix multiplymat4(const Matrix* m1, const Matrix* m2);
 Vector4 mulmatvec4(const Matrix* m, const Vector4* v);
 void normalizevec4(Vector4* v);
@@ -44,4 +50,6 @@ Matrix perspective(float fovy, float aspect_ratio, float near_plane,
     float far_plane);
 Matrix orthogonal(float left, float right, float bottom, float top);
 
-Matrix lookAt(Vector4 pos, Vector4 dir);
+Matrix lookAt(Vector4 pos, Vector4 dir, Vector4 up);
+
+#endif // AFISKON_OPENGL_LINEARALG_H

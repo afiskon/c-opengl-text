@@ -1,21 +1,23 @@
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp> // TODO: delete
+
 #include <GLFW/glfw3.h>
 #include "camera.h"
+#include "linearalg.h"
 
-static const float speed = 4.0f; // units per second
-static const float mouseSpeedRad = 0.0005f;
+static const float CAMERA_SPEED = 4.0f; // units per second
+static const float MOUSE_SPEED_RAD = 0.0005f;
 
 struct Camera
 {
     GLFWwindow* window;
-    glm::vec3 position;
+    Vector4 position;
     float horizontalAngleRad;
     float verticalAngleRad;
     bool mouseInterceptionEnabled;
 };
 
 Camera*
-cameraCreate(GLFWwindow* window, const glm::vec3& startPosition,
+cameraCreate(GLFWwindow* window, const Vector4 startPosition,
     float startHorizontalAngleRad, float startVerticalAngleRad)
 {
     Camera* cam = (Camera*)malloc(sizeof(Camera));
@@ -28,7 +30,8 @@ cameraCreate(GLFWwindow* window, const glm::vec3& startPosition,
     cam->verticalAngleRad = startVerticalAngleRad;
     cam->mouseInterceptionEnabled = true;
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide cursor
+    // hide cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     return cam;
 }
@@ -40,7 +43,7 @@ cameraDestroy(Camera* cam)
 }
 
 void
-cameraGetPosition(Camera* cam, glm::vec3 *pOutVec)
+cameraGetPosition(Camera* cam, Vector4* pOutVec)
 {
     *pOutVec = cam->position;
 }
@@ -62,7 +65,7 @@ cameraSetMouseInterceptionEnabled(Camera* cam, bool enabled)
 }
 
 void
-cameraGetViewMatrix(Camera* cam, float deltaTimeMs, glm::mat4* pOutViewMatrix)
+cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
 {
     float deltaTimeSec = deltaTimeMs/1000.0f;
 
@@ -74,40 +77,61 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, glm::mat4* pOutViewMatrix)
         double mouseX, mouseY;
         glfwGetCursorPos(cam->window, &mouseX, &mouseY);
 
-        cam->horizontalAngleRad += mouseSpeedRad * (windowWidth/2 - mouseX);
-        cam->verticalAngleRad += mouseSpeedRad * (windowHeight/2 - mouseY);
+        cam->horizontalAngleRad += MOUSE_SPEED_RAD * (windowWidth/2 - mouseX);
+        cam->verticalAngleRad += MOUSE_SPEED_RAD * (windowHeight/2 - mouseY);
 
         glfwSetCursorPos(cam->window, windowWidth/2, windowHeight/2);
     }
 
-    glm::vec3 direction(
-        cos(cam->verticalAngleRad) * sin(cam->horizontalAngleRad),
-        sin(cam->verticalAngleRad),
-        cos(cam->verticalAngleRad) * cos(cam->horizontalAngleRad)
-    );
+    Vector4 direction = {{
+            (float)(cos(cam->verticalAngleRad) * sin(cam->horizontalAngleRad)),
+            (float)(sin(cam->verticalAngleRad)),
+            (float)(cos(cam->verticalAngleRad) * cos(cam->horizontalAngleRad)),
+            0.0f
+        }};
 
-    glm::vec3 right = glm::vec3(
-        sin(cam->horizontalAngleRad - 3.14f/2.0f),
-        0,
-        cos(cam->horizontalAngleRad - 3.14f/2.0f)
-    );
+    Vector4 right = {{
+            (float)(sin(cam->horizontalAngleRad - 3.14f/2.0f)),
+            0.0f,
+            (float)(cos(cam->horizontalAngleRad - 3.14f/2.0f)),
+            0.0f
+        }};
 
-    glm::vec3 up = glm::cross(right, direction);
+    Vector4 up = crossvec4(right, direction);
+    float delta = deltaTimeSec * CAMERA_SPEED;
 
     if(glfwGetKey(cam->window, GLFW_KEY_W) == GLFW_PRESS)
-        cam->position += direction * deltaTimeSec * speed;
+        cam->position = addvec4(cam->position, mulvec4(direction, delta));
 
     if(glfwGetKey(cam->window, GLFW_KEY_S) == GLFW_PRESS)
-        cam->position -= direction * deltaTimeSec * speed;
+        cam->position = addvec4(cam->position, mulvec4(direction, -delta));
 
     if(glfwGetKey(cam->window, GLFW_KEY_A) == GLFW_PRESS)
-        cam->position -= right * deltaTimeSec * speed;
+        cam->position = addvec4(cam->position, mulvec4(right, -delta));
 
     if(glfwGetKey(cam->window, GLFW_KEY_D) == GLFW_PRESS)
-        cam->position += right * deltaTimeSec * speed;
+        cam->position = addvec4(cam->position, mulvec4(right, delta));
 
-    *pOutViewMatrix = glm::lookAt(cam->position,
-                                  cam->position + direction,
-                                  up
-                                );
+    // *pOutViewMatrix = glm::lookAt(cam->position,
+    //                               cam->position + direction,
+    //                               up
+    //                             );
+
+    *pOutViewMatrix = lookAt(
+                            cam->position,
+                            addvec4(cam->position, direction),
+                            up
+                        );
+
+    glm::vec3 posTemp = glm::vec3(cam->position.x, cam->position.y, cam->position.z);
+    glm::vec3 dirTemp = glm::vec3(direction.x, direction.y, direction.z);
+    glm::vec3 upTemp = glm::vec3(up.x, up.y, up.z);
+    glm::mat4 viewExpected = glm::lookAt(posTemp,
+                              posTemp + dirTemp,
+                              upTemp
+                            );
+
+    for(int ti = 0; ti < 4; ti++)
+        for(int tj = 0; tj < 4; tj++)
+            pOutViewMatrix->m[ti*4 + tj] = viewExpected[ti][tj];
 }

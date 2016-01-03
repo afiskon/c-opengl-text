@@ -5,14 +5,43 @@
 
 // based on https://github.com/shua/jams/tree/master/ld26
 
-static const Matrix IDENTITY_MATRIX = {{
+static const Matrix IDENTITY_MATRIX =
+{{
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1
 }};
 
-Matrix multiplymat4(const Matrix* m1, const Matrix* m2) {
+Vector4
+addvec4(Vector4 v1, Vector4 v2)
+{
+    Vector4 res;
+
+    res.x = v1.x + v2.x;
+    res.y = v1.y + v2.y;
+    res.z = v1.z + v2.z;
+    res.w = v1.w + v2.w;
+
+    return res;
+}
+
+Vector4
+mulvec4(Vector4 v, float n)
+{
+    Vector4 res = v;
+
+    res.x *= n;
+    res.y *= n;
+    res.z *= n;
+    res.w *= n;
+
+    return res;
+}
+
+Matrix
+multiplymat4(const Matrix* m1, const Matrix* m2)
+{
     Matrix out = IDENTITY_MATRIX;
     unsigned int row, column, row_offset;
 
@@ -27,7 +56,9 @@ Matrix multiplymat4(const Matrix* m1, const Matrix* m2) {
     return out;
 }
 
-Vector4 mulmatvec4(const Matrix* m, const Vector4* v) {
+Vector4
+mulmatvec4(const Matrix* m, const Vector4* v)
+{
     Vector4 out;
     for(int i = 0; i < 4; ++i) {
         out.m[i] =
@@ -40,22 +71,29 @@ Vector4 mulmatvec4(const Matrix* m, const Vector4* v) {
     return out;
 }
 
-void normalizevec4(Vector4* v) {
+void
+normalizevec4(Vector4* v)
+{
     float sqr = v->m[0] * v->m[0] + v->m[1] * v->m[1] + v->m[2] * v->m[2];
     if(sqr == 1 || sqr == 0)
         return;
+
     float invrt = 1.f/sqrt(sqr);
     v->m[0] *= invrt;
     v->m[1] *= invrt;
     v->m[2] *= invrt;
 }
 
-float dotvec4(Vector4 v1, Vector4 v2) {
+float
+dotvec4(Vector4 v1, Vector4 v2)
+{
     return v1.m[0] * v2.m[0] + v1.m[1] * v2.m[1] + v1.m[2] * v2.m[2] +
         v1.m[3] * v2.m[3];
 }
 
-Vector4 crossvec4(Vector4 v1, Vector4 v2) {
+Vector4
+crossvec4(Vector4 v1, Vector4 v2)
+{
     Vector4 out = {{0}};
     out.m[0] = v1.m[1]*v2.m[2] - v1.m[2]*v2.m[1];
     out.m[1] = v1.m[2]*v2.m[0] - v1.m[0]*v2.m[2];
@@ -63,7 +101,9 @@ Vector4 crossvec4(Vector4 v1, Vector4 v2) {
     return out;
 }
 
-void rotateX(Matrix* m, float angle) {
+void
+rotateX(Matrix* m, float angle)
+{
     Matrix rotation = IDENTITY_MATRIX;
     float sine = (float)sin(angle);
     float cosine = (float)cos(angle);
@@ -76,7 +116,9 @@ void rotateX(Matrix* m, float angle) {
     memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
 }
 
-void rotateY(Matrix* m, float angle) {
+void
+rotateY(Matrix* m, float angle)
+{
     Matrix rotation = IDENTITY_MATRIX;
     float sine = (float)sin(angle);
     float cosine = (float)cos(angle);
@@ -89,7 +131,9 @@ void rotateY(Matrix* m, float angle) {
     memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
 }
 
-void rotateZ(Matrix* m, float angle) {
+void
+rotateZ(Matrix* m, float angle)
+{
     Matrix rotation = IDENTITY_MATRIX;
     float sine = (float)sin(angle);
     float cosine = (float)cos(angle);
@@ -102,7 +146,9 @@ void rotateZ(Matrix* m, float angle) {
     memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
 }
 
-void scale(Matrix* m, float x, float y, float z) {
+void
+scale(Matrix* m, float x, float y, float z)
+{
     Matrix scale = IDENTITY_MATRIX;
 
     scale.m[0] = x;
@@ -112,7 +158,9 @@ void scale(Matrix* m, float x, float y, float z) {
     memcpy(m->m, multiplymat4(m, &scale).m, sizeof(m->m));
 }
 
-void translate(Matrix* m, float x, float y, float z) {
+void
+translate(Matrix* m, float x, float y, float z)
+{
     Matrix translation = IDENTITY_MATRIX;
     
     translation.m[12] = x;
@@ -122,8 +170,9 @@ void translate(Matrix* m, float x, float y, float z) {
     memcpy(m->m, multiplymat4(m, &translation).m, sizeof(m->m));
 }
 
-Matrix perspective(float fovy, float aspect_ratio, float near_plane,
-        float far_plane) {
+Matrix
+perspective(float fovy, float aspect_ratio, float near_plane, float far_plane)
+{
     Matrix out = { { 0 } };
 
     const float
@@ -140,7 +189,9 @@ Matrix perspective(float fovy, float aspect_ratio, float near_plane,
     return out;
 }
 
-Matrix orthogonal(float left, float right, float bottom, float top) {
+Matrix
+orthogonal(float left, float right, float bottom, float top)
+{
     Matrix out = IDENTITY_MATRIX;
     out.m[0] = 2 / (right - left);
     out.m[5] = 2 / (top - bottom);
@@ -151,29 +202,32 @@ Matrix orthogonal(float left, float right, float bottom, float top) {
     return out;
 }
 
-Matrix lookAt(Vector4 pos, Vector4 dir) {
+Matrix
+lookAt(Vector4 pos, Vector4 dir, Vector4 up)
+{
     Vector4 f = dir;
     normalizevec4(&f);
-    Vector4 u = {{0, 1, 0, 0}};
-    Vector4 s = crossvec4(f, u);
+    // Vector4 up = {{0, 1, 0, 0}};
+    // up = {{0, 1, 0, 0}};
+    Vector4 s = crossvec4(f, up);
     normalizevec4(&s);
-    u = crossvec4(s, f);
+    up = crossvec4(s, f);
 
     Matrix out = IDENTITY_MATRIX;
     out.m[0] = s.x;
     out.m[4] = s.y;
     out.m[8] = s.z;
 
-    out.m[1] = u.x;
-    out.m[5] = u.y;
-    out.m[9] = u.z;
+    out.m[1] = up.x;
+    out.m[5] = up.y;
+    out.m[9] = up.z;
 
     out.m[2] = -f.x;
     out.m[6] = -f.y;
     out.m[10] = -f.z;
 
     out.m[12] = -dotvec4(s, pos);
-    out.m[13] = -dotvec4(u, pos);
+    out.m[13] = -dotvec4(up, pos);
     out.m[14] =  dotvec4(f, pos);
     return out;
 }
