@@ -10,8 +10,6 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: get rid of glm?
-// TODO: use C interface of Assimp?
 // TODO: "compress" repository
 // TODO: move all my sources to demo directory - it makes search much simpler
 // TODO: convert project to one codestyle
