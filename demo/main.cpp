@@ -417,7 +417,8 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			printf("FPS: %f, currentTimeMs = 0x%08x%08x\n",
+			// TODO: output camera coordinates
+			printf("FPS: %f, T: 0x%08x%08x, X: ???, Y: ???, Z: ???\n",
 					fps,
 					(uint32_t)(currentTimeMs >> 32),
 					(uint32_t)(currentTimeMs & 0xFFFFFFFF)
@@ -538,10 +539,6 @@ mainInternal(CommonResources* resources)
 			torusIndexType, NULL);
 
 		// grass
-
-		// glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
-		// 	glm::translate(0.0f, -1.0f, 0.0f);
-		// glm::mat4 grassMVP = vpOld * grassM;
 
 		Matrix tempGrassM = identitymat();
 		Matrix grassM = rotate(&tempGrassM, islandAngle,
