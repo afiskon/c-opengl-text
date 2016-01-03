@@ -5,9 +5,8 @@
 
 #include "fileMapping.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define DDS_HEADER_SIZE 128
 #define DDS_SIGNATURE    0x20534444 // "DDS "
