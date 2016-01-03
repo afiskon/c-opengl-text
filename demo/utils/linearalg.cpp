@@ -3,8 +3,6 @@
 #include <string.h>
 #include <math.h>
 
-// a lot of useful procedures are in matrix_tranform.inl of GLM
-
 static const Matrix IDENTITY_MATRIX =
 {
     1.0f, 0.0f, 0.0f, 0.0f,

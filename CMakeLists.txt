@@ -10,7 +10,6 @@ add_subdirectory(assimp)
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(glxw/include)
 include_directories(glfw/include)
-include_directories(glm)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror -Wno-deprecated-register -Wno-shift-op-parentheses")

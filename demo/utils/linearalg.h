@@ -8,13 +8,6 @@ typedef struct Matrix
     float m[16];
 } Matrix;
 
-/*
-0 1 2 3
-4 5 6 7
-8 9 A B
-C D E F
-*/
-
 // TODO: refactor interface: always return Vector/Matrix or never return
 
 // TODO: rename to Vector + corresponding procedures refactorings
