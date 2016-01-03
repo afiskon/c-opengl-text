@@ -1,25 +1,37 @@
 #include <GLXW/glxw.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <assert.h>
 
 #include "utils/constants.h"
+
+extern "C" {
+#include "utils/linearalg.h"
+}
+
 #include "utils/utils.h"
 #include "utils/camera.h"
 #include "utils/models.h"
 
 // TODO: "compress" repository
 
-static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
-static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
-static const uint64_t keyPressCheckIntervalMs = 250;
-static const float fpsSmoothing = 0.9; // larger - more smoothing
+static const glm::vec3 POINT_LIGHT_POS(-2.0f, 3.0f, 0.0f);
+static const glm::vec3 SPOT_LIGHT_POS(4.0f, 5.0f, 0.0f);
 
-static_assert(fpsSmoothing >= 0.0 && fpsSmoothing <= 1.0,
-	"Invalid fpsSmoothing value");
+// static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
+// static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
+// static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
+
+static const uint64_t KEY_PRESS_CHECK_INTERVAL_MS = 250;
+static const float FPS_SMOOTHING = 0.9; // larger - more smoothing
+
+static_assert(FPS_SMOOTHING >= 0.0 && FPS_SMOOTHING <= 1.0,
+	"Invalid FPS_SMOOTHING value");
 
 #define TEXTURES_NUM 6
 #define VAOS_NUM 5
@@ -104,6 +116,7 @@ commonResourcesCreate(CommonResources* resources)
 	resources->camera = cameraCreate(
 			resources->window,
 			glm::vec3(0, 0, 5),
+			// CAMERA_START_POS,
 			3.14f, // toward -Z
 			0.0f // look at the horizon
 		);
@@ -198,7 +211,10 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	bool pointLightEnabled, bool spotLightEnabled)
 {
 	{
-		glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+		// glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
+
+		Vector4 direction = {{ 0.0f, -1.0f, 1.0f, 0.0f }};
+		normalizevec4(&direction);
 
 		setUniform3f(programId, "directionalLight.direction",
 			direction.x, direction.y, direction.z);
@@ -214,7 +230,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 
 	{
 		setUniform3f(programId, "pointLight.position",
-			pointLightPos.x, pointLightPos.y, pointLightPos.z);
+			POINT_LIGHT_POS.x, POINT_LIGHT_POS.y, POINT_LIGHT_POS.z);
 		setUniform3f(programId, "pointLight.color",
 			1.0f, 0.0f, 0.0f);
 		setUniform1f(programId, "pointLight.ambientIntensity",
@@ -226,12 +242,14 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 
 	{
-		glm::vec3 direction = glm::normalize(glm::vec3(-0.5f, -1.0f, 0.0f));
+		// glm::vec3 direction = glm::normalize(glm::vec3(-0.5f, -1.0f, 0.0f));
+		Vector4 direction = {{ -0.5f, -1.0f, 0.0f, 0.0f }};
+		normalizevec4(&direction);
 
 		setUniform3f(programId, "spotLight.direction",
 			direction.x, direction.y, direction.z);
 		setUniform3f(programId, "spotLight.position",
-			spotLightPos.x, spotLightPos.y, spotLightPos.z);
+			SPOT_LIGHT_POS.x, SPOT_LIGHT_POS.y, SPOT_LIGHT_POS.z);
 		setUniform1f(programId, "spotLight.cutoff", 
 			cos(M_PI * 15.0f / 180.0f ));
 		setUniform3f(programId, "spotLight.color",
@@ -379,7 +397,7 @@ mainInternal(CommonResources* resources)
 		// prevent devision by zero and/or very high FPS value right
 		// after program start
 		if(prevDeltaTimeMs > 0)
-			fps = fps*fpsSmoothing + (1.0 - fpsSmoothing) *
+			fps = fps*FPS_SMOOTHING + (1.0 - FPS_SMOOTHING) *
 				(1000.0 / (float)prevDeltaTimeMs);
 
 		// don't update fps to often or no one can read it
@@ -394,7 +412,7 @@ mainInternal(CommonResources* resources)
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
 
-		if(startDeltaTimeMs - lastKeyPressCheckMs > keyPressCheckIntervalMs)
+		if(startDeltaTimeMs - lastKeyPressCheckMs > KEY_PRESS_CHECK_INTERVAL_MS)
 		{
 			if(glfwGetKey(resources->window, GLFW_KEY_X) == GLFW_PRESS)
 			{
@@ -523,7 +541,7 @@ mainInternal(CommonResources* resources)
 
 		// point light source
 		if(pointLightEnabled) {
-			glm::mat4 pointLightM = glm::translate(pointLightPos);
+			glm::mat4 pointLightM = glm::translate(POINT_LIGHT_POS);
 			glm::mat4 pointLightMVP = vp * pointLightM;
 
 			glBindTexture(GL_TEXTURE_2D, redTexture);
@@ -540,7 +558,7 @@ mainInternal(CommonResources* resources)
 
 		// spot light source
 		if(spotLightEnabled) {
-			glm::mat4 spotLightM = glm::translate(spotLightPos);
+			glm::mat4 spotLightM = glm::translate(SPOT_LIGHT_POS);
 			glm::mat4 spotLightMVP = vp * spotLightM;
 
 			glBindTexture(GL_TEXTURE_2D, blueTexture);
