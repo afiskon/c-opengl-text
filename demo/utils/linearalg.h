@@ -15,6 +15,8 @@ typedef struct Matrix
 C D E F
 */
 
+// TODO: refactor interface: always return Vector/Matrix or never return
+
 // TODO: rename to Vector + corresponding procedures refactorings
 typedef union Vector4
 {

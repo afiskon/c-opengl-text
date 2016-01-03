@@ -561,9 +561,6 @@ mainInternal(CommonResources* resources)
 
 		// skybox
 
-		//glm::mat4 skyboxM = glm::translate(cameraPosOld) *
-		//	glm::scale(100.0f,100.0f,100.0f);
-		//glm::mat4 skyboxMVP = vpOld * skyboxM;
 		Matrix tempSkyboxM = identitymat();
 		Matrix skyboxM = identitymat();
 		translate(&skyboxM,
@@ -586,13 +583,14 @@ mainInternal(CommonResources* resources)
 
 		// point light source
 		if(pointLightEnabled) {
-			glm::mat4 pointLightM = glm::translate(POINT_LIGHT_POS_OLD);
-			glm::mat4 pointLightMVP = vpOld * pointLightM;
+			Matrix pointLightM = identitymat();
+			translate(&pointLightM, POINT_LIGHT_POS_NEW.m[0], POINT_LIGHT_POS_NEW.m[1], POINT_LIGHT_POS_NEW.m[2]);
+			Matrix pointLightMVP = multiplymat4(&pointLightM, &vpNew);
 
 			glBindTexture(GL_TEXTURE_2D, redTexture);
 			glBindVertexArray(sphereVAO);
-			glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &pointLightMVP[0][0]);
-			glUniformMatrix4fv(uniformM, 1, GL_FALSE, &pointLightM[0][0]);
+			glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &pointLightMVP.m[0]);
+			glUniformMatrix4fv(uniformM, 1, GL_FALSE, &pointLightM.m[0]);
 			glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 			glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 			glUniform3f(uniformMaterialEmission, 0.5f, 0.5f, 0.5f);
