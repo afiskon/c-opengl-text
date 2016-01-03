@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 #include "utils/utils.h"
 #include "utils/camera.h"
@@ -231,8 +232,8 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 			direction.x, direction.y, direction.z);
 		setUniform3f(programId, "spotLight.position",
 			spotLightPos.x, spotLightPos.y, spotLightPos.z);
-		setUniform1f(programId, "spotLight.cutoff",
-			glm::cos(glm::radians(15.0f)));
+		setUniform1f(programId, "spotLight.cutoff", 
+			cos(M_PI * 15.0f / 180.0f ));
 		setUniform3f(programId, "spotLight.color",
 			0.0f, 0.0f, 1.0f);
 		setUniform1f(programId, "spotLight.ambientIntensity",
