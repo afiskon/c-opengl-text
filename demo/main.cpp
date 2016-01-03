@@ -258,6 +258,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 }
 
+// TODO: delete this
 static void
 debugCompareMatrices(glm::mat4 Old, Matrix New)
 {
@@ -341,7 +342,7 @@ mainInternal(CommonResources* resources)
 
 	glm::mat4 projectionOld = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
-	// OK: Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
+	Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f); // OK
 
 	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
 	GLint uniformM = getUniformLocation(resources->programId, "M");
@@ -473,7 +474,6 @@ mainInternal(CommonResources* resources)
 
 		glm::vec3 cameraPosOld(cameraPosNew.x, cameraPosNew.y, cameraPosNew.z);
 
-
 		glUniform3f(uniformCameraPos, cameraPosNew.x, cameraPosNew.y, cameraPosNew.z);
 
 		
@@ -486,10 +486,7 @@ mainInternal(CommonResources* resources)
                 viewOld[ti][tj] = viewNew.m[ti*4 + tj];
 
 		glm::mat4 vpOld = projectionOld * viewOld;
-		// OK: Matrix vpNew = multiplymat4(&viewNew, &projectionNew);
-
-
-
+		Matrix vpNew = multiplymat4(&viewNew, &projectionNew); // OK
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -508,17 +505,17 @@ mainInternal(CommonResources* resources)
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerMNew = multiplymat4(&tempTowerM, &towerMNew); // OK!
 
-		debugCompareMatrices(towerMOld, towerMNew);
+		// debugCompareMatrices(towerMOld, towerMNew);
 
-		// Matrix towerMVPNew = multiplymat4(&towerMNew, &vpNew);
-		// debugCompareMatrices(towerMVPOld, towerMVPNew);
+		Matrix towerMVPNew = multiplymat4(&towerMNew, &vpNew);
+		debugCompareMatrices(towerMVPOld, towerMVPNew);
 
 		glBindTexture(GL_TEXTURE_2D, towerTexture);
 		glBindVertexArray(towerVAO);
-		// glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPNew.m[0]);
-		// glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM.m[0]);
-		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPOld[0][0]);
-        glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerMOld[0][0]);
+		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPNew.m[0]);
+		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerMNew.m[0]);
+		// glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPOld[0][0]);
+        // glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerMOld[0][0]);
 
 		glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
