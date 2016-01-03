@@ -12,8 +12,6 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: "compress" repository
-
 static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
 static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
 static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
@@ -457,8 +455,6 @@ mainInternal(CommonResources* resources)
 			}
 		}
 
-
-
 		glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
 		Matrix view;
@@ -589,6 +585,9 @@ mainInternal(CommonResources* resources)
 			glDrawElements(GL_TRIANGLES, sphereIndicesNumber,
 				sphereIndexType, NULL);
 		}
+
+		// TODO: glUseProgram with different shaders
+		// render text (a few filled triangles first)
 
 		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
