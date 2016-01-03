@@ -7,7 +7,8 @@
 
 #pragma pack(push, 1)
 
-struct EaxmodHeader {
+struct EaxmodHeader
+{
     char signature[7];
     unsigned char version;
     uint16_t headerSize;
@@ -25,7 +26,8 @@ static bool
 checkFileSizeAndHeader(const char* fname, const EaxmodHeader * header,
 					   unsigned int fileSize)
 {
-    if(fileSize < sizeof(EaxmodHeader)) {
+    if(fileSize < sizeof(EaxmodHeader))
+    {
         fprintf(stderr, "modelLoad - file is too small, fname = %s\n", fname);
         return false;
     }
