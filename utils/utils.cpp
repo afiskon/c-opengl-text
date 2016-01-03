@@ -19,7 +19,8 @@
 
 #include <windows.h>
 
-uint64_t getCurrentTimeMs()
+uint64_t
+getCurrentTimeMs()
 {
 	FILETIME filetime;
 	GetSystemTimeAsFileTime(&filetime);
@@ -37,7 +38,8 @@ uint64_t getCurrentTimeMs()
 
 #include <sys/time.h>
 
-uint64_t getCurrentTimeMs()
+uint64_t
+getCurrentTimeMs()
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -125,7 +127,8 @@ loadDDSTextureCommon(const char* fname, GLuint textureId,
 	return true;
 }
 
-bool loadDDSTexture(const char *fname, GLuint textureId)
+bool
+loadDDSTexture(const char *fname, GLuint textureId)
 {
 	FileMapping* mapping = fileMappingCreate(fname);
 	if(mapping == NULL) return false;
@@ -140,7 +143,8 @@ bool loadDDSTexture(const char *fname, GLuint textureId)
 	return res;
 }
 
-void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId)
+void
+loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId)
 {
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	unsigned char textureData[3];
@@ -195,7 +199,8 @@ checkProgramLinkStatus(GLuint obj)
 	return false;
 }
 
-GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
+GLuint
+loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
 {
 	*errorFlagPtr = false;
 
@@ -227,7 +232,8 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
 	return shaderId;
 }
 
-GLuint prepareProgram(const GLuint* shaders, int nshaders, bool *errorFlagPtr)
+GLuint
+prepareProgram(const GLuint* shaders, int nshaders, bool *errorFlagPtr)
 {
 	*errorFlagPtr = false;
 
@@ -247,7 +253,8 @@ GLuint prepareProgram(const GLuint* shaders, int nshaders, bool *errorFlagPtr)
 	return programId;
 }
 
-GLint getUniformLocation(GLuint programId, const char* uniformName)
+GLint
+getUniformLocation(GLuint programId, const char* uniformName)
 {
 	GLint location = glGetUniformLocation(programId, uniformName);
 	if(location == -1) {
@@ -258,13 +265,15 @@ GLint getUniformLocation(GLuint programId, const char* uniformName)
 	return location;
 }
 
-void setUniform1f(GLuint programId, const char* uniformName, float value)
+void
+setUniform1f(GLuint programId, const char* uniformName, float value)
 {
 	GLint uniformId = getUniformLocation(programId, uniformName);
 	glUniform1f(uniformId, value);
 }
 
-void setUniform3f(GLuint programId, const char* uniformName,
+void
+setUniform3f(GLuint programId, const char* uniformName,
 	float v1, float v2, float v3)
 {
 	GLint uniformId = getUniformLocation(programId, uniformName);
