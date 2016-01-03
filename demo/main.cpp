@@ -11,7 +11,6 @@
 #include "utils/models.h"
 
 // TODO: "compress" repository
-// TODO: move all my sources to demo directory - it makes search much simpler
 
 static const glm::vec3 pointLightPos(-2.0f, 3.0f, 0.0f);
 static const glm::vec3 spotLightPos(4.0f, 5.0f, 0.0f);
