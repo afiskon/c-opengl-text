@@ -1,7 +1,7 @@
 #ifndef AFISKON_OPENGL_LINEARALG_H
 #define AFISKON_OPENGL_LINEARALG_H
 
-// based on https://github.com/shua/jams/tree/master/ld26
+// based on https://github.com/shua/jams/tree/master/ld26 and partially GLM
 
 typedef struct Matrix
 {
@@ -24,15 +24,6 @@ typedef union Vector4
     };
 } Vector4;
 
-/*
-static const Vector4 X_AXIS = {{1, 0, 0, 0}};
-static const Vector4 Y_AXIS = {{0, 1, 0, 0}};
-static const Vector4 Z_AXIS = {{0, 0, 1, 0}};
-static const Vector4 INV_X_AXIS = {{-1, 0, 0, 0}};
-static const Vector4 INV_Y_AXIS = {{0, -1, 0, 0}};
-static const Vector4 INV_Z_AXIS = {{0, 0, -1, 0}};
-*/
-
 Vector4 addvec4(Vector4 v1, Vector4 v2);
 Vector4 mulvec4(Vector4 v, float n);
 Matrix multiplymat4(const Matrix* m1, const Matrix* m2);
@@ -50,6 +41,6 @@ Matrix perspective(float fovy, float aspect_ratio, float near_plane,
     float far_plane);
 Matrix orthogonal(float left, float right, float bottom, float top);
 
-Matrix lookAt(Vector4 pos, Vector4 dir, Vector4 up);
+Matrix lookAt(Vector4 eye, Vector4 center, Vector4 up);
 
 #endif // AFISKON_OPENGL_LINEARALG_H

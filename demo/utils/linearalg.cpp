@@ -3,8 +3,6 @@
 #include <string.h>
 #include <math.h>
 
-// based on https://github.com/shua/jams/tree/master/ld26
-
 static const Matrix IDENTITY_MATRIX =
 {{
     1, 0, 0, 0,
@@ -203,31 +201,33 @@ orthogonal(float left, float right, float bottom, float top)
 }
 
 Matrix
-lookAt(Vector4 pos, Vector4 dir, Vector4 up)
+lookAt(Vector4 eye, Vector4 center, Vector4 up)
 {
-    Vector4 f = dir;
+    Vector4 f = addvec4(center, mulvec4(eye, -1.0f));
     normalizevec4(&f);
-    // Vector4 up = {{0, 1, 0, 0}};
-    // up = {{0, 1, 0, 0}};
-    Vector4 s = crossvec4(f, up);
+
+    Vector4 u = up;
+    normalizevec4(&u);
+
+    Vector4 s = crossvec4(f, u);
     normalizevec4(&s);
-    up = crossvec4(s, f);
+    u = crossvec4(s, f);
 
     Matrix out = IDENTITY_MATRIX;
     out.m[0] = s.x;
     out.m[4] = s.y;
     out.m[8] = s.z;
 
-    out.m[1] = up.x;
-    out.m[5] = up.y;
-    out.m[9] = up.z;
+    out.m[1] = u.x;
+    out.m[5] = u.y;
+    out.m[9] = u.z;
 
     out.m[2] = -f.x;
     out.m[6] = -f.y;
     out.m[10] = -f.z;
 
-    out.m[12] = -dotvec4(s, pos);
-    out.m[13] = -dotvec4(up, pos);
-    out.m[14] =  dotvec4(f, pos);
+    out.m[12] = -dotvec4(s, eye);
+    out.m[13] = -dotvec4(u, eye);
+    out.m[14] =  dotvec4(f, eye);
     return out;
 }

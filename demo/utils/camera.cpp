@@ -1,6 +1,6 @@
-#include <glm/gtc/matrix_transform.hpp> // TODO: delete
-
 #include <GLFW/glfw3.h>
+#include <stdlib.h>
+#include <math.h>
 #include "camera.h"
 #include "linearalg.h"
 
@@ -112,26 +112,9 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
     if(glfwGetKey(cam->window, GLFW_KEY_D) == GLFW_PRESS)
         cam->position = addvec4(cam->position, mulvec4(right, delta));
 
-    // *pOutViewMatrix = glm::lookAt(cam->position,
-    //                               cam->position + direction,
-    //                               up
-    //                             );
-
     *pOutViewMatrix = lookAt(
                             cam->position,
                             addvec4(cam->position, direction),
                             up
                         );
-
-    glm::vec3 posTemp = glm::vec3(cam->position.x, cam->position.y, cam->position.z);
-    glm::vec3 dirTemp = glm::vec3(direction.x, direction.y, direction.z);
-    glm::vec3 upTemp = glm::vec3(up.x, up.y, up.z);
-    glm::mat4 viewExpected = glm::lookAt(posTemp,
-                              posTemp + dirTemp,
-                              upTemp
-                            );
-
-    for(int ti = 0; ti < 4; ti++)
-        for(int tj = 0; tj < 4; tj++)
-            pOutViewMatrix->m[ti*4 + tj] = viewExpected[ti][tj];
 }
