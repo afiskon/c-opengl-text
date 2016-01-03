@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../assimp/include/assimp/cimport.h"
-#include "../assimp/include/assimp/postprocess.h"
-#include "../assimp/include/assimp/scene.h"
+#include <assimp/cimport.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
 #include "utils/models.h"
 
 // 3 per position + 3 per normal + UV

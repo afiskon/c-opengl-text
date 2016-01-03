@@ -10,6 +10,7 @@ add_subdirectory(assimp)
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(glxw/include)
 include_directories(glfw/include)
+include_directories(assimp/include)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -Wextra -Werror")
 
