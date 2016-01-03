@@ -259,6 +259,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 }
 
 // TODO: delete this
+/*
 static void
 debugCompareMatrices(glm::mat4 Old, Matrix New)
 {
@@ -272,6 +273,7 @@ debugCompareMatrices(glm::mat4 Old, Matrix New)
         	}
     if(error) exit(1);
 }
+*/
 
 static int
 mainInternal(CommonResources* resources)
@@ -342,7 +344,7 @@ mainInternal(CommonResources* resources)
 
 	glm::mat4 projectionOld = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
-	Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f); // OK
+	Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f); //OK!
 
 	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
 	GLint uniformM = getUniformLocation(resources->programId, "M");
@@ -476,7 +478,6 @@ mainInternal(CommonResources* resources)
 
 		glUniform3f(uniformCameraPos, cameraPosNew.x, cameraPosNew.y, cameraPosNew.z);
 
-		
 		Matrix viewNew;
 		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &viewNew);
 
@@ -486,7 +487,7 @@ mainInternal(CommonResources* resources)
                 viewOld[ti][tj] = viewNew.m[ti*4 + tj];
 
 		glm::mat4 vpOld = projectionOld * viewOld;
-		Matrix vpNew = multiplymat4(&viewNew, &projectionNew); // OK
+		Matrix vpNew = multiplymat4(&viewNew, &projectionNew); // OK!
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -494,28 +495,23 @@ mainInternal(CommonResources* resources)
 
 		// tower
 
-		glm::mat4 towerMOld = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
-			glm::translate(-1.5f, -1.0f, -1.5f);
-		glm::mat4 towerMVPOld = vpOld * towerMOld;
+		// glm::mat4 towerMOld = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
+			// glm::translate(-1.5f, -1.0f, -1.5f);
+		// glm::mat4 towerMVPOld = vpOld * towerMOld;
 
 		Matrix tempTowerM = identitymat();
 		Matrix towerMNew = rotate(&tempTowerM /* identity */,
 							islandAngle, { 0.0f, 1.0f, 0.0f, 0.0f });
-
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerMNew = multiplymat4(&tempTowerM, &towerMNew); // OK!
 
-		// debugCompareMatrices(towerMOld, towerMNew);
-
-		Matrix towerMVPNew = multiplymat4(&towerMNew, &vpNew);
-		debugCompareMatrices(towerMVPOld, towerMVPNew);
+		Matrix towerMVPNew = multiplymat4(&towerMNew, &vpNew); // OK!
+		// debugCompareMatrices(towerMVPOld, towerMVPNew);
 
 		glBindTexture(GL_TEXTURE_2D, towerTexture);
 		glBindVertexArray(towerVAO);
 		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPNew.m[0]);
 		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerMNew.m[0]);
-		// glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPOld[0][0]);
-        // glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerMOld[0][0]);
 
 		glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
@@ -526,14 +522,22 @@ mainInternal(CommonResources* resources)
 
 		// torus
 
-		glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) *
-			glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
-		glm::mat4 torusMVP = vpOld * torusM;
+		// glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) *
+			// glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
+		// glm::mat4 torusMVP = vpOld * torusM;
+
+		Matrix tempTorusM = identitymat();
+		Matrix torusM = rotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
+							{ 0.0f, 1.0f, 0.0f, 0.0f});
+		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
+		torusM = multiplymat4(&tempTorusM, &torusM);
+
+		Matrix torusMVP = multiplymat4(&torusM, &vpNew);
 
 		glBindTexture(GL_TEXTURE_2D, garkGreenTexture);
 		glBindVertexArray(torusVAO);
-		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &torusMVP[0][0]);
-		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &torusM[0][0]);
+		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &torusMVP.m[0]);
+		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &torusM.m[0]);
 		glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 1.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
