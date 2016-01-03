@@ -455,7 +455,8 @@ mainInternal(CommonResources* resources)
 
 		// tower
 
-		glm::mat4 towerM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(-1.5f, -1.0f, -1.5f);
+		glm::mat4 towerM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
+			glm::translate(-1.5f, -1.0f, -1.5f);
 		glm::mat4 towerMVP = vp * towerM;
 
 		glBindTexture(GL_TEXTURE_2D, towerTexture);
@@ -471,7 +472,8 @@ mainInternal(CommonResources* resources)
 
 		// torus
 
-		glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) * glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
+		glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) *
+			glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
 		glm::mat4 torusMVP = vp * torusM;
 
 		glBindTexture(GL_TEXTURE_2D, garkGreenTexture);
@@ -487,7 +489,8 @@ mainInternal(CommonResources* resources)
 
 		// grass
 
-		glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) * glm::translate(0.0f, -1.0f, 0.0f);
+		glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
+			glm::translate(0.0f, -1.0f, 0.0f);
 		glm::mat4 grassMVP = vp * grassM;
 
 		glBindTexture(GL_TEXTURE_2D, grassTexture);
@@ -503,7 +506,8 @@ mainInternal(CommonResources* resources)
 
 		// skybox
 
-		glm::mat4 skyboxM = glm::translate(cameraPos) * glm::scale(100.0f,100.0f,100.0f);
+		glm::mat4 skyboxM = glm::translate(cameraPos) *
+			glm::scale(100.0f,100.0f,100.0f);
 		glm::mat4 skyboxMVP = vp * skyboxM;
 
 		glBindTexture(GL_TEXTURE_2D, skyboxTexture);
