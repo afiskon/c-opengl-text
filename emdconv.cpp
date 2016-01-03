@@ -6,6 +6,8 @@
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
+// TODO: get rid of c++ vectors?
+
 // 3 per position + 3 per normal + UV
 static const unsigned int floatsPerVertex = (3 + 3 + 2); 
 

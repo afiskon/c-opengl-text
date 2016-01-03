@@ -3,7 +3,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 #include <GLFW/glfw3.h>
-#include <vector>
 #include <stdio.h>
 #include <assert.h>
 
@@ -11,7 +10,6 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
-// TODO: get rid of c++ vectors?
 // TODO: get rid of glm?
 // TODO: use C interface of Assimp?
 // TODO: "compress" repository
@@ -123,39 +121,38 @@ commonResourcesCreate(CommonResources* resources)
 
 	// initialize programId
 
-	bool errorFlag = false;
+	bool errorFlag;
 
-	// TODO: use an array!
-	std::vector<GLuint> shaders;
+	// vertexShader, fragmentShader
+	GLuint shaders[2];
 
-	GLuint vertexShaderId = loadShader("shaders/vertexShader.glsl", 
-		GL_VERTEX_SHADER, &errorFlag);
+	shaders[0] = loadShader("shaders/vertexShader.glsl", GL_VERTEX_SHADER,
+		&errorFlag);
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load vertex shader (invalid working "
 			"directory?)\n");
 		return -1;
 	}
 
-	shaders.push_back(vertexShaderId);
-
-	GLuint fragmentShaderId = loadShader("shaders/fragmentShader.glsl", 
-		GL_FRAGMENT_SHADER, &errorFlag);
+	shaders[1] = loadShader("shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER,
+		&errorFlag);
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load fragment shader (invalid working "
 			"directory?)\n");
+		glDeleteShader(shaders[0]);
 		return -1;
 	}
 
-	shaders.push_back(fragmentShaderId);
+	resources->programId = prepareProgram(
+		shaders, sizeof(shaders)/sizeof(shaders[0]), &errorFlag);
 
-	resources->programId = prepareProgram(shaders, &errorFlag);
+	glDeleteShader(shaders[1]);
+	glDeleteShader(shaders[0]);
+
 	if(errorFlag) {
 		fprintf(stderr, "Failed to prepare program\n");
 		return -1;
 	}
-
-	glDeleteShader(vertexShaderId);
-	glDeleteShader(fragmentShaderId);
 
 	resources->programIdInitialized = true;
 

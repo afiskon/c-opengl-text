@@ -197,6 +197,8 @@ checkProgramLinkStatus(GLuint obj)
 
 GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
 {
+	*errorFlagPtr = false;
+
 	FileMapping* mapping = fileMappingCreate(fname);
 	if(mapping == NULL) {
 		*errorFlagPtr = true;
@@ -225,15 +227,15 @@ GLuint loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
 	return shaderId;
 }
 
-// TODO: pass an array!
-GLuint prepareProgram(const std::vector<GLuint>& shaders, bool *errorFlagPtr)
+GLuint prepareProgram(const GLuint* shaders, int nshaders, bool *errorFlagPtr)
 {
 	*errorFlagPtr = false;
 
 	GLuint programId = glCreateProgram();
-	for(auto it = shaders.cbegin(); it != shaders.cend(); ++it) {
-		glAttachShader(programId, *it);
-	}
+
+	for(int i = 0; i < nshaders; i++)
+		glAttachShader(programId, shaders[i]);
+
 	glLinkProgram(programId);
 
 	*errorFlagPtr = checkProgramLinkStatus(programId);
