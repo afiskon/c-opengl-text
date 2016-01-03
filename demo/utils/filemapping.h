@@ -2,6 +2,7 @@
 #define AFISKON_FILEMAPPING_H
 
 struct FileMapping;
+typedef struct FileMapping FileMapping;
 
 FileMapping * fileMappingCreate(const char* fname);
 unsigned char* fileMappingGetPointer(FileMapping * mapping);

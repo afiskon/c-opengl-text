@@ -1,7 +1,8 @@
-#ifndef AFISKON_OPENGL_UTILS_H
-#define AFISKON_OPENGL_UTILS_H
+#ifndef AFISKON_UTILS_H
+#define AFISKON_UTILS_H
 
 #include <GLXW/glxw.h>
+#include <stdbool.h>
 
 bool loadDDSTexture(const char *fname, GLuint textureId);
 void loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId);
@@ -15,4 +16,4 @@ void setUniform3f(GLuint programId, const char* uniformName,
 
 uint64_t getCurrentTimeMs();
 
-#endif // AFISKON_OPENGL_UTILS_H
+#endif // AFISKON_UTILS_H

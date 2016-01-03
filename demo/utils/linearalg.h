@@ -1,5 +1,5 @@
-#ifndef AFISKON_OPENGL_LINEARALG_H
-#define AFISKON_OPENGL_LINEARALG_H
+#ifndef AFISKON_LINEARALG_H
+#define AFISKON_LINEARALG_H
 
 // based on https://github.com/shua/jams/tree/master/ld26 and partially GLM
 
@@ -30,7 +30,8 @@ Vector4 crossvec4(Vector4 v1, Vector4 v2);
 //void rotateX(Matrix* m, float angle);
 //void rotateY(Matrix* m, float angle);
 //void rotateZ(Matrix* m, float angle);
-Matrix rotate(const Matrix* m, float angle, Vector4 axis);
+Matrix rotate(const Matrix* m, float angle,
+	float axis_x, float axis_y, float axis_z);
 void scale(Matrix* m, float x, float y, float z);
 void translate(Matrix* m, float x, float y, float z);
 
@@ -39,4 +40,4 @@ Matrix orthogonal(float left, float right, float bottom, float top);
 
 Matrix lookAt(Vector4 eye, Vector4 center, Vector4 up);
 
-#endif // AFISKON_OPENGL_LINEARALG_H
+#endif // AFISKON_LINEARALG_H

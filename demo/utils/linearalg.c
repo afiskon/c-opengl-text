@@ -4,12 +4,12 @@
 #include <math.h>
 
 static const Matrix IDENTITY_MATRIX =
-{
+{{
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f,
-};
+}};
 
 Vector4
 addvec4(Vector4 v1, Vector4 v2)
@@ -100,7 +100,7 @@ dotvec4(Vector4 v1, Vector4 v2)
 Vector4
 crossvec4(Vector4 v1, Vector4 v2)
 {
-    Vector4 out = { 0 };
+    Vector4 out = {{ 0 }};
     out.m[0] = v1.m[1]*v2.m[2] - v1.m[2]*v2.m[1];
     out.m[1] = v1.m[2]*v2.m[0] - v1.m[0]*v2.m[2];
     out.m[2] = v1.m[0]*v2.m[1] - v1.m[1]*v2.m[0];
@@ -155,16 +155,17 @@ rotateZ(Matrix* m, float angle)
 */
 
 Matrix
-rotate(const Matrix* in, float angle, Vector4 axis)
+rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
 {
     float a = M_PI * (angle / 180.0f);
     float c = cos(a);
     float s = sin(a);
 
+    Vector4 axis = {{ axis_x, axis_y, axis_z, 0.0f }};
     normalizevec4(&axis);
 
     Vector4 temp = mulvec4(axis, (1.0f - c));
-    Matrix rotate = { 0 };
+    Matrix rotate = {{ 0 }};
 
     rotate.m[0*4 + 0] = c + temp.m[0] * axis.m[0];
     rotate.m[0*4 + 1] = 0 + temp.m[0] * axis.m[1] + s * axis.m[2];
@@ -191,7 +192,7 @@ rotate(const Matrix* in, float angle, Vector4 axis)
                  ), mulvec4(m[2], rotate.m[i*4 + 2]));
     r[3] = m[3];
 
-    Matrix result = { 0 };
+    Matrix result = {{ 0 }};
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++)
             result.m[i*4 + j] = r[i].m[j];
@@ -226,7 +227,7 @@ translate(Matrix* m, float x, float y, float z)
 Matrix
 perspective(float fovy, float aspect, float zNear, float zFar)
 {
-    Matrix out = { 0 };
+    Matrix out = {{ 0 }};
 
     // range = tan(radians(fovy / 2)) * zNear;
     float range = tan(M_PI * (fovy / (2.0f * 180.f))) * zNear;    

@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include "utils.h"
 #include "models.h"
-#include "fileMapping.h"
+#include "filemapping.h"
 
 #pragma pack(push, 1)
 
-struct EaxmodHeader
+typedef struct
 {
     char signature[7];
     unsigned char version;
@@ -15,7 +15,7 @@ struct EaxmodHeader
     uint32_t verticesDataSize;
     uint32_t indicesDataSize;
     unsigned char indexSize;
-};
+} EaxmodHeader;
 
 #pragma pack(pop)
 

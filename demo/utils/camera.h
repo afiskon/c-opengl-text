@@ -1,9 +1,11 @@
-#ifndef AFISKON_OPENGL_CAMERA_H
-#define AFISKON_OPENGL_CAMERA_H
+#ifndef AFISKON_CAMERA_H
+#define AFISKON_CAMERA_H
 
+#include <stdbool.h>
 #include "linearalg.h"
 
 struct Camera;
+typedef struct Camera Camera;
 
 Camera* cameraCreate(GLFWwindow* window, const Vector4 startPosition,
 	float startHorizontalAngleRad, float startVerticalAngleRad);
@@ -15,4 +17,4 @@ void cameraGetViewMatrix(Camera* cam, float deltaTimeMs,
 void cameraDestroy(Camera* cam);
 
 
-#endif // AFISKON_OPENGL_CAMERA_H
+#endif // AFISKON_CAMERA_H

@@ -3,7 +3,7 @@
 // <GL/glext.h> on Linux, <OpenGL/glext.h> on MacOS :(
 #include "../../glfw/deps/GL/glext.h"
 
-#include "fileMapping.h"
+#include "filemapping.h"
 
 #include <stdio.h>
 #include <stdlib.h>

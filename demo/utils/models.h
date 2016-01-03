@@ -1,6 +1,7 @@
 #ifndef AFISKON_MODELS_H
 #define AFISKON_MODELS_H
 
+#include <stdbool.h>
 #include <GLXW/glxw.h>
 
 bool modelSave(const char *fname, const GLfloat *verticesData,

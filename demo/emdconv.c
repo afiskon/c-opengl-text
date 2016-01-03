@@ -1,4 +1,6 @@
 #include <GLXW/glxw.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include "../assimp/include/assimp/cimport.h"
@@ -24,7 +26,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
 {
     *outVerticesBufferSize = 0;
     *outVerticesNumber = 0;
-    const aiScene* scene = aiImportFile(
+    const struct aiScene* scene = aiImportFile(
             fname,
             aiProcess_CalcTangentSpace | aiProcess_Triangulate | 
             aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
@@ -46,7 +48,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
         return NULL;
     }
 
-    aiMesh* mesh = scene->mMeshes[meshNumber];
+    struct aiMesh* mesh = scene->mMeshes[meshNumber];
     unsigned int facesNum = mesh->mNumFaces;
     // unsigned int verticesNum = mesh->mNumVertices;
 
@@ -70,24 +72,24 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
 
     for(unsigned int i = 0; i < facesNum; ++i)
     {
-        const aiFace& face = mesh->mFaces[i];
-        if(face.mNumIndices != verticesPerFace)
+        if(mesh->mFaces[i].mNumIndices != verticesPerFace)
         {
             fprintf(stderr,
-                    "face.numIndices = %d (3 expected), i = %u, fname = %s\n",
-                    face.mNumIndices, i, fname
+                    "mesh->mFaces[i].numIndices = %d (3 expected),"
+                    " i = %u, fname = %s\n",
+                    mesh->mFaces[i].mNumIndices, i, fname
                 );
             free(verticesBuffer);
             aiReleaseImport(scene);
             return NULL;
         }
 
-        for(unsigned int j = 0; j < face.mNumIndices; ++j)
+        for(unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; ++j)
         {
-            unsigned int index = face.mIndices[j];
-            aiVector3D pos = mesh->mVertices[index];
-            aiVector3D uv = mesh->mTextureCoords[0][index];
-            aiVector3D normal = mesh->mNormals[index];
+            unsigned int index = mesh->mFaces[i].mIndices[j];
+            struct aiVector3D pos = mesh->mVertices[index];
+            struct aiVector3D uv = mesh->mTextureCoords[0][index];
+            struct aiVector3D normal = mesh->mNormals[index];
             verticesBuffer[verticesBufferIndex++] = pos.x;
             verticesBuffer[verticesBufferIndex++] = pos.y;
             verticesBuffer[verticesBufferIndex++] = pos.z;

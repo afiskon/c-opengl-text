@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 #include <assert.h>
 
 #include "utils/constants.h"
@@ -14,12 +15,13 @@
 
 // TODO: "compress" repository
 
-static const Vector4 POINT_LIGHT_POS = { -2.0f, 3.0f, 0.0f, 0.0f };
-static const Vector4 SPOT_LIGHT_POS = { 4.0f, 5.0f, 0.0f, 0.0f };
-static const Vector4 CAMERA_START_POS = { 0.0f, 0.0f, 5.0f, 0.0f };
+static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
+static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
+static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 
-static const uint64_t KEY_PRESS_CHECK_INTERVAL_MS = 250;
-static const float FPS_SMOOTHING = 0.9; // larger - more smoothing
+#define KEY_PRESS_CHECK_INTERVAL 250 // ms
+
+#define FPS_SMOOTHING 0.9f // larger - more smoothing
 
 static_assert(FPS_SMOOTHING >= 0.0 && FPS_SMOOTHING <= 1.0,
 	"Invalid FPS_SMOOTHING value");
@@ -28,7 +30,7 @@ static_assert(FPS_SMOOTHING >= 0.0 && FPS_SMOOTHING <= 1.0,
 #define VAOS_NUM 5
 #define VBOS_NUM 10
 
-struct CommonResources
+typedef struct
 {
 	bool windowInitialized;
 	bool cameraInitialized;
@@ -43,11 +45,12 @@ struct CommonResources
 	GLuint textureArray[TEXTURES_NUM];
 	GLuint vaoArray[VAOS_NUM];
 	GLuint vboArray[VBOS_NUM];
-};
+} CommonResources;
 
 static void
-windowSizeCallback(GLFWwindow *, int width, int height)
+windowSizeCallback(GLFWwindow * window, int width, int height)
 {
+	UNUSED(window);
 	glViewport(0, 0, width, height);
 }
 
@@ -200,7 +203,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	bool pointLightEnabled, bool spotLightEnabled)
 {
 	{
-		Vector4 direction = { 0.0f, -1.0f, 1.0f, 0.0f };
+		Vector4 direction = {{ 0.0f, -1.0f, 1.0f, 0.0f }};
 		normalizevec4(&direction);
 
 		setUniform3f(programId, "directionalLight.direction",
@@ -208,11 +211,11 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 		setUniform3f(programId, "directionalLight.color",
 			1.0f, 1.0f, 1.0f);
 		setUniform1f(programId, "directionalLight.ambientIntensity",
-			float(directionalLightEnabled)*0.1f);
+			((float)directionalLightEnabled)*0.1f);
 		setUniform1f(programId, "directionalLight.diffuseIntensity",
-			float(directionalLightEnabled)*0.1f);
+			((float)directionalLightEnabled)*0.1f);
 		setUniform1f(programId, "directionalLight.specularIntensity",
-			float(directionalLightEnabled)*1.0f);
+			((float)directionalLightEnabled)*1.0f);
 	}
 
 	{
@@ -221,15 +224,15 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 		setUniform3f(programId, "pointLight.color",
 			1.0f, 0.0f, 0.0f);
 		setUniform1f(programId, "pointLight.ambientIntensity",
-			float(pointLightEnabled) * 0.1f);
+			((float)pointLightEnabled) * 0.1f);
 		setUniform1f(programId, "pointLight.diffuseIntensity",
-			float(pointLightEnabled) * 1.0f);
+			((float)pointLightEnabled) * 1.0f);
 		setUniform1f(programId, "pointLight.specularIntensity",
-			float(pointLightEnabled) * 1.0f);
+			((float)pointLightEnabled) * 1.0f);
 	}
 
 	{
-		Vector4 direction = { -0.5f, -1.0f, 0.0f, 0.0f };
+		Vector4 direction = {{ -0.5f, -1.0f, 0.0f, 0.0f }};
 		normalizevec4(&direction);
 
 		setUniform3f(programId, "spotLight.direction",
@@ -241,11 +244,11 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 		setUniform3f(programId, "spotLight.color",
 			0.0f, 0.0f, 1.0f);
 		setUniform1f(programId, "spotLight.ambientIntensity",
-			float(spotLightEnabled)*0.1f);
+			((float)spotLightEnabled)*0.1f);
 		setUniform1f(programId, "spotLight.diffuseIntensity",
-			float(spotLightEnabled)*20.0f);
+			((float)spotLightEnabled)*20.0f);
 		setUniform1f(programId, "spotLight.specularIntensity",
-			float(spotLightEnabled)*1.0f);
+			((float)spotLightEnabled)*1.0f);
 	}
 }
 
@@ -391,8 +394,8 @@ mainInternal(CommonResources* resources)
 		// prevent devision by zero and/or very high FPS value right
 		// after program start
 		if(prevDeltaTimeMs > 0)
-			fps = fps*FPS_SMOOTHING + (1.0 - FPS_SMOOTHING) *
-				(1000.0 / (float)prevDeltaTimeMs);
+			fps = fps*FPS_SMOOTHING + (1.0f - FPS_SMOOTHING) *
+				(1000.0f / (float)prevDeltaTimeMs);
 
 		Vector4 cameraPos;
 		cameraGetPosition(resources->camera, &cameraPos);
@@ -411,7 +414,7 @@ mainInternal(CommonResources* resources)
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
 
-		if(startDeltaTimeMs - lastKeyPressCheckMs > KEY_PRESS_CHECK_INTERVAL_MS)
+		if(startDeltaTimeMs - lastKeyPressCheckMs > KEY_PRESS_CHECK_INTERVAL)
 		{
 			if(glfwGetKey(resources->window, GLFW_KEY_X) == GLFW_PRESS)
 			{
@@ -473,8 +476,7 @@ mainInternal(CommonResources* resources)
 		// tower
 
 		Matrix tempTowerM = identitymat();
-		Matrix towerM = rotate(&tempTowerM, islandAngle,
-									{ 0.0f, 1.0f, 0.0f, 0.0f });
+		Matrix towerM = rotate(&tempTowerM, islandAngle, 0.0f, 1.0f, 0.0f);
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerM = multiplymat4(&tempTowerM, &towerM);
 
@@ -496,7 +498,7 @@ mainInternal(CommonResources* resources)
 
 		Matrix tempTorusM = identitymat();
 		Matrix torusM = rotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
-								{ 0.0f, 1.0f, 0.0f, 0.0f});
+							0.0f, 1.0f, 0.0f);
 		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
 		torusM = multiplymat4(&tempTorusM, &torusM);
 
@@ -516,8 +518,7 @@ mainInternal(CommonResources* resources)
 		// grass
 
 		Matrix tempGrassM = identitymat();
-		Matrix grassM = rotate(&tempGrassM, islandAngle,
-								{ 0.0f, 1.0f, 0.0f, 0.0f});
+		Matrix grassM = rotate(&tempGrassM, islandAngle, 0.0f, 1.0f, 0.0f);
 		translate(&tempGrassM, 0.0f, -1.0f, 0.0f);
 		grassM = multiplymat4(&tempGrassM, &grassM);
 
