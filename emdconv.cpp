@@ -1,13 +1,22 @@
 #include <GLXW/glxw.h>
+#include <assert.h>
 
-#include <vector>
 #include "../assimp/include/assimp/Importer.hpp"
 #include "../assimp/include/assimp/postprocess.h"
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
 
 // 3 per position + 3 per normal + UV
-static const unsigned int floatsPerVertex = (3 + 3 + 2); 
+#define FLOATS_PER_VERTEX (3 + 3 + 2)
+
+// real case: 1.0f and 0.999969f should be considered equal
+#define MODEL_FLOAT_EPS 0.00005f
+
+// should be enough, actually only 18432 in torus.blend
+#define MAX_VERTICES 65536
+
+// should be enough, actually only 3456 in torus.blend
+#define MAX_INDICES 16384
 
 GLfloat*
 importedModelCreate(const char* fname, unsigned int meshNumber,
@@ -53,7 +62,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
     unsigned int verticesPerFace = 3;
     *outVerticesNumber = facesNum*verticesPerFace;
     *outVerticesBufferSize = *outVerticesNumber * sizeof(GLfloat)
-                                * floatsPerVertex;
+                                * FLOATS_PER_VERTEX;
     GLfloat* verticesBuffer = (GLfloat*)malloc(*outVerticesBufferSize);
 
     unsigned int verticesBufferIndex = 0;
@@ -95,12 +104,27 @@ bool
 importedModelSave(const char* fname, GLfloat* verticesBuffer,
     unsigned int verticesNumber)
 {
-    std::vector<GLfloat> vertices;
-    std::vector<unsigned int> indices;
+    bool error = false;
+    unsigned int verticesArrSize = 0;
+    unsigned int indicesArrSize = 0;
     unsigned int usedIndices = 0;
     
-     // real case: 1.0f and 0.999969f should be considered equal
-    const GLfloat eps = 0.00005f;
+    GLfloat* vertices = (GLfloat*)malloc(sizeof(GLfloat) * MAX_VERTICES);
+    if(vertices == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for vertices\n");
+        return false;
+    }
+
+    unsigned int* indices = (unsigned int*)malloc(
+                                    sizeof(unsigned int) * MAX_INDICES
+                                );
+    if(indices == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for indices\n");
+        free(vertices);
+        return false;   
+    }
 
     for(unsigned int vtx = 0; vtx < verticesNumber; ++vtx)
     {
@@ -110,10 +134,10 @@ importedModelSave(const char* fname, GLfloat* verticesBuffer,
         {
             indexFound = true;
             // compare X, Y, Z, NX, NY, NZ, U and V
-            for(unsigned int k = 0; indexFound && k < floatsPerVertex; ++k)
+            for(unsigned int k = 0; indexFound && k < FLOATS_PER_VERTEX; ++k)
             {
-                if(fabs(verticesBuffer[vtx * floatsPerVertex + k] -
-                    vertices[idx * floatsPerVertex + k]) > eps)
+                if(fabs(verticesBuffer[vtx * FLOATS_PER_VERTEX + k] -
+                    vertices[idx * FLOATS_PER_VERTEX + k]) > MODEL_FLOAT_EPS)
                 {
                     indexFound = false;
                 }
@@ -125,25 +149,49 @@ importedModelSave(const char* fname, GLfloat* verticesBuffer,
         if(!indexFound)
         {
             // save X, Y, Z, NX, NY, NZ, U and V
-            for(unsigned int k = 0; k < floatsPerVertex; ++k)
-                vertices.push_back(verticesBuffer[vtx * floatsPerVertex + k]);
+            for(unsigned int k = 0; k < FLOATS_PER_VERTEX; ++k)
+            {
+                if(verticesArrSize >= MAX_VERTICES)
+                {
+                    error = true;
+                    break;
+                }
+                vertices[verticesArrSize++] = verticesBuffer[
+                                                    vtx * FLOATS_PER_VERTEX + k
+                                                ];
+            }
     
             foundIndex = usedIndices;
             usedIndices++;
         }
 
-        indices.push_back(foundIndex);
+        if(error || (indicesArrSize >= MAX_INDICES))
+        {
+            error = true;
+            break;
+        }
+
+        indices[indicesArrSize++] = foundIndex;
     }
+
+    if(error)
+    {
+        free(indices);
+        free(vertices);
+        return false;
+    }
+
+    assert(indicesArrSize == verticesNumber);
 
     unsigned char indexSize = 1;
     if(verticesNumber > 255) indexSize *= 2;
     if(verticesNumber > 65535) indexSize *= 2;
 
     unsigned int modelSize = (unsigned int) (
-                                verticesNumber*floatsPerVertex*sizeof(GLfloat)
+                                verticesNumber*FLOATS_PER_VERTEX*sizeof(GLfloat)
                             );
     unsigned int indexedModelSize = (unsigned int) (
-                                usedIndices*floatsPerVertex*sizeof(GLfloat)
+                                usedIndices*FLOATS_PER_VERTEX*sizeof(GLfloat)
                                     + verticesNumber*indexSize
                             );
     float ratio = (float)indexedModelSize*100.0f / (float)modelSize;
@@ -156,13 +204,20 @@ importedModelSave(const char* fname, GLfloat* verticesBuffer,
             "ratio = %f%%\n", modelSize, indexedModelSize, ratio
         );
 
-    return modelSave(
+    fprintf(stderr, "DEBUG: vertices.size() = %lu, indices.size() = %lu\n",
+            (long unsigned int)verticesArrSize, (long unsigned int)indicesArrSize);
+
+    bool res = modelSave(
             fname,
-            vertices.data(),
-            usedIndices * floatsPerVertex * sizeof(GLfloat),
-            indices.data(),
+            vertices,
+            usedIndices * FLOATS_PER_VERTEX * sizeof(GLfloat),
+            indices,
             verticesNumber
         );
+
+    free(indices);
+    free(vertices);
+    return res;
 }
 
 void
