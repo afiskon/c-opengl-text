@@ -32,9 +32,10 @@ Vector4 mulmatvec4(const Matrix* m, const Vector4* v);
 void normalizevec4(Vector4* v);
 float dotvec4(Vector4 v1, Vector4 v2);
 Vector4 crossvec4(Vector4 v1, Vector4 v2);
-void rotateX(Matrix* m, float angle);
-void rotateY(Matrix* m, float angle);
-void rotateZ(Matrix* m, float angle);
+//void rotateX(Matrix* m, float angle);
+//void rotateY(Matrix* m, float angle);
+//void rotateZ(Matrix* m, float angle);
+Matrix rotate(const Matrix* m, float angle, Vector4 axis);
 void scale(Matrix* m, float x, float y, float z);
 void translate(Matrix* m, float x, float y, float z);
 

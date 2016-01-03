@@ -3,13 +3,15 @@
 #include <string.h>
 #include <math.h>
 
+// a lot of useful procedures are in matrix_tranform.inl of GLM
+
 static const Matrix IDENTITY_MATRIX =
-{{
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-}};
+{
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f,
+};
 
 Vector4
 addvec4(Vector4 v1, Vector4 v2)
@@ -44,6 +46,7 @@ identitymat()
     return out;
 }
 
+// WARNING! What in GLM is m1 * m2 is multiplymat4(m2, m1)
 Matrix
 multiplymat4(const Matrix* m1, const Matrix* m2)
 {
@@ -99,13 +102,14 @@ dotvec4(Vector4 v1, Vector4 v2)
 Vector4
 crossvec4(Vector4 v1, Vector4 v2)
 {
-    Vector4 out = {{0}};
+    Vector4 out = { 0 };
     out.m[0] = v1.m[1]*v2.m[2] - v1.m[2]*v2.m[1];
     out.m[1] = v1.m[2]*v2.m[0] - v1.m[0]*v2.m[2];
     out.m[2] = v1.m[0]*v2.m[1] - v1.m[1]*v2.m[0];
     return out;
 }
 
+/*
 void
 rotateX(Matrix* m, float angle)
 {
@@ -150,6 +154,52 @@ rotateZ(Matrix* m, float angle)
 
     memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
 }
+*/
+
+Matrix
+rotate(const Matrix* in, float angle, Vector4 axis)
+{
+    float a = M_PI * (angle / 180.0f);
+    float c = cos(a);
+    float s = sin(a);
+
+    normalizevec4(&axis);
+
+    Vector4 temp = mulvec4(axis, (1.0f - c));
+    Matrix rotate = { 0 };
+
+    rotate.m[0*4 + 0] = c + temp.m[0] * axis.m[0];
+    rotate.m[0*4 + 1] = 0 + temp.m[0] * axis.m[1] + s * axis.m[2];
+    rotate.m[0*4 + 2] = 0 + temp.m[0] * axis.m[2] - s * axis.m[1];
+
+    rotate.m[1*4 + 0] = 0 + temp.m[1] * axis.m[0] - s * axis.m[2];
+    rotate.m[1*4 + 1] = c + temp.m[1] * axis.m[1];
+    rotate.m[1*4 + 2] = 0 + temp.m[1] * axis.m[2] + s * axis.m[0];
+
+    rotate.m[2*4 + 0] = 0 + temp.m[2] * axis.m[0] + s * axis.m[1];
+    rotate.m[2*4 + 1] = 0 + temp.m[2] * axis.m[1] - s * axis.m[0];
+    rotate.m[2*4 + 2] = c + temp.m[2] * axis.m[2];
+
+    // TODO: try to optimize
+    Vector4 r[4], m[4];
+    for(int i = 0; i < 4; i++)
+        for(int j = 0; j < 4; j++)
+            m[i].m[j] = in->m[i*4 + j];
+
+    for(int i = 0; i <= 2; i++)
+        r[i] = addvec4( addvec4(
+                    mulvec4(m[0], rotate.m[i*4 + 0]),
+                    mulvec4(m[1], rotate.m[i*4 + 1])
+                 ), mulvec4(m[2], rotate.m[i*4 + 2]));
+    r[3] = m[3];
+
+    Matrix result = { 0 };
+    for(int i = 0; i < 4; i++)
+        for(int j = 0; j < 4; j++)
+            result.m[i*4 + j] = r[i].m[j];
+
+    return result;
+}
 
 void
 scale(Matrix* m, float x, float y, float z)
@@ -178,7 +228,7 @@ translate(Matrix* m, float x, float y, float z)
 Matrix
 perspective(float fovy, float aspect, float zNear, float zFar)
 {
-    Matrix out = {{ 0 }};
+    Matrix out = { 0 };
 
     // range = tan(radians(fovy / 2)) * zNear;
     float range = tan(M_PI * (fovy / (2.0f * 180.f))) * zNear;    

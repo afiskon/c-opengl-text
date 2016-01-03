@@ -1,6 +1,5 @@
 #include <GLXW/glxw.h>
 
-// TODO !!! rewrite glm::rotate in pure C!
 // TODO: clean code + delete link to glm repository
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -259,6 +258,20 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 }
 
+static void
+debugCompareMatrices(glm::mat4 Old, Matrix New)
+{
+	bool error = false;
+    for(int ti = 0; ti < 4; ti++)
+        for(int tj = 0; tj < 4; tj++)
+        	if(fabs(Old[ti][tj] - New.m[ti*4 + tj]) > 0.0001f ) {
+        		fprintf(stderr, "ERROR: Old != New,"
+        			" ti = %d, tj = %d, old = %f, new = %f, delta = %f\n", ti, tj, Old[ti][tj], New.m[ti*4 + tj], fabs(Old[ti][tj] - New.m[ti*4 + tj]));
+        		error = true;
+        	}
+    if(error) exit(1);
+}
+
 static int
 mainInternal(CommonResources* resources)
 {
@@ -328,17 +341,7 @@ mainInternal(CommonResources* resources)
 
 	glm::mat4 projectionOld = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
-	Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
-
-	bool error = false;
-    for(int ti = 0; ti < 4; ti++)
-        for(int tj = 0; tj < 4; tj++)
-        	if(fabs(projectionOld[ti][tj] - projectionNew.m[ti*4 + tj]) > 0.0001f ) {
-        		fprintf(stderr, "ERROR: projectionOld != projectionNew,"
-        			" ti = %d, tj = %d, old = %f, new = %f\n", ti, tj, projectionOld[ti][tj], projectionNew.m[ti*4 + tj]);
-        		error = true;
-        	}
-    if(error) exit(1);
+	// OK: Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
 	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
 	GLint uniformM = getUniformLocation(resources->programId, "M");
@@ -411,7 +414,6 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			// see http://stackoverflow.com/q/6299083/1565238 :(
 			printf("FPS: %f, currentTimeMs = 0x%08x%08x\n",
 					fps,
 					(uint32_t)(currentTimeMs >> 32),
@@ -484,7 +486,10 @@ mainInternal(CommonResources* resources)
                 viewOld[ti][tj] = viewNew.m[ti*4 + tj];
 
 		glm::mat4 vpOld = projectionOld * viewOld;
-		// Matrix vpNew = multiplymat4(&projectionNew, &viewNew);
+		// OK: Matrix vpNew = multiplymat4(&viewNew, &projectionNew);
+
+
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -492,30 +497,28 @@ mainInternal(CommonResources* resources)
 
 		// tower
 
-		glm::mat4 towerM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
+		glm::mat4 towerMOld = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
 			glm::translate(-1.5f, -1.0f, -1.5f);
-		glm::mat4 towerMVP = vpOld * towerM;
+		glm::mat4 towerMVPOld = vpOld * towerMOld;
 
-		// Matrix towerMNew = identitymat();
-		//rotateY(&towerM, islandAngle);
-//
-//		//Matrix tempTowerM = identitymat();
-//		//translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
-//
-//towerM = multiplymat4(&towerM, &tempTowerM);
-        // for(int ti = 0; ti < 4; ti++)
-            // for(int tj = 0; tj < 4; tj++)
-                // towerMNew.m[ti*4 + tj] = towerM[ti][tj];
+		Matrix tempTowerM = identitymat();
+		Matrix towerMNew = rotate(&tempTowerM /* identity */,
+							islandAngle, { 0.0f, 1.0f, 0.0f, 0.0f });
 
+		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
+		towerMNew = multiplymat4(&tempTowerM, &towerMNew); // OK!
 
-		// Matrix towerMVPNew = multiplymat4(&vpNew, &towerMNew);
+		debugCompareMatrices(towerMOld, towerMNew);
+
+		// Matrix towerMVPNew = multiplymat4(&towerMNew, &vpNew);
+		// debugCompareMatrices(towerMVPOld, towerMVPNew);
 
 		glBindTexture(GL_TEXTURE_2D, towerTexture);
 		glBindVertexArray(towerVAO);
 		// glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPNew.m[0]);
 		// glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM.m[0]);
-		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVP[0][0]);
-        glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM[0][0]);
+		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPOld[0][0]);
+        glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerMOld[0][0]);
 
 		glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
