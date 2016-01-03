@@ -395,14 +395,19 @@ mainInternal(CommonResources* resources)
 			fps = fps*FPS_SMOOTHING + (1.0 - FPS_SMOOTHING) *
 				(1000.0 / (float)prevDeltaTimeMs);
 
+		Vector4 cameraPos;
+		cameraGetPosition(resources->camera, &cameraPos);
+
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			// TODO: output camera coordinates
-			printf("FPS: %f, T: 0x%08x%08x, X: ???, Y: ???, Z: ???\n",
+			printf("FPS: %f, T: 0x%08x%08x, X: %f, Y: %f, Z: %f\n",
 					fps,
 					(uint32_t)(currentTimeMs >> 32),
-					(uint32_t)(currentTimeMs & 0xFFFFFFFF)
+					(uint32_t)(currentTimeMs & 0xFFFFFFFF),
+					cameraPos.m[0],
+					cameraPos.m[1],
+					cameraPos.m[2]
 				);
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
@@ -453,8 +458,7 @@ mainInternal(CommonResources* resources)
 			}
 		}
 
-		Vector4 cameraPos;
-		cameraGetPosition(resources->camera, &cameraPos);
+
 
 		glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
