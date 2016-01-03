@@ -26,6 +26,7 @@ typedef union Vector4
 
 Vector4 addvec4(Vector4 v1, Vector4 v2);
 Vector4 mulvec4(Vector4 v, float n);
+Matrix identitymat();
 Matrix multiplymat4(const Matrix* m1, const Matrix* m2);
 Vector4 mulmatvec4(const Matrix* m, const Vector4* v);
 void normalizevec4(Vector4* v);
@@ -37,8 +38,7 @@ void rotateZ(Matrix* m, float angle);
 void scale(Matrix* m, float x, float y, float z);
 void translate(Matrix* m, float x, float y, float z);
 
-Matrix perspective(float fovy, float aspect_ratio, float near_plane,
-    float far_plane);
+Matrix perspective(float fovy, float aspect, float zNear, float zFar);
 Matrix orthogonal(float left, float right, float bottom, float top);
 
 Matrix lookAt(Vector4 eye, Vector4 center, Vector4 up);

@@ -38,6 +38,13 @@ mulvec4(Vector4 v, float n)
 }
 
 Matrix
+identitymat()
+{
+    Matrix out = IDENTITY_MATRIX;
+    return out;
+}
+
+Matrix
 multiplymat4(const Matrix* m1, const Matrix* m2)
 {
     Matrix out = IDENTITY_MATRIX;
@@ -169,20 +176,22 @@ translate(Matrix* m, float x, float y, float z)
 }
 
 Matrix
-perspective(float fovy, float aspect_ratio, float near_plane, float far_plane)
+perspective(float fovy, float aspect, float zNear, float zFar)
 {
-    Matrix out = { { 0 } };
+    Matrix out = {{ 0 }};
 
-    const float
-        y_scale = (float)(1/cos(fovy * M_PI / 360.0)),
-        x_scale = y_scale / aspect_ratio,
-        frustum_length = far_plane - near_plane;
+    // range = tan(radians(fovy / 2)) * zNear;
+    float range = tan(M_PI * (fovy / (2.0f * 180.f))) * zNear;    
+    float left = -range * aspect;
+    float right = range * aspect;
+    float bottom = -range;
+    float top = range;
 
-    out.m[0] = x_scale;
-    out.m[5] = y_scale;
-    out.m[10] = -((far_plane + near_plane) / frustum_length);
-    out.m[11] = -1;
-    out.m[14] = -((2 * near_plane * far_plane) / frustum_length);
+    out.m[0] = (2.0f * zNear) / (right - left);
+    out.m[5] = (2.0f * zNear) / (top - bottom);
+    out.m[10] = - (zFar + zNear) / (zFar - zNear);
+    out.m[11] = - 1.0f;
+    out.m[14] = - (2.0f * zFar * zNear) / (zFar - zNear);
     
     return out;
 }

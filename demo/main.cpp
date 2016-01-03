@@ -1,5 +1,6 @@
 #include <GLXW/glxw.h>
 
+// TODO !!! rewrite glm::rotate in pure C!
 // TODO: clean code + delete link to glm repository
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -17,12 +18,13 @@
 #include "utils/models.h"
 
 // TODO: "compress" repository
+// TODO: use Assimp C interface
 
-static const glm::vec3 POINT_LIGHT_POS(-2.0f, 3.0f, 0.0f);
-static const glm::vec3 SPOT_LIGHT_POS(4.0f, 5.0f, 0.0f);
+static const glm::vec3 POINT_LIGHT_POS_OLD(-2.0f, 3.0f, 0.0f);
+static const glm::vec3 SPOT_LIGHT_POS_OLD(4.0f, 5.0f, 0.0f);
 
-// static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
-// static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
+static const Vector4 POINT_LIGHT_POS_NEW = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
+static const Vector4 SPOT_LIGHT_POS_NEW = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
 static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 
 static const uint64_t KEY_PRESS_CHECK_INTERVAL_MS = 250;
@@ -113,7 +115,6 @@ commonResourcesCreate(CommonResources* resources)
 	// initialize camera
 	resources->camera = cameraCreate(
 			resources->window,
-			// glm::vec3(0, 0, 5),
 			CAMERA_START_POS,
 			3.14f, // toward -Z
 			0.0f // look at the horizon
@@ -209,8 +210,6 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	bool pointLightEnabled, bool spotLightEnabled)
 {
 	{
-		// glm::vec3 direction = glm::normalize(glm::vec3(0.0f, -1.0f, 1.0f));
-
 		Vector4 direction = {{ 0.0f, -1.0f, 1.0f, 0.0f }};
 		normalizevec4(&direction);
 
@@ -228,7 +227,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 
 	{
 		setUniform3f(programId, "pointLight.position",
-			POINT_LIGHT_POS.x, POINT_LIGHT_POS.y, POINT_LIGHT_POS.z);
+			POINT_LIGHT_POS_NEW.x, POINT_LIGHT_POS_NEW.y, POINT_LIGHT_POS_NEW.z);
 		setUniform3f(programId, "pointLight.color",
 			1.0f, 0.0f, 0.0f);
 		setUniform1f(programId, "pointLight.ambientIntensity",
@@ -240,14 +239,13 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 
 	{
-		// glm::vec3 direction = glm::normalize(glm::vec3(-0.5f, -1.0f, 0.0f));
 		Vector4 direction = {{ -0.5f, -1.0f, 0.0f, 0.0f }};
 		normalizevec4(&direction);
 
 		setUniform3f(programId, "spotLight.direction",
 			direction.x, direction.y, direction.z);
 		setUniform3f(programId, "spotLight.position",
-			SPOT_LIGHT_POS.x, SPOT_LIGHT_POS.y, SPOT_LIGHT_POS.z);
+			SPOT_LIGHT_POS_NEW.x, SPOT_LIGHT_POS_NEW.y, SPOT_LIGHT_POS_NEW.z);
 		setUniform1f(programId, "spotLight.cutoff", 
 			cos(M_PI * 15.0f / 180.0f ));
 		setUniform3f(programId, "spotLight.color",
@@ -328,7 +326,19 @@ mainInternal(CommonResources* resources)
 	if(!modelLoad("models/sphere.emd", sphereVAO, sphereVBO, sphereIndicesVBO, &sphereIndicesNumber, &sphereIndexType))
 		return -1;
 
-	glm::mat4 projection = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
+	glm::mat4 projectionOld = glm::perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
+
+	Matrix projectionNew = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
+
+	bool error = false;
+    for(int ti = 0; ti < 4; ti++)
+        for(int tj = 0; tj < 4; tj++)
+        	if(fabs(projectionOld[ti][tj] - projectionNew.m[ti*4 + tj]) > 0.0001f ) {
+        		fprintf(stderr, "ERROR: projectionOld != projectionNew,"
+        			" ti = %d, tj = %d, old = %f, new = %f\n", ti, tj, projectionOld[ti][tj], projectionNew.m[ti*4 + tj]);
+        		error = true;
+        	}
+    if(error) exit(1);
 
 	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
 	GLint uniformM = getUniformLocation(resources->programId, "M");
@@ -456,24 +466,25 @@ mainInternal(CommonResources* resources)
 			}
 		}
 
-		Vector4 cameraPosTemp;
-		cameraGetPosition(resources->camera, &cameraPosTemp);
+		Vector4 cameraPosNew;
+		cameraGetPosition(resources->camera, &cameraPosNew);
 
-		glm::vec3 cameraPos(cameraPosTemp.x, cameraPosTemp.y, cameraPosTemp.z);
+		glm::vec3 cameraPosOld(cameraPosNew.x, cameraPosNew.y, cameraPosNew.z);
 
-		glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
+
+		glUniform3f(uniformCameraPos, cameraPosNew.x, cameraPosNew.y, cameraPosNew.z);
 
 		
-		Matrix viewTemp;
-		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &viewTemp);
+		Matrix viewNew;
+		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &viewNew);
 
-		glm::mat4 view;
-		for(int ti = 0; ti < 4; ti++)
-			for(int tj = 0; tj < 4; tj++)
-				view[ti][tj] = viewTemp.m[ti*4 + tj];
+        glm::mat4 viewOld;
+        for(int ti = 0; ti < 4; ti++)
+            for(int tj = 0; tj < 4; tj++)
+                viewOld[ti][tj] = viewNew.m[ti*4 + tj];
 
-
-		glm::mat4 vp = projection * view;
+		glm::mat4 vpOld = projectionOld * viewOld;
+		// Matrix vpNew = multiplymat4(&projectionNew, &viewNew);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -483,12 +494,29 @@ mainInternal(CommonResources* resources)
 
 		glm::mat4 towerM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
 			glm::translate(-1.5f, -1.0f, -1.5f);
-		glm::mat4 towerMVP = vp * towerM;
+		glm::mat4 towerMVP = vpOld * towerM;
+
+		// Matrix towerMNew = identitymat();
+		//rotateY(&towerM, islandAngle);
+//
+//		//Matrix tempTowerM = identitymat();
+//		//translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
+//
+//towerM = multiplymat4(&towerM, &tempTowerM);
+        // for(int ti = 0; ti < 4; ti++)
+            // for(int tj = 0; tj < 4; tj++)
+                // towerMNew.m[ti*4 + tj] = towerM[ti][tj];
+
+
+		// Matrix towerMVPNew = multiplymat4(&vpNew, &towerMNew);
 
 		glBindTexture(GL_TEXTURE_2D, towerTexture);
 		glBindVertexArray(towerVAO);
+		// glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVPNew.m[0]);
+		// glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM.m[0]);
 		glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, &towerMVP[0][0]);
-		glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM[0][0]);
+        glUniformMatrix4fv(uniformM, 1, GL_FALSE, &towerM[0][0]);
+
 		glUniform1f(uniformMaterialSpecularFactor, 1.0f);
 		glUniform1f(uniformMaterialSpecularIntensity, 0.0f);
 		glUniform3f(uniformMaterialEmission, 0.0f, 0.0f, 0.0f);
@@ -500,7 +528,7 @@ mainInternal(CommonResources* resources)
 
 		glm::mat4 torusM = glm::translate(0.0f, 1.0f, 0.0f) *
 			glm::rotate((60.0f - 3.0f*islandAngle), 0.0f, 0.5f, 0.0f);
-		glm::mat4 torusMVP = vp * torusM;
+		glm::mat4 torusMVP = vpOld * torusM;
 
 		glBindTexture(GL_TEXTURE_2D, garkGreenTexture);
 		glBindVertexArray(torusVAO);
@@ -517,7 +545,7 @@ mainInternal(CommonResources* resources)
 
 		glm::mat4 grassM = glm::rotate(islandAngle, 0.0f, 1.0f, 0.0f) *
 			glm::translate(0.0f, -1.0f, 0.0f);
-		glm::mat4 grassMVP = vp * grassM;
+		glm::mat4 grassMVP = vpOld * grassM;
 
 		glBindTexture(GL_TEXTURE_2D, grassTexture);
 		glBindVertexArray(grassVAO);
@@ -532,9 +560,9 @@ mainInternal(CommonResources* resources)
 
 		// skybox
 
-		glm::mat4 skyboxM = glm::translate(cameraPos) *
+		glm::mat4 skyboxM = glm::translate(cameraPosOld) *
 			glm::scale(100.0f,100.0f,100.0f);
-		glm::mat4 skyboxMVP = vp * skyboxM;
+		glm::mat4 skyboxMVP = vpOld * skyboxM;
 
 		glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 		glBindVertexArray(skyboxVAO);
@@ -549,8 +577,8 @@ mainInternal(CommonResources* resources)
 
 		// point light source
 		if(pointLightEnabled) {
-			glm::mat4 pointLightM = glm::translate(POINT_LIGHT_POS);
-			glm::mat4 pointLightMVP = vp * pointLightM;
+			glm::mat4 pointLightM = glm::translate(POINT_LIGHT_POS_OLD);
+			glm::mat4 pointLightMVP = vpOld * pointLightM;
 
 			glBindTexture(GL_TEXTURE_2D, redTexture);
 			glBindVertexArray(sphereVAO);
@@ -566,8 +594,8 @@ mainInternal(CommonResources* resources)
 
 		// spot light source
 		if(spotLightEnabled) {
-			glm::mat4 spotLightM = glm::translate(SPOT_LIGHT_POS);
-			glm::mat4 spotLightMVP = vp * spotLightM;
+			glm::mat4 spotLightM = glm::translate(SPOT_LIGHT_POS_OLD);
+			glm::mat4 spotLightMVP = vpOld * spotLightM;
 
 			glBindTexture(GL_TEXTURE_2D, blueTexture);
 			glBindVertexArray(sphereVAO);
