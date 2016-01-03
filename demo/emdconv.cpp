@@ -1,7 +1,7 @@
 #include <GLXW/glxw.h>
 #include <assert.h>
 
-#include "../assimp/include/assimp/Importer.hpp"
+#include "../assimp/include/assimp/cimport.h"
 #include "../assimp/include/assimp/postprocess.h"
 #include "../assimp/include/assimp/scene.h"
 #include "utils/models.h"
@@ -24,8 +24,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
 {
     *outVerticesBufferSize = 0;
     *outVerticesNumber = 0;
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(
+    const aiScene* scene = aiImportFile(
             fname,
             aiProcess_CalcTangentSpace | aiProcess_Triangulate | 
             aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
@@ -43,6 +42,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
                 "There is no mesh #%u in model (%d only), fname = %s\n",
                 meshNumber, scene->mNumMeshes, fname
             );
+        aiReleaseImport(scene);
         return NULL;
     }
 
@@ -56,6 +56,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
                 "mesh->mTextureCoords[0] == NULL, fname = %s\n",
                 fname
             );
+        aiReleaseImport(scene);
         return NULL;
     }
 
@@ -77,6 +78,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
                     face.mNumIndices, i, fname
                 );
             free(verticesBuffer);
+            aiReleaseImport(scene);
             return NULL;
         }
 
@@ -96,6 +98,8 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
             verticesBuffer[verticesBufferIndex++] = 1.0f - uv.y;
         }
     }
+
+    aiReleaseImport(scene);
 
     return verticesBuffer;
 }
@@ -203,9 +207,6 @@ importedModelSave(const char* fname, GLfloat* verticesBuffer,
             "importedModelSave - modelSize = %u, indexedModelSize = %u, "
             "ratio = %f%%\n", modelSize, indexedModelSize, ratio
         );
-
-    fprintf(stderr, "DEBUG: vertices.size() = %lu, indices.size() = %lu\n",
-            (long unsigned int)verticesArrSize, (long unsigned int)indicesArrSize);
 
     bool res = modelSave(
             fname,

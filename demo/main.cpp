@@ -13,7 +13,6 @@
 #include "utils/models.h"
 
 // TODO: "compress" repository
-// TODO: use Assimp C interface
 
 static const Vector4 POINT_LIGHT_POS = { -2.0f, 3.0f, 0.0f, 0.0f };
 static const Vector4 SPOT_LIGHT_POS = { 4.0f, 5.0f, 0.0f, 0.0f };
