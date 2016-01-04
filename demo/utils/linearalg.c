@@ -101,6 +101,19 @@ matrixPerspective(float fovy, float aspect, float zNear, float zFar)
     return out;
 }
 
+Matrix
+matrixOrthogonal(float left, float right, float bottom, float top)
+{
+    Matrix out = matrixIdentity();
+    out.m[0*4 + 0] = 2 / (right - left);
+    out.m[1*4 + 1] = 2 / (top - bottom);
+    out.m[2*4 + 2] = -1;
+    out.m[3*4 + 0] = - (right + left) / (right - left);
+    out.m[3*4 + 1] = - (top + bottom) / (top - bottom);
+
+    return out;
+}
+
 // WARNING! What in GLM is m1 * m2 is multiplymat4(m2, m1)
 Matrix
 multiplymat4(const Matrix* m1, const Matrix* m2)
@@ -205,20 +218,6 @@ translate(Matrix* m, float x, float y, float z)
     translation.m[14] = z;
 
     memcpy(m->m, multiplymat4(m, &translation).m, sizeof(m->m));
-}
-
-Matrix
-orthogonal(float left, float right, float bottom, float top)
-{
-    // TODO: use 4*i + j
-    Matrix out = matrixIdentity();
-    out.m[0] = 2 / (right - left);
-    out.m[5] = 2 / (top - bottom);
-    out.m[10] = -1;
-    out.m[12] = - (right + left) / (right - left);
-    out.m[13] = - (top + bottom) / (top - bottom);
-
-    return out;
 }
 
 Matrix
