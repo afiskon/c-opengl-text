@@ -319,16 +319,14 @@ mainInternal(CommonResources* resources)
 	loadOneColorTexture(1.0f, 0.0f, 0.0f, redTexture);
 	loadOneColorTexture(0.0f, 0.0f, 1.0f, blueTexture);
 
-	// load models
-
-	// GLuint textVAO          = resources->vaoArray[ 0];
+	GLuint textVAO          = resources->vaoArray[ 0];
 	GLuint grassVAO         = resources->vaoArray[ 1];
 	GLuint skyboxVAO        = resources->vaoArray[ 2];
 	GLuint towerVAO         = resources->vaoArray[ 3];
 	GLuint torusVAO         = resources->vaoArray[ 4];
 	GLuint sphereVAO        = resources->vaoArray[ 5];
 
-	// GLuint textVBO          = resources->vboArray[ 0];
+	GLuint textVBO          = resources->vboArray[ 0];
 	GLuint grassVBO         = resources->vboArray[ 1];
 	GLuint grassIndicesVBO  = resources->vboArray[ 2];
 	GLuint skyboxVBO        = resources->vboArray[ 3];
@@ -339,6 +337,23 @@ mainInternal(CommonResources* resources)
 	GLuint torusIndicesVBO  = resources->vboArray[ 8];
 	GLuint sphereVBO        = resources->vboArray[ 9];
 	GLuint sphereIndicesVBO = resources->vboArray[10];
+
+	// prepare text
+
+	static const GLfloat globVertexBufferData[] = {
+	    -1.0f, -1.0f,  0.0f,
+	     1.0f, -1.0f,  0.0f,
+	     0.0f,  1.0f,  0.0f,
+	};
+
+	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
+    	globVertexBufferData, GL_STATIC_DRAW);
+
+    glBindVertexArray(textVAO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	// load models
 
 	GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber,
 		torusIndicesNumber, sphereIndicesNumber;
