@@ -389,9 +389,12 @@ mainInternal(CommonResources* resources)
 
 	const GLfloat globVertexBufferData[] = {
     //  X     Y     U                            V
-	    0.0f, 0.0f, fontTextureCoordULeft('A'),  fontTextureCoordVBottom('A'),
-	    0.2f, 0.0f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
-	    0.2f, 0.2f, fontTextureCoordURight('A'), fontTextureCoordVTop('A'),
+	0.00f, 0.00f, fontTextureCoordULeft('A'),  fontTextureCoordVBottom('A'),
+	0.03f, 0.00f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
+	0.03f, 0.06f, fontTextureCoordURight('A'), fontTextureCoordVTop('A'),
+	0.03f, 0.06f, fontTextureCoordURight('A'), fontTextureCoordVTop('A'),
+	0.00f, 0.06f, fontTextureCoordULeft('A'),  fontTextureCoordVTop('A'),
+	0.00f, 0.00f, fontTextureCoordULeft('A'),  fontTextureCoordVBottom('A'),
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
@@ -723,7 +726,7 @@ mainInternal(CommonResources* resources)
 	    glBindVertexArray(textVAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
