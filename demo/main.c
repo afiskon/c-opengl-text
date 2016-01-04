@@ -303,13 +303,15 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 }
 
+#define FONT_TEXTURE_COORD_DELTA 0.0035;
+
 inline static float
 fontTextureCoordULeft(char c)
 {
 	int colNum = ((int)(c - ' ')) % FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)colNum * FONT_TEXTURE_LETTER_WIDTH_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	return coord;
+	return coord + FONT_TEXTURE_COORD_DELTA;
 }
 
 inline static float 
@@ -318,7 +320,7 @@ fontTextureCoordURight(char c)
 	int colNum = 1 + ((int)(c - ' ')) % FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)colNum * FONT_TEXTURE_LETTER_WIDTH_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	return coord;
+	return coord - FONT_TEXTURE_COORD_DELTA;
 }
 
 inline static float 
@@ -327,7 +329,8 @@ fontTextureCoordVTop(char c)
 	int rowNum = ((int)(c - ' ')) / FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)rowNum * FONT_TEXTURE_LETTER_HEIGHT_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	return coord; // no correction for V coordinate required
+	// no correction for V coordinate required
+	return coord + FONT_TEXTURE_COORD_DELTA; 
 }
 
 inline static float 
@@ -336,7 +339,8 @@ fontTextureCoordVBottom(char c)
 	int rowNum = 1 + ((int)(c - ' ')) / FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)rowNum * FONT_TEXTURE_LETTER_HEIGHT_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	return coord; // no correction for V coordinate required
+	// no correction for V coordinate required
+	return coord - FONT_TEXTURE_COORD_DELTA; 
 }
 
 static void
