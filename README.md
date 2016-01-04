@@ -1,4 +1,4 @@
-# cpp-opengl-text
+# c-opengl-text
 
 On Linux you will need these packages:
 
