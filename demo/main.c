@@ -475,7 +475,7 @@ mainInternal(CommonResources* resources)
 		Matrix tempTowerM = matrixIdentity();
 		Matrix towerM = matrixRotate(&tempTowerM, islandAngle,
 							0.0f, 1.0f, 0.0f);
-		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
+		matrixTranslateInplace(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerM = matrixMulMat(&tempTowerM, &towerM);
 
 		Matrix towerMVP = matrixMulMat(&towerM, &vp);
@@ -497,7 +497,7 @@ mainInternal(CommonResources* resources)
 		Matrix tempTorusM = matrixIdentity();
 		Matrix torusM = matrixRotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
 							0.0f, 1.0f, 0.0f);
-		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
+		matrixTranslateInplace(&tempTorusM, 0.0f, 1.0f, 0.0f);
 		torusM = matrixMulMat(&tempTorusM, &torusM);
 
 		Matrix torusMVP = matrixMulMat(&torusM, &vp);
@@ -518,7 +518,7 @@ mainInternal(CommonResources* resources)
 		Matrix tempGrassM = matrixIdentity();
 		Matrix grassM = matrixRotate(&tempGrassM, islandAngle,
 							0.0f, 1.0f, 0.0f);
-		translate(&tempGrassM, 0.0f, -1.0f, 0.0f);
+		matrixTranslateInplace(&tempGrassM, 0.0f, -1.0f, 0.0f);
 		grassM = matrixMulMat(&tempGrassM, &grassM);
 
 		Matrix grassMVP = matrixMulMat(&grassM, &vp);
@@ -538,8 +538,8 @@ mainInternal(CommonResources* resources)
 
 		Matrix tempSkyboxM = matrixIdentity();
 		Matrix skyboxM = matrixIdentity();
-		translate(&skyboxM,
-			cameraPos.m[0], cameraPos.m[1], cameraPos.m[2]);
+		matrixTranslateInplace(&skyboxM,
+			cameraPos.x, cameraPos.y, cameraPos.z);
 		matrixScaleInplace(&tempSkyboxM, 100.0f, 100.0f, 100.0f);
 		skyboxM = matrixMulMat(&tempSkyboxM, &skyboxM);
 
@@ -559,7 +559,8 @@ mainInternal(CommonResources* resources)
 		// point light source
 		if(pointLightEnabled) {
 			Matrix pointLightM = matrixIdentity();
-			translate(&pointLightM, POINT_LIGHT_POS.m[0], POINT_LIGHT_POS.m[1], POINT_LIGHT_POS.m[2]);
+			matrixTranslateInplace(&pointLightM,
+				POINT_LIGHT_POS.x, POINT_LIGHT_POS.y, POINT_LIGHT_POS.z);
 			Matrix pointLightMVP = matrixMulMat(&pointLightM, &vp);
 
 			glBindTexture(GL_TEXTURE_2D, redTexture);
@@ -577,7 +578,8 @@ mainInternal(CommonResources* resources)
 		// spot light source
 		if(spotLightEnabled) {
 			Matrix spotLightM = matrixIdentity();
-			translate(&spotLightM, SPOT_LIGHT_POS.m[0], SPOT_LIGHT_POS.m[1], SPOT_LIGHT_POS.m[2]);
+			matrixTranslateInplace(&spotLightM,
+				SPOT_LIGHT_POS.x, SPOT_LIGHT_POS.y, SPOT_LIGHT_POS.z);
 			Matrix spotLightMVP = matrixMulMat(&spotLightM, &vp);
 
 			glBindTexture(GL_TEXTURE_2D, blueTexture);

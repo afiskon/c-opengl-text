@@ -39,14 +39,14 @@ vectorMul(Vector v, float n)
 void
 vectorNormalizeInplace(Vector* v)
 {
-    float sqr = v->m[0] * v->m[0] + v->m[1] * v->m[1] + v->m[2] * v->m[2];
+    float sqr = v->x * v->x + v->y * v->y + v->z * v->z;
     if(sqr == 1 || sqr == 0)
         return;
 
-    float invrt = 1.f/sqrt(sqr);
-    v->m[0] *= invrt;
-    v->m[1] *= invrt;
-    v->m[2] *= invrt;
+    float invrt = 1.0f/sqrt(sqr);
+    v->x *= invrt;
+    v->y *= invrt;
+    v->z *= invrt;
 }
 
 float
@@ -153,10 +153,10 @@ matrixMulVec(const Matrix* m, const Vector* v)
     Vector out;
     for(int i = 0; i < 4; ++i) {
         out.m[i] =
-            (v->x * m->m[i + 0]) +
-            (v->y * m->m[i + 4]) +
-            (v->z * m->m[i + 8]) +
-            (v->w * m->m[i + 12]);
+            (v->x * m->m[0*4 + i]) +
+            (v->y * m->m[1*4 + i]) +
+            (v->z * m->m[2*4 + i]) +
+            (v->w * m->m[3*4 + i]);
     }
 
     return out;
@@ -194,18 +194,17 @@ matrixRotate(const Matrix* in, float angle,
     Vector temp = vectorMul(axis, (1.0f - c));
     Matrix rotate = {{ 0 }};
 
-    // TODO: use .x, .y, .z
-    rotate.m[0*4 + 0] = c + temp.m[0] * axis.m[0];
-    rotate.m[0*4 + 1] = 0 + temp.m[0] * axis.m[1] + s * axis.m[2];
-    rotate.m[0*4 + 2] = 0 + temp.m[0] * axis.m[2] - s * axis.m[1];
+    rotate.m[0*4 + 0] = c + temp.x * axis.x;
+    rotate.m[0*4 + 1] = 0 + temp.x * axis.y + s * axis.z;
+    rotate.m[0*4 + 2] = 0 + temp.x * axis.z - s * axis.y;
 
-    rotate.m[1*4 + 0] = 0 + temp.m[1] * axis.m[0] - s * axis.m[2];
-    rotate.m[1*4 + 1] = c + temp.m[1] * axis.m[1];
-    rotate.m[1*4 + 2] = 0 + temp.m[1] * axis.m[2] + s * axis.m[0];
+    rotate.m[1*4 + 0] = 0 + temp.y * axis.x - s * axis.z;
+    rotate.m[1*4 + 1] = c + temp.y * axis.y;
+    rotate.m[1*4 + 2] = 0 + temp.y * axis.z + s * axis.x;
 
-    rotate.m[2*4 + 0] = 0 + temp.m[2] * axis.m[0] + s * axis.m[1];
-    rotate.m[2*4 + 1] = 0 + temp.m[2] * axis.m[1] - s * axis.m[0];
-    rotate.m[2*4 + 2] = c + temp.m[2] * axis.m[2];
+    rotate.m[2*4 + 0] = 0 + temp.z * axis.x + s * axis.y;
+    rotate.m[2*4 + 1] = 0 + temp.z * axis.y - s * axis.x;
+    rotate.m[2*4 + 2] = c + temp.z * axis.z;
 
     Vector r[4], m[4];
     for(int i = 0; i < 4; i++)
@@ -240,14 +239,13 @@ matrixScaleInplace(Matrix* m, float x, float y, float z)
 }
 
 void
-translate(Matrix* m, float x, float y, float z)
+matrixTranslateInplace(Matrix* m, float x, float y, float z)
 {
     Matrix translation = matrixIdentity();
     
-    // TODO: use 4*i + j
-    translation.m[12] = x;
-    translation.m[13] = y;
-    translation.m[14] = z;
+    translation.m[3*4 + 0] = x;
+    translation.m[3*4 + 1] = y;
+    translation.m[3*4 + 2] = z;
 
     memcpy(m->m, matrixMulMat(m, &translation).m, sizeof(m->m));
 }

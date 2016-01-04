@@ -38,8 +38,6 @@ Matrix matrixMulMat(const Matrix* m1, const Matrix* m2);
 Matrix matrixRotate(const Matrix* m, float angle,
 	float axis_x, float axis_y, float axis_z);
 void matrixScaleInplace(Matrix* m, float x, float y, float z);
-
-// TODO: rename to ...Inplace
-void translate(Matrix* m, float x, float y, float z);
+void matrixTranslateInplace(Matrix* m, float x, float y, float z);
 
 #endif // AFISKON_LINEARALG_H
