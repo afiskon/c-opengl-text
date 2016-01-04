@@ -21,16 +21,16 @@
 uint64_t
 getCurrentTimeMs()
 {
-	FILETIME filetime;
-	GetSystemTimeAsFileTime(&filetime);
+    FILETIME filetime;
+    GetSystemTimeAsFileTime(&filetime);
 
-	unsigned long long nowWindows = (unsigned long long)filetime.dwLowDateTime
-		+ ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
+    unsigned long long nowWindows = (unsigned long long)filetime.dwLowDateTime
+        + ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
 
-	unsigned long long nowUnix = nowWindows - 116444736000000000ULL;
-	unsigned long long nowUnixMs = nowUnix / 10000ULL;
+    unsigned long long nowUnix = nowWindows - 116444736000000000ULL;
+    unsigned long long nowUnixMs = nowUnix / 10000ULL;
 
-	return (uint64_t)nowUnixMs;
+    return (uint64_t)nowUnixMs;
 }
 
 #else // Linux, MacOS, etc
@@ -40,241 +40,241 @@ getCurrentTimeMs()
 uint64_t
 getCurrentTimeMs()
 {
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
 
-	return ((uint64_t)tv.tv_sec) * 1000 + ((uint64_t)tv.tv_usec) / 1000;
+    return ((uint64_t)tv.tv_sec) * 1000 + ((uint64_t)tv.tv_usec) / 1000;
 }
 #endif
 
 static bool
 loadDDSTextureCommon(const char* fname, GLuint textureId,
-					 unsigned int fsize, unsigned char* dataPtr)
+                     unsigned int fsize, unsigned char* dataPtr)
 {
-	if(fsize < DDS_HEADER_SIZE)
-	{
-		fprintf(stderr, "loadDDSTexture failed, fname = %s, "
-					"fsize = %u, less then"
-					" DDS_HEADER_SIZE ( %d )\n",
-				fname, fsize,  DDS_HEADER_SIZE);
-		return false;
-	}
+    if(fsize < DDS_HEADER_SIZE)
+    {
+        fprintf(stderr, "loadDDSTexture failed, fname = %s, "
+                    "fsize = %u, less then"
+                    " DDS_HEADER_SIZE ( %d )\n",
+                fname, fsize,  DDS_HEADER_SIZE);
+        return false;
+    }
 
-	unsigned int signature    = *(unsigned int*)&(dataPtr[ 0]);
-	unsigned int height       = *(unsigned int*)&(dataPtr[12]);
-	unsigned int width        = *(unsigned int*)&(dataPtr[16]);
-	unsigned int mipMapNumber = *(unsigned int*)&(dataPtr[28]);
-	unsigned int formatCode   = *(unsigned int*)&(dataPtr[84]);
+    unsigned int signature    = *(unsigned int*)&(dataPtr[ 0]);
+    unsigned int height       = *(unsigned int*)&(dataPtr[12]);
+    unsigned int width        = *(unsigned int*)&(dataPtr[16]);
+    unsigned int mipMapNumber = *(unsigned int*)&(dataPtr[28]);
+    unsigned int formatCode   = *(unsigned int*)&(dataPtr[84]);
 
-	if(signature != DDS_SIGNATURE)
-	{
-		fprintf(stderr, "loadDDSTexture failed, fname = %s,"
-			" invalid signature: "
-			"0x%08X\n", fname, signature);
-		return false;
-	}
+    if(signature != DDS_SIGNATURE)
+    {
+        fprintf(stderr, "loadDDSTexture failed, fname = %s,"
+            " invalid signature: "
+            "0x%08X\n", fname, signature);
+        return false;
+    }
 
-	unsigned int format;
-	switch(formatCode)
-	{
-		case FORMAT_CODE_DXT1:
-			format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
-			break;
-		case FORMAT_CODE_DXT3:
-			format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
-			break;
-		case FORMAT_CODE_DXT5:
-			format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
-			break;
-		default:
-			fprintf(stderr, "loadDDSTexture failed, fname = %s,"
-				" unknown formatCode:"
-				" 0x%08X\n", fname, formatCode);
-			return false;
-	}
+    unsigned int format;
+    switch(formatCode)
+    {
+        case FORMAT_CODE_DXT1:
+            format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+            break;
+        case FORMAT_CODE_DXT3:
+            format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+            break;
+        case FORMAT_CODE_DXT5:
+            format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+            break;
+        default:
+            fprintf(stderr, "loadDDSTexture failed, fname = %s,"
+                " unknown formatCode:"
+                " 0x%08X\n", fname, formatCode);
+            return false;
+    }
 
-	glBindTexture(GL_TEXTURE_2D, textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
 
-	unsigned int blockSize = (format ==
-		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) ? 8 : 16;
-	unsigned int offset = DDS_HEADER_SIZE;
+    unsigned int blockSize = (format ==
+        GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) ? 8 : 16;
+    unsigned int offset = DDS_HEADER_SIZE;
 
-	// load mipmaps
-	for (unsigned int level = 0; level < mipMapNumber; ++level)
-	{
-		unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
-		if(fsize < offset + size) {
-			fprintf(stderr, "loadDDSTexture failed, fname = %s,"
-						" fsize = %u, level ="
-						" %u, offset = %u, size = %u\n",
-					fname, fsize, level, offset, size);
-			return false;
-		}
-		glCompressedTexImage2D(GL_TEXTURE_2D,
-			level, format, width, height, 0, size, dataPtr + offset);
+    // load mipmaps
+    for (unsigned int level = 0; level < mipMapNumber; ++level)
+    {
+        unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
+        if(fsize < offset + size) {
+            fprintf(stderr, "loadDDSTexture failed, fname = %s,"
+                        " fsize = %u, level ="
+                        " %u, offset = %u, size = %u\n",
+                    fname, fsize, level, offset, size);
+            return false;
+        }
+        glCompressedTexImage2D(GL_TEXTURE_2D,
+            level, format, width, height, 0, size, dataPtr + offset);
 
-		width = width > 1 ? width >> 1 : 1;
-		height = height > 1 ? height >> 1 : 1;
-		offset += size;
-	}
+        width = width > 1 ? width >> 1 : 1;
+        height = height > 1 ? height >> 1 : 1;
+        offset += size;
+    }
 
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+        GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+        GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	return true;
+    return true;
 }
 
 bool
 loadDDSTexture(const char *fname, GLuint textureId)
 {
-	FileMapping* mapping = fileMappingCreate(fname);
-	if(mapping == NULL) return false;
+    FileMapping* mapping = fileMappingCreate(fname);
+    if(mapping == NULL) return false;
 
-	unsigned char* dataPtr = fileMappingGetPointer(mapping);
-	unsigned int fsize = fileMappingGetSize(mapping);
+    unsigned char* dataPtr = fileMappingGetPointer(mapping);
+    unsigned int fsize = fileMappingGetSize(mapping);
 
-	bool res = loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
+    bool res = loadDDSTextureCommon(fname, textureId, fsize, dataPtr);
 
-	fileMappingDestroy(mapping);
+    fileMappingDestroy(mapping);
 
-	return res;
+    return res;
 }
 
 void
 loadOneColorTexture(GLfloat r, GLfloat g, GLfloat b, GLuint textureId)
 {
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	unsigned char textureData[3];
-	textureData[0] = (unsigned char)(r*255.0f);
-	textureData[1] = (unsigned char)(g*255.0f);
-	textureData[2] = (unsigned char)(b*255.0f);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0,
-		GL_RGB, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    unsigned char textureData[3];
+    textureData[0] = (unsigned char)(r*255.0f);
+    textureData[1] = (unsigned char)(g*255.0f);
+    textureData[2] = (unsigned char)(b*255.0f);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0,
+        GL_RGB, GL_UNSIGNED_BYTE, textureData);
 }
 
 static bool
 checkShaderCompileStatus(GLuint obj)
 {
-	GLint status;
-	glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
-	if(status == GL_FALSE) {
-		GLint buffsize;
-		glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &buffsize);
+    GLint status;
+    glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
+    if(status == GL_FALSE) {
+        GLint buffsize;
+        glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &buffsize);
 
-		char* buff = (char*)malloc((size_t) buffsize);
-		if(!buff) {
-			fprintf(stderr, "checkShaderCompileStatus - error!\n");
-		} else {
-			glGetShaderInfoLog(obj, buffsize, &buffsize, buff);
-			fprintf(stderr, "checkShaderCompileStatus - error: %s\n", buff);
-			free(buff);
-		}
-		return true;
-	}
-	return false;
+        char* buff = (char*)malloc((size_t) buffsize);
+        if(!buff) {
+            fprintf(stderr, "checkShaderCompileStatus - error!\n");
+        } else {
+            glGetShaderInfoLog(obj, buffsize, &buffsize, buff);
+            fprintf(stderr, "checkShaderCompileStatus - error: %s\n", buff);
+            free(buff);
+        }
+        return true;
+    }
+    return false;
 }
 
 static bool
 checkProgramLinkStatus(GLuint obj)
 {
-	GLint status;
-	glGetProgramiv(obj, GL_LINK_STATUS, &status);
-	if(status == GL_FALSE) {
-		GLint buffsize;
-		glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &buffsize);
+    GLint status;
+    glGetProgramiv(obj, GL_LINK_STATUS, &status);
+    if(status == GL_FALSE) {
+        GLint buffsize;
+        glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &buffsize);
 
-		char* buff = (char*)malloc((size_t) buffsize);
-		if(!buff) {
-			fprintf(stderr, "checkProgramLinkStatus - error!\n");
-		} else {
-			glGetProgramInfoLog(obj, buffsize, &buffsize, buff);
-			fprintf(stderr, "checkProgramLinkStatus - error: %s\n", buff);
-			free(buff);
-		}
-		return true;
-	}
-	return false;
+        char* buff = (char*)malloc((size_t) buffsize);
+        if(!buff) {
+            fprintf(stderr, "checkProgramLinkStatus - error!\n");
+        } else {
+            glGetProgramInfoLog(obj, buffsize, &buffsize, buff);
+            fprintf(stderr, "checkProgramLinkStatus - error: %s\n", buff);
+            free(buff);
+        }
+        return true;
+    }
+    return false;
 }
 
 GLuint
 loadShader(const char *fname, GLenum shaderType, bool *errorFlagPtr)
 {
-	*errorFlagPtr = false;
+    *errorFlagPtr = false;
 
-	FileMapping* mapping = fileMappingCreate(fname);
-	if(mapping == NULL) {
-		*errorFlagPtr = true;
-		return 0;
-	}
+    FileMapping* mapping = fileMappingCreate(fname);
+    if(mapping == NULL) {
+        *errorFlagPtr = true;
+        return 0;
+    }
 
-	GLuint shaderId = glCreateShader(shaderType);
-	GLchar* stringArray[1];
-	GLint lengthArray[1];
+    GLuint shaderId = glCreateShader(shaderType);
+    GLchar* stringArray[1];
+    GLint lengthArray[1];
 
-	stringArray[0] = (GLchar*)fileMappingGetPointer(mapping);
-	lengthArray[0] = fileMappingGetSize(mapping);
+    stringArray[0] = (GLchar*)fileMappingGetPointer(mapping);
+    lengthArray[0] = fileMappingGetSize(mapping);
 
-	glShaderSource(shaderId, 1,
-		(GLchar const * const *)stringArray, lengthArray);
-	glCompileShader(shaderId);
+    glShaderSource(shaderId, 1,
+        (GLchar const * const *)stringArray, lengthArray);
+    glCompileShader(shaderId);
 
-	fileMappingDestroy(mapping);
+    fileMappingDestroy(mapping);
 
-	*errorFlagPtr = checkShaderCompileStatus(shaderId);
-	if(*errorFlagPtr) {
-		glDeleteShader(shaderId);
-		return 0;
-	}
+    *errorFlagPtr = checkShaderCompileStatus(shaderId);
+    if(*errorFlagPtr) {
+        glDeleteShader(shaderId);
+        return 0;
+    }
 
-	return shaderId;
+    return shaderId;
 }
 
 GLuint
 prepareProgram(const GLuint* shaders, int nshaders, bool *errorFlagPtr)
 {
-	*errorFlagPtr = false;
+    *errorFlagPtr = false;
 
-	GLuint programId = glCreateProgram();
+    GLuint programId = glCreateProgram();
 
-	for(int i = 0; i < nshaders; i++)
-		glAttachShader(programId, shaders[i]);
+    for(int i = 0; i < nshaders; i++)
+        glAttachShader(programId, shaders[i]);
 
-	glLinkProgram(programId);
+    glLinkProgram(programId);
 
-	*errorFlagPtr = checkProgramLinkStatus(programId);
-	if(*errorFlagPtr) {
-		glDeleteProgram(programId);
-		return 0;
-	}
+    *errorFlagPtr = checkProgramLinkStatus(programId);
+    if(*errorFlagPtr) {
+        glDeleteProgram(programId);
+        return 0;
+    }
 
-	return programId;
+    return programId;
 }
 
 GLint
 getUniformLocation(GLuint programId, const char* uniformName)
 {
-	GLint location = glGetUniformLocation(programId, uniformName);
-	if(location == -1) {
-		fprintf(stderr, "getUniformLocation failed, programId = %u, "
-							"uniformName = %s\n",
-				programId, uniformName);
-	}
-	return location;
+    GLint location = glGetUniformLocation(programId, uniformName);
+    if(location == -1) {
+        fprintf(stderr, "getUniformLocation failed, programId = %u, "
+                            "uniformName = %s\n",
+                programId, uniformName);
+    }
+    return location;
 }
 
 void
 setUniform1f(GLuint programId, const char* uniformName, float value)
 {
-	GLint uniformId = getUniformLocation(programId, uniformName);
-	glUniform1f(uniformId, value);
+    GLint uniformId = getUniformLocation(programId, uniformName);
+    glUniform1f(uniformId, value);
 }
 
 void
 setUniform3f(GLuint programId, const char* uniformName,
-	float v1, float v2, float v3)
+    float v1, float v2, float v3)
 {
-	GLint uniformId = getUniformLocation(programId, uniformName);
-	glUniform3f(uniformId, v1, v2, v3);
+    GLint uniformId = getUniformLocation(programId, uniformName);
+    glUniform3f(uniformId, v1, v2, v3);
 }
