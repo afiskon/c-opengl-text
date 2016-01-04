@@ -398,10 +398,10 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			printf("FPS: %f, T: 0x%08x%08x, X: %f, Y: %f, Z: %f\n",
+			printf("FPS: %f, T: %u%09u, X: %f, Y: %f, Z: %f\n",
 					fps,
-					(uint32_t)(currentTimeMs >> 32),
-					(uint32_t)(currentTimeMs & 0xFFFFFFFF),
+					(uint32_t)(currentTimeMs / 1000000000),
+					(uint32_t)(currentTimeMs % 1000000000),
 					cameraPos.m[0],
 					cameraPos.m[1],
 					cameraPos.m[2]
