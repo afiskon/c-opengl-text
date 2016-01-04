@@ -21,11 +21,8 @@ typedef union Vector
 } Vector;
 
 Vector vectorNull();
-
-// Other possible constructors: vectorXAxis, vectorYAxis, vectorZAxis
-
-Vector addvec4(Vector v1, Vector v2);
-Vector mulvec4(Vector v, float n);
+Vector vectorAdd(Vector v1, Vector v2);
+Vector vectorMul(Vector v, float n);
 
 // TODO: rename to ...Inplace
 void normalizevec4(Vector* v);

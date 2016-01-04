@@ -101,20 +101,20 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
     float delta = deltaTimeSec * CAMERA_SPEED;
 
     if(glfwGetKey(cam->window, GLFW_KEY_W) == GLFW_PRESS)
-        cam->position = addvec4(cam->position, mulvec4(direction, delta));
+        cam->position = vectorAdd(cam->position, vectorMul(direction, delta));
 
     if(glfwGetKey(cam->window, GLFW_KEY_S) == GLFW_PRESS)
-        cam->position = addvec4(cam->position, mulvec4(direction, -delta));
+        cam->position = vectorAdd(cam->position, vectorMul(direction, -delta));
 
     if(glfwGetKey(cam->window, GLFW_KEY_A) == GLFW_PRESS)
-        cam->position = addvec4(cam->position, mulvec4(right, -delta));
+        cam->position = vectorAdd(cam->position, vectorMul(right, -delta));
 
     if(glfwGetKey(cam->window, GLFW_KEY_D) == GLFW_PRESS)
-        cam->position = addvec4(cam->position, mulvec4(right, delta));
+        cam->position = vectorAdd(cam->position, vectorMul(right, delta));
 
     *pOutViewMatrix = lookAt(
                             cam->position,
-                            addvec4(cam->position, direction),
+                            vectorAdd(cam->position, direction),
                             up
                         );
 }

@@ -19,7 +19,7 @@ vectorNull()
 }
 
 Vector
-addvec4(Vector v1, Vector v2)
+vectorAdd(Vector v1, Vector v2)
 {
     Vector res;
 
@@ -32,7 +32,7 @@ addvec4(Vector v1, Vector v2)
 }
 
 Vector
-mulvec4(Vector v, float n)
+vectorMul(Vector v, float n)
 {
     Vector res = v;
 
@@ -124,7 +124,7 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
     Vector axis = {{ axis_x, axis_y, axis_z, 0.0f }};
     normalizevec4(&axis);
 
-    Vector temp = mulvec4(axis, (1.0f - c));
+    Vector temp = vectorMul(axis, (1.0f - c));
     Matrix rotate = {{ 0 }};
 
     rotate.m[0*4 + 0] = c + temp.m[0] * axis.m[0];
@@ -145,10 +145,10 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
             m[i].m[j] = in->m[i*4 + j];
 
     for(int i = 0; i <= 2; i++)
-        r[i] = addvec4( addvec4(
-                    mulvec4(m[0], rotate.m[i*4 + 0]),
-                    mulvec4(m[1], rotate.m[i*4 + 1])
-                 ), mulvec4(m[2], rotate.m[i*4 + 2]));
+        r[i] = vectorAdd( vectorAdd(
+                    vectorMul(m[0], rotate.m[i*4 + 0]),
+                    vectorMul(m[1], rotate.m[i*4 + 1])
+                 ), vectorMul(m[2], rotate.m[i*4 + 2]));
     r[3] = m[3];
 
     Matrix result = {{ 0 }};
@@ -220,7 +220,7 @@ orthogonal(float left, float right, float bottom, float top)
 Matrix
 lookAt(Vector eye, Vector center, Vector up)
 {
-    Vector f = addvec4(center, mulvec4(eye, -1.0f));
+    Vector f = vectorAdd(center, vectorMul(eye, -1.0f));
     normalizevec4(&f);
 
     Vector u = up;
