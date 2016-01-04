@@ -586,7 +586,7 @@ mainInternal(CommonResources* resources)
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
 			snprintf(globStatusLineBuff, sizeof(globStatusLineBuff),
-					"FPS: %.1f, T: %u%09u, X: %.1f, Y: %.1f, Z: %.1f",
+					"FPS: %.1f, Time: %u%09u, X: %.1f, Y: %.1f, Z: %.1f",
 					fps,
 					(uint32_t)(currentTimeMs / 1000000000),
 					(uint32_t)(currentTimeMs % 1000000000),
