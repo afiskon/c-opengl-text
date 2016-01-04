@@ -345,17 +345,26 @@ mainInternal(CommonResources* resources)
 	// prepare text
 
 	static const GLfloat globVertexBufferData[] = {
-	    -1.0f, -0.9f,  -1.0f,
-	    -0.4f, -0.9f,  -1.0f,
-	    -0.7f, -0.3f,  -1.0f,
+		//  X        Y       U       V
+	    -1.0f,   -0.9f,   0.0f,   0.0f,
+	    -0.4f,   -0.9f,   1.0f,   0.0f,
+	    -0.7f,   -0.3f,   0.5f,   1.0f,
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
-    	globVertexBufferData, GL_STATIC_DRAW);
+    	globVertexBufferData, GL_DYNAMIC_DRAW);
 
     glBindVertexArray(textVAO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
+		NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
+		(const void*)(2*sizeof(GLfloat)));
+
+	GLint uniformTextTextureSample = getUniformLocation(
+			resources->textProgramId, 
+			"textureSampler"
+		);
 
 	// load models
 
@@ -426,6 +435,7 @@ mainInternal(CommonResources* resources)
 	glUseProgram(resources->programId);
 
 	glUniform1i(uniformTextureSample, 0);
+	glUniform1i(uniformTextTextureSample, 0);
 
 	setupLights(resources->programId, directionalLightEnabled, 
 		pointLightEnabled, spotLightEnabled);
@@ -663,12 +673,11 @@ mainInternal(CommonResources* resources)
 
 		glUseProgram(resources->textProgramId);
 
+		glBindTexture(GL_TEXTURE_2D, textTexture);
 	    glBindVertexArray(textVAO);
 		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-		// TODO: glUseProgram with different shaders
-		// render text (a few filled triangles first)
-
 
 		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
