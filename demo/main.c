@@ -366,14 +366,14 @@ mainInternal(CommonResources* resources)
 	loadOneColorTexture(1.0f, 0.0f, 0.0f, redTexture);
 	loadOneColorTexture(0.0f, 0.0f, 1.0f, blueTexture);
 
-	GLuint textVAO          = resources->vaoArray[ 0];
+	GLuint fontVAO          = resources->vaoArray[ 0];
 	GLuint grassVAO         = resources->vaoArray[ 1];
 	GLuint skyboxVAO        = resources->vaoArray[ 2];
 	GLuint towerVAO         = resources->vaoArray[ 3];
 	GLuint torusVAO         = resources->vaoArray[ 4];
 	GLuint sphereVAO        = resources->vaoArray[ 5];
 
-	GLuint textVBO          = resources->vboArray[ 0];
+	GLuint fontVBO          = resources->vboArray[ 0];
 	GLuint grassVBO         = resources->vboArray[ 1];
 	GLuint grassIndicesVBO  = resources->vboArray[ 2];
 	GLuint skyboxVBO        = resources->vboArray[ 3];
@@ -404,11 +404,11 @@ mainInternal(CommonResources* resources)
 	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
 	};
 
-	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
     	globVertexBufferData, GL_DYNAMIC_DRAW);
 
-    glBindVertexArray(textVAO);
+    glBindVertexArray(fontVAO);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
 		NULL);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
@@ -730,7 +730,7 @@ mainInternal(CommonResources* resources)
 		glUseProgram(resources->fontProgramId);
 
 		glBindTexture(GL_TEXTURE_2D, fontTexture);
-	    glBindVertexArray(textVAO);
+	    glBindVertexArray(fontVAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glDrawArrays(GL_TRIANGLES, 0, sizeof(globVertexBufferData) / sizeof(globVertexBufferData[0]));
