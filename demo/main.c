@@ -29,12 +29,14 @@ static const Vector CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 // [0.0, 1.0], larger - more smoothing
 #define FPS_SMOOTHING 0.95f 
 
-#define FONT_RENDER_SIZE 0.025
+#define FONT_RENDER_SIZE 0.035
 #define FONT_TEXTURE_LETTER_WIDTH_PX 32
 #define FONT_TEXTURE_LETTER_HEIGHT_PX 65
 #define FONT_TEXTURE_LETTER_NUM_IN_ROW 16
 #define FONT_TEXTURE_SIZE_PX (FONT_TEXTURE_LETTER_WIDTH_PX * \
 								FONT_TEXTURE_LETTER_NUM_IN_ROW)
+
+#define FONT_TEXTURE_COORD_DELTA 0.0035
 
 #define TEXTURES_NUM 7
 #define VAOS_NUM 6
@@ -302,8 +304,6 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 			((float)spotLightEnabled)*1.0f);
 	}
 }
-
-#define FONT_TEXTURE_COORD_DELTA 0.0035;
 
 inline static float
 fontTextureCoordULeft(char c)
