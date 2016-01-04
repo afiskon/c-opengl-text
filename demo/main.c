@@ -398,7 +398,10 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			printf("FPS: %f, T: %u%09u, X: %f, Y: %f, Z: %f\n",
+			// usually about 53 chars is enough, using 128 just to be safe
+			char buff[128]; 
+			snprintf(buff, sizeof(buff),
+					"FPS: %.1f, T: %u%09u, X: %.1f, Y: %.1f, Z: %.1f\n",
 					fps,
 					(uint32_t)(currentTimeMs / 1000000000),
 					(uint32_t)(currentTimeMs % 1000000000),
@@ -406,6 +409,8 @@ mainInternal(CommonResources* resources)
 					cameraPos.m[1],
 					cameraPos.m[2]
 				);
+			printf("%s", buff);
+
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
 
