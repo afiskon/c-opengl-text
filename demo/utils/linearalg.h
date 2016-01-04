@@ -14,7 +14,7 @@ typedef struct Matrix
 
 typedef union Vector
 {
-    float m[4];
+    float v[4];
     struct {
         float x, y, z, w;
     };

@@ -152,7 +152,7 @@ matrixMulVec(const Matrix* m, const Vector* v)
 {
     Vector out;
     for(int i = 0; i < 4; ++i) {
-        out.m[i] =
+        out.v[i] =
             (v->x * m->m[0*4 + i]) +
             (v->y * m->m[1*4 + i]) +
             (v->z * m->m[2*4 + i]) +
@@ -209,7 +209,7 @@ matrixRotate(const Matrix* in, float angle,
     Vector r[4], m[4];
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++)
-            m[i].m[j] = in->m[i*4 + j];
+            m[i].v[j] = in->m[i*4 + j];
 
     for(int i = 0; i <= 2; i++)
         r[i] = vectorAdd( vectorAdd(
@@ -221,7 +221,7 @@ matrixRotate(const Matrix* in, float angle,
     Matrix result = {{ 0 }};
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++)
-            result.m[i*4 + j] = r[i].m[j];
+            result.m[i*4 + j] = r[i].v[j];
 
     return result;
 }
