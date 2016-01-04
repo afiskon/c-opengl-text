@@ -24,7 +24,7 @@ static const Vector CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 // [0.0, 1.0], larger - more smoothing
 #define FPS_SMOOTHING 0.95f 
 
-#define TEXTURES_NUM 6
+#define TEXTURES_NUM 7
 #define VAOS_NUM 6
 #define VBOS_NUM 11
 
@@ -296,12 +296,16 @@ mainInternal(CommonResources* resources)
 {
 	// load textures
 
-	GLuint grassTexture = resources->textureArray[0];
-	GLuint skyboxTexture = resources->textureArray[1];
-	GLuint towerTexture = resources->textureArray[2];
-	GLuint garkGreenTexture = resources->textureArray[3];
-	GLuint redTexture = resources->textureArray[4];
-	GLuint blueTexture = resources->textureArray[5];
+	GLuint textTexture      = resources->textureArray[0];
+	GLuint grassTexture     = resources->textureArray[1];
+	GLuint skyboxTexture    = resources->textureArray[2];
+	GLuint towerTexture     = resources->textureArray[3];
+	GLuint garkGreenTexture = resources->textureArray[4];
+	GLuint redTexture       = resources->textureArray[5];
+	GLuint blueTexture      = resources->textureArray[6];
+
+	if(!loadDDSTexture("textures/text.dds", textTexture))
+		return -1;
 
 	if(!loadDDSTexture("textures/grass.dds", grassTexture))
 		return -1;
