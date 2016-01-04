@@ -341,9 +341,9 @@ mainInternal(CommonResources* resources)
 	// prepare text
 
 	static const GLfloat globVertexBufferData[] = {
-	    -1.0f, -1.0f,  0.0f,
-	     1.0f, -1.0f,  0.0f,
-	     0.0f,  1.0f,  0.0f,
+	    -0.5f, -0.5f,  -1.0f,
+	     0.5f, -0.5f,  -1.0f,
+	     0.0f,  0.5f,  -1.0f,
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
@@ -380,7 +380,7 @@ mainInternal(CommonResources* resources)
 		&sphereIndicesNumber, &sphereIndexType))
 		return -1;
 
-	Matrix projection = matrixPerspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
+	Matrix projection = matrixPerspective(70.0f, 4.0f / 3.0f, 1.0f, 250.0f);
 
 	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
 	GLint uniformM = getUniformLocation(resources->programId, "M");
@@ -412,17 +412,20 @@ mainInternal(CommonResources* resources)
 	glDepthFunc(GL_LESS);
 	glClearColor(0, 0, 0, 1);
 
-	glUseProgram(resources->programId);
-
-	glUniform1i(uniformTextureSample, 0);
-
 	bool directionalLightEnabled = true;
 	bool pointLightEnabled = true;
 	bool spotLightEnabled = true;
 	bool wireframesModeEnabled = false;
 
+	// setup lights before main loop
+
+	glUseProgram(resources->programId);
+
+	glUniform1i(uniformTextureSample, 0);
+
 	setupLights(resources->programId, directionalLightEnabled, 
 		pointLightEnabled, spotLightEnabled);
+
 
 	uint64_t startTimeMs = getCurrentTimeMs();
 	uint64_t currentTimeMs = startTimeMs;
@@ -435,6 +438,8 @@ mainInternal(CommonResources* resources)
 	{
 		if(glfwGetKey(resources->window, GLFW_KEY_Q) == GLFW_PRESS)
 			break;
+
+		glUseProgram(resources->programId);
 
 		currentTimeMs = getCurrentTimeMs();
 
@@ -652,8 +657,14 @@ mainInternal(CommonResources* resources)
 				sphereIndexType, NULL);
 		}
 
+		glUseProgram(resources->textProgramId);
+
+	    glBindVertexArray(textVAO);
+		glEnableVertexAttribArray(0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		// TODO: glUseProgram with different shaders
 		// render text (a few filled triangles first)
+
 
 		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
