@@ -464,7 +464,7 @@ mainInternal(CommonResources* resources)
 		Matrix view;
 		cameraGetViewMatrix(resources->camera, prevDeltaTimeMs, &view);
 
-		Matrix vp = multiplymat4(&view, &projection);
+		Matrix vp = matrixMulMat(&view, &projection);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -475,9 +475,9 @@ mainInternal(CommonResources* resources)
 		Matrix tempTowerM = matrixIdentity();
 		Matrix towerM = rotate(&tempTowerM, islandAngle, 0.0f, 1.0f, 0.0f);
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
-		towerM = multiplymat4(&tempTowerM, &towerM);
+		towerM = matrixMulMat(&tempTowerM, &towerM);
 
-		Matrix towerMVP = multiplymat4(&towerM, &vp);
+		Matrix towerMVP = matrixMulMat(&towerM, &vp);
 
 		glBindTexture(GL_TEXTURE_2D, towerTexture);
 		glBindVertexArray(towerVAO);
@@ -497,9 +497,9 @@ mainInternal(CommonResources* resources)
 		Matrix torusM = rotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
 							0.0f, 1.0f, 0.0f);
 		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
-		torusM = multiplymat4(&tempTorusM, &torusM);
+		torusM = matrixMulMat(&tempTorusM, &torusM);
 
-		Matrix torusMVP = multiplymat4(&torusM, &vp);
+		Matrix torusMVP = matrixMulMat(&torusM, &vp);
 
 		glBindTexture(GL_TEXTURE_2D, garkGreenTexture);
 		glBindVertexArray(torusVAO);
@@ -517,9 +517,9 @@ mainInternal(CommonResources* resources)
 		Matrix tempGrassM = matrixIdentity();
 		Matrix grassM = rotate(&tempGrassM, islandAngle, 0.0f, 1.0f, 0.0f);
 		translate(&tempGrassM, 0.0f, -1.0f, 0.0f);
-		grassM = multiplymat4(&tempGrassM, &grassM);
+		grassM = matrixMulMat(&tempGrassM, &grassM);
 
-		Matrix grassMVP = multiplymat4(&grassM, &vp);
+		Matrix grassMVP = matrixMulMat(&grassM, &vp);
 
 		glBindTexture(GL_TEXTURE_2D, grassTexture);
 		glBindVertexArray(grassVAO);
@@ -539,9 +539,9 @@ mainInternal(CommonResources* resources)
 		translate(&skyboxM,
 			cameraPos.m[0], cameraPos.m[1], cameraPos.m[2]);
 		scale(&tempSkyboxM, 100.0f, 100.0f, 100.0f);
-		skyboxM = multiplymat4(&tempSkyboxM, &skyboxM);
+		skyboxM = matrixMulMat(&tempSkyboxM, &skyboxM);
 
-		Matrix skyboxMVP = multiplymat4(&skyboxM, &vp);
+		Matrix skyboxMVP = matrixMulMat(&skyboxM, &vp);
 
 		glBindTexture(GL_TEXTURE_2D, skyboxTexture);
 		glBindVertexArray(skyboxVAO);
@@ -558,7 +558,7 @@ mainInternal(CommonResources* resources)
 		if(pointLightEnabled) {
 			Matrix pointLightM = matrixIdentity();
 			translate(&pointLightM, POINT_LIGHT_POS.m[0], POINT_LIGHT_POS.m[1], POINT_LIGHT_POS.m[2]);
-			Matrix pointLightMVP = multiplymat4(&pointLightM, &vp);
+			Matrix pointLightMVP = matrixMulMat(&pointLightM, &vp);
 
 			glBindTexture(GL_TEXTURE_2D, redTexture);
 			glBindVertexArray(sphereVAO);
@@ -576,7 +576,7 @@ mainInternal(CommonResources* resources)
 		if(spotLightEnabled) {
 			Matrix spotLightM = matrixIdentity();
 			translate(&spotLightM, SPOT_LIGHT_POS.m[0], SPOT_LIGHT_POS.m[1], SPOT_LIGHT_POS.m[2]);
-			Matrix spotLightMVP = multiplymat4(&spotLightM, &vp);
+			Matrix spotLightMVP = matrixMulMat(&spotLightM, &vp);
 
 			glBindTexture(GL_TEXTURE_2D, blueTexture);
 			glBindVertexArray(sphereVAO);

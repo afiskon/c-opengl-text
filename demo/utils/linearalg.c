@@ -162,15 +162,15 @@ matrixMulVec(const Matrix* m, const Vector* v)
     return out;
 }
 
-// NOTE: What in GLM is m1 * m2 is multiplymat4(m2, m1)
+// NOTE: What in GLM is m1 * m2 is matrixMulMat(m2, m1)
 Matrix
-multiplymat4(const Matrix* m1, const Matrix* m2)
+matrixMulMat(const Matrix* m1, const Matrix* m2)
 {
     Matrix out = matrixIdentity();
     unsigned int row, column, row_offset;
 
-    for (row = 0, row_offset = row * 4; row < 4; ++row, row_offset = row * 4)
-        for (column = 0; column < 4; ++column)
+    for(row = 0, row_offset = row * 4; row < 4; ++row, row_offset = row * 4)
+        for(column = 0; column < 4; column++)
             out.m[row_offset + column] =
                 (m1->m[row_offset + 0] * m2->m[column + 0]) +
                 (m1->m[row_offset + 1] * m2->m[column + 4]) +
@@ -236,7 +236,7 @@ scale(Matrix* m, float x, float y, float z)
     scale.m[5] = y;
     scale.m[10] = z;
 
-    memcpy(m->m, multiplymat4(m, &scale).m, sizeof(m->m));
+    memcpy(m->m, matrixMulMat(m, &scale).m, sizeof(m->m));
 }
 
 void
@@ -249,5 +249,5 @@ translate(Matrix* m, float x, float y, float z)
     translation.m[13] = y;
     translation.m[14] = z;
 
-    memcpy(m->m, multiplymat4(m, &translation).m, sizeof(m->m));
+    memcpy(m->m, matrixMulMat(m, &translation).m, sizeof(m->m));
 }
