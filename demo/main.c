@@ -12,6 +12,9 @@
 #include "utils/camera.h"
 #include "utils/models.h"
 
+// usually about 53 chars is enough, using 128 to be safe
+static char STATUS_LINE_BUFF[128]; 
+
 static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
 static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
 static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
@@ -398,9 +401,7 @@ mainInternal(CommonResources* resources)
 		// don't update fps to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			// usually about 53 chars is enough, using 128 just to be safe
-			char buff[128]; 
-			snprintf(buff, sizeof(buff),
+			snprintf(STATUS_LINE_BUFF, sizeof(STATUS_LINE_BUFF),
 					"FPS: %.1f, T: %u%09u, X: %.1f, Y: %.1f, Z: %.1f\n",
 					fps,
 					(uint32_t)(currentTimeMs / 1000000000),
@@ -409,7 +410,7 @@ mainInternal(CommonResources* resources)
 					cameraPos.m[1],
 					cameraPos.m[2]
 				);
-			printf("%s", buff);
+			printf("%s", STATUS_LINE_BUFF);
 
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
