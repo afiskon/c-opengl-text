@@ -25,8 +25,8 @@ static const Vector CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 #define FPS_SMOOTHING 0.95f 
 
 #define TEXTURES_NUM 6
-#define VAOS_NUM 5
-#define VBOS_NUM 10
+#define VAOS_NUM 6
+#define VBOS_NUM 11
 
 typedef struct
 {
@@ -321,22 +321,24 @@ mainInternal(CommonResources* resources)
 
 	// load models
 
-	GLuint grassVAO = resources->vaoArray[0];
-	GLuint skyboxVAO = resources->vaoArray[1];
-	GLuint towerVAO = resources->vaoArray[2];
-	GLuint torusVAO = resources->vaoArray[3];
-	GLuint sphereVAO = resources->vaoArray[4];
+	// GLuint textVAO          = resources->vaoArray[ 0];
+	GLuint grassVAO         = resources->vaoArray[ 1];
+	GLuint skyboxVAO        = resources->vaoArray[ 2];
+	GLuint towerVAO         = resources->vaoArray[ 3];
+	GLuint torusVAO         = resources->vaoArray[ 4];
+	GLuint sphereVAO        = resources->vaoArray[ 5];
 
-	GLuint grassVBO = resources->vboArray[0];
-	GLuint grassIndicesVBO = resources->vboArray[1];
-	GLuint skyboxVBO = resources->vboArray[2];
-	GLuint skyboxIndicesVBO = resources->vboArray[3];
-	GLuint towerVBO = resources->vboArray[4];
-	GLuint towerIndicesVBO = resources->vboArray[5];
-	GLuint torusVBO = resources->vboArray[6];
-	GLuint torusIndicesVBO = resources->vboArray[7];
-	GLuint sphereVBO = resources->vboArray[8];
-	GLuint sphereIndicesVBO = resources->vboArray[9];
+	// GLuint textVBO          = resources->vboArray[ 0];
+	GLuint grassVBO         = resources->vboArray[ 1];
+	GLuint grassIndicesVBO  = resources->vboArray[ 2];
+	GLuint skyboxVBO        = resources->vboArray[ 3];
+	GLuint skyboxIndicesVBO = resources->vboArray[ 4];
+	GLuint towerVBO         = resources->vboArray[ 5];
+	GLuint towerIndicesVBO  = resources->vboArray[ 6];
+	GLuint torusVBO         = resources->vboArray[ 7];
+	GLuint torusIndicesVBO  = resources->vboArray[ 8];
+	GLuint sphereVBO        = resources->vboArray[ 9];
+	GLuint sphereIndicesVBO = resources->vboArray[10];
 
 	GLsizei grassIndicesNumber, skyboxIndicesNumber, towerIndicesNumber,
 		torusIndicesNumber, sphereIndicesNumber;
