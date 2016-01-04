@@ -346,9 +346,9 @@ mainInternal(CommonResources* resources)
 
 	static const GLfloat globVertexBufferData[] = {
 		//  X        Y       U       V
-	    -1.0f,   -0.9f,   0.0f,   0.0f,
-	    -0.4f,   -0.9f,   1.0f,   0.0f,
-	    -0.7f,   -0.3f,   0.5f,   1.0f,
+	    -1.0f,   -0.9f,   U(0.0f),   V(0.0f),
+	    -0.4f,   -0.9f,   U(1.0f),   V(0.0f),
+	    -0.7f,   -0.3f,   U(0.5f),   V(1.0f),
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);

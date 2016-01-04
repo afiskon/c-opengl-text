@@ -5,4 +5,8 @@
 
 #define UNUSED(x) (void)(x)
 
+#define U(x) (x)
+
+#define V(x) (1.0f - (x))
+
 #endif // AFISKON_DEFINITIONS_H
