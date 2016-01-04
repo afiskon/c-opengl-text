@@ -30,8 +30,7 @@ Vector vectorCross(Vector v1, Vector v2);
 Matrix matrixIdentity();
 Matrix matrixPerspective(float fovy, float aspect, float zNear, float zFar);
 Matrix matrixOrthogonal(float left, float right, float bottom, float top);
-
-Matrix lookAt(Vector eye, Vector center, Vector up);
+Matrix matrixLookAt(Vector eye, Vector center, Vector up);
 
 Vector mulmatvec4(const Matrix* m, const Vector* v);
 Matrix multiplymat4(const Matrix* m1, const Matrix* m2);

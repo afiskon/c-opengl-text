@@ -112,7 +112,7 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
     if(glfwGetKey(cam->window, GLFW_KEY_D) == GLFW_PRESS)
         cam->position = vectorAdd(cam->position, vectorMul(right, delta));
 
-    *pOutViewMatrix = lookAt(
+    *pOutViewMatrix = matrixLookAt(
                             cam->position,
                             vectorAdd(cam->position, direction),
                             up

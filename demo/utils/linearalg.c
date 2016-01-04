@@ -114,6 +114,39 @@ matrixOrthogonal(float left, float right, float bottom, float top)
     return out;
 }
 
+Matrix
+matrixLookAt(Vector eye, Vector center, Vector up)
+{
+    Vector f = vectorAdd(center, vectorMul(eye, -1.0f));
+    vectorNormalizeInplace(&f);
+
+    Vector u = up;
+    vectorNormalizeInplace(&u);
+
+    Vector s = vectorCross(f, u);
+    vectorNormalizeInplace(&s);
+    u = vectorCross(s, f);
+
+    Matrix out = matrixIdentity();
+
+    out.m[0*4 + 0] = s.x;
+    out.m[1*4 + 0] = s.y;
+    out.m[2*4 + 0] = s.z;
+
+    out.m[0*4 + 1] = u.x;
+    out.m[1*4 + 1] = u.y;
+    out.m[2*4 + 1] = u.z;
+
+    out.m[0*4 + 2] = -f.x;
+    out.m[1*4 + 2] = -f.y;
+    out.m[2*4 + 2] = -f.z;
+
+    out.m[3*4 + 0] = -vectorDot(s, eye);
+    out.m[3*4 + 1] = -vectorDot(u, eye);
+    out.m[3*4 + 2] =  vectorDot(f, eye);
+    return out;
+}
+
 // WARNING! What in GLM is m1 * m2 is multiplymat4(m2, m1)
 Matrix
 multiplymat4(const Matrix* m1, const Matrix* m2)
@@ -218,38 +251,4 @@ translate(Matrix* m, float x, float y, float z)
     translation.m[14] = z;
 
     memcpy(m->m, multiplymat4(m, &translation).m, sizeof(m->m));
-}
-
-Matrix
-lookAt(Vector eye, Vector center, Vector up)
-{
-    Vector f = vectorAdd(center, vectorMul(eye, -1.0f));
-    vectorNormalizeInplace(&f);
-
-    Vector u = up;
-    vectorNormalizeInplace(&u);
-
-    Vector s = vectorCross(f, u);
-    vectorNormalizeInplace(&s);
-    u = vectorCross(s, f);
-
-    Matrix out = matrixIdentity();
-
-    // TODO: use 4*i + j
-    out.m[0] = s.x;
-    out.m[4] = s.y;
-    out.m[8] = s.z;
-
-    out.m[1] = u.x;
-    out.m[5] = u.y;
-    out.m[9] = u.z;
-
-    out.m[2] = -f.x;
-    out.m[6] = -f.y;
-    out.m[10] = -f.z;
-
-    out.m[12] = -vectorDot(s, eye);
-    out.m[13] = -vectorDot(u, eye);
-    out.m[14] =  vectorDot(f, eye);
-    return out;
 }
