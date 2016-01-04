@@ -291,6 +291,54 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 }
 
+
+// TODO: rename text.dds, textTexture, etc to font.dds, fontTexture, ...
+#define FONT_TEXTURE_LETTER_WIDTH_PX 32
+#define FONT_TEXTURE_LETTER_HEIGHT_PX 65
+#define FONT_TEXTURE_LETTER_NUM_IN_ROW 16
+#define FONT_TEXTURE_SIZE_PX (FONT_TEXTURE_LETTER_WIDTH_PX * \
+								FONT_TEXTURE_LETTER_NUM_IN_ROW)
+
+inline float
+FONT_TEXTURE_CHAR_COORD_U_LEFT(char c)
+{
+	int colNum = ((int)(c - ' ')) % FONT_TEXTURE_LETTER_NUM_IN_ROW;
+	float coord = (float)colNum * FONT_TEXTURE_LETTER_WIDTH_PX
+					/ FONT_TEXTURE_SIZE_PX;
+	// printf("char = %c, left colNum = %d, coord = %f\n", c, colNum, coord);
+	return coord;
+}
+
+inline float 
+FONT_TEXTURE_CHAR_COORD_U_RIGHT(char c)
+{
+	int colNum = 1 + ((int)(c - ' ')) % FONT_TEXTURE_LETTER_NUM_IN_ROW;
+	float coord = (float)colNum * FONT_TEXTURE_LETTER_WIDTH_PX
+					/ FONT_TEXTURE_SIZE_PX;
+	// printf("char = %c, right colNum = %d, coord = %f\n", c, colNum, coord);
+	return coord;
+}
+
+inline float 
+FONT_TEXTURE_CHAR_COORD_V_TOP(char c)
+{
+	int rowNum = ((int)(c - ' ')) / FONT_TEXTURE_LETTER_NUM_IN_ROW;
+	float coord = (float)rowNum * FONT_TEXTURE_LETTER_HEIGHT_PX
+					/ FONT_TEXTURE_SIZE_PX;
+	// printf("char = %c, top rowNum = %d, coord = %f\n", c, rowNum, coord);
+	return coord; // no correction for V coordinate required
+}
+
+inline float 
+FONT_TEXTURE_CHAR_COORD_V_BOTTOM(char c)
+{
+	int rowNum = 1 + ((int)(c - ' ')) / FONT_TEXTURE_LETTER_NUM_IN_ROW;
+	float coord = (float)rowNum * FONT_TEXTURE_LETTER_HEIGHT_PX
+					/ FONT_TEXTURE_SIZE_PX;
+	// printf("char = %c, bottom rowNum = %d, coord = %f\n", c, rowNum, coord);
+	return coord; // no correction for V coordinate required
+}
+
 static int
 mainInternal(CommonResources* resources)
 {
@@ -344,13 +392,25 @@ mainInternal(CommonResources* resources)
 
 	// prepare text
 
-	static const GLfloat globVertexBufferData[] = {
+	const GLfloat globVertexBufferData[] = {
     //     X       Y          U          V
-	    0.0f,   0.0f,   U(0.0f),   V(0.0f),
-	    0.2f,   0.0f,   U(1.0f),   V(0.0f),
-	    0.1f,   0.2f,   U(0.5f),   V(1.0f),
+	    0.0f,   0.0f,   FONT_TEXTURE_CHAR_COORD_U_LEFT('A'),   FONT_TEXTURE_CHAR_COORD_V_BOTTOM('A'),
+	    0.2f,   0.0f,   FONT_TEXTURE_CHAR_COORD_U_RIGHT('A'),   FONT_TEXTURE_CHAR_COORD_V_BOTTOM('A'),
+	    0.2f,   0.2f,   FONT_TEXTURE_CHAR_COORD_U_RIGHT('A'),   FONT_TEXTURE_CHAR_COORD_V_TOP('A'),
 	};
 
+/*
+	printf("--------------------------------\n");
+	for(char c = 'M'; c <= 'R'; c++)
+	{
+		FONT_TEXTURE_CHAR_COORD_U_LEFT(c);
+		FONT_TEXTURE_CHAR_COORD_U_RIGHT(c);
+		FONT_TEXTURE_CHAR_COORD_V_BOTTOM(c);
+		FONT_TEXTURE_CHAR_COORD_V_TOP(c);
+	}
+	printf("--------------------------------\n");
+*/
+	
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
     	globVertexBufferData, GL_DYNAMIC_DRAW);
