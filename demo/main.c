@@ -388,13 +388,20 @@ mainInternal(CommonResources* resources)
 	// prepare text
 
 	const GLfloat globVertexBufferData[] = {
-    //  X     Y     U                            V
-	0.00f, 0.00f, fontTextureCoordULeft('A'),  fontTextureCoordVBottom('A'),
-	0.03f, 0.00f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
-	0.03f, 0.06f, fontTextureCoordURight('A'), fontTextureCoordVTop('A'),
-	0.03f, 0.06f, fontTextureCoordURight('A'), fontTextureCoordVTop('A'),
-	0.00f, 0.06f, fontTextureCoordULeft('A'),  fontTextureCoordVTop('A'),
-	0.00f, 0.00f, fontTextureCoordULeft('A'),  fontTextureCoordVBottom('A'),
+ 	//   X       Y                           U                             V
+	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
+	0.025f, 0.000f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
+	0.025f, 0.050f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
+	0.025f, 0.050f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
+	0.000f, 0.050f, fontTextureCoordULeft( 'A'), fontTextureCoordVTop(   'A'),
+	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
+
+	0.025f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
+	0.050f, 0.000f, fontTextureCoordURight('B'), fontTextureCoordVBottom('B'),
+	0.050f, 0.050f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
+	0.050f, 0.050f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
+	0.025f, 0.050f, fontTextureCoordULeft( 'B'), fontTextureCoordVTop(   'B'),
+	0.025f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
@@ -726,7 +733,7 @@ mainInternal(CommonResources* resources)
 	    glBindVertexArray(textVAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(globVertexBufferData) / sizeof(globVertexBufferData[0]));
 
 		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
