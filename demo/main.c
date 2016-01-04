@@ -33,6 +33,7 @@ typedef struct
 	bool windowInitialized;
 	bool cameraInitialized;
 	bool programIdInitialized;
+	bool textProgramIdInitialized;
 	bool textureArrayInitialized;
 	bool vaoArrayInitialized;
 	bool vboArrayInitialized;
@@ -40,6 +41,7 @@ typedef struct
 	GLFWwindow* window;
 	Camera* camera;
 	GLuint programId;
+	GLuint textProgramId;
 	GLuint textureArray[TEXTURES_NUM];
 	GLuint vaoArray[VAOS_NUM];
 	GLuint vboArray[VBOS_NUM];
@@ -127,7 +129,8 @@ commonResourcesCreate(CommonResources* resources)
 	// vertexShader, fragmentShader
 	GLuint shaders[2];
 
-	shaders[0] = loadShader("shaders/vertexShader.glsl", GL_VERTEX_SHADER,
+	shaders[0] = loadShader("shaders/vertexShader.glsl",
+		GL_VERTEX_SHADER,
 		&errorFlag);
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load vertex shader (invalid working "
@@ -135,7 +138,8 @@ commonResourcesCreate(CommonResources* resources)
 		return -1;
 	}
 
-	shaders[1] = loadShader("shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER,
+	shaders[1] = loadShader("shaders/fragmentShader.glsl",
+		GL_FRAGMENT_SHADER,
 		&errorFlag);
 	if(errorFlag) {
 		fprintf(stderr, "Failed to load fragment shader (invalid working "
@@ -156,6 +160,40 @@ commonResourcesCreate(CommonResources* resources)
 	}
 
 	resources->programIdInitialized = true;
+
+	// initialize textProgramId
+
+	shaders[0] = loadShader("shaders/textVertexShader.glsl",
+		GL_VERTEX_SHADER,
+		&errorFlag);
+	if(errorFlag) {
+		fprintf(stderr, "Failed to load text vertex shader (invalid working "
+			"directory?)\n");
+		return -1;
+	}
+
+	shaders[1] = loadShader("shaders/textFragmentShader.glsl",
+		GL_FRAGMENT_SHADER,
+		&errorFlag);
+	if(errorFlag) {
+		fprintf(stderr, "Failed to load text fragment shader (invalid working "
+			"directory?)\n");
+		glDeleteShader(shaders[0]);
+		return -1;
+	}
+
+	resources->textProgramId = prepareProgram(
+		shaders, sizeof(shaders)/sizeof(shaders[0]), &errorFlag);
+
+	glDeleteShader(shaders[1]);
+	glDeleteShader(shaders[0]);
+
+	if(errorFlag) {
+		fprintf(stderr, "Failed to prepare text program\n");
+		return -1;
+	}
+
+	resources->textProgramIdInitialized = true;
 
 	// initialize textureArray
 	glGenTextures(TEXTURES_NUM, resources->textureArray);
@@ -183,6 +221,9 @@ commonResourcesDestroy(CommonResources* resources)
 
 	if(resources->programIdInitialized)
 		glDeleteProgram(resources->programId);
+
+	if(resources->textProgramIdInitialized)
+		glDeleteProgram(resources->textProgramId);
 
 	if(resources->textureArrayInitialized)
 		glDeleteTextures(TEXTURES_NUM, resources->textureArray);
