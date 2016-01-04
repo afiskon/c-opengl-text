@@ -12,6 +12,13 @@ static const Matrix IDENTITY_MATRIX =
 }};
 
 Vector
+vectorNull()
+{
+    Vector res = {{ 0 }};
+    return res;
+}
+
+Vector
 addvec4(Vector v1, Vector v2)
 {
     Vector res;
@@ -107,53 +114,6 @@ crossvec4(Vector v1, Vector v2)
     return out;
 }
 
-/*
-void
-rotateX(Matrix* m, float angle)
-{
-    Matrix rotation = IDENTITY_MATRIX;
-    float sine = (float)sin(angle);
-    float cosine = (float)cos(angle);
-    
-    rotation.m[5] = cosine;
-    rotation.m[6] = -sine;
-    rotation.m[9] = sine;
-    rotation.m[10] = cosine;
-
-    memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
-}
-
-void
-rotateY(Matrix* m, float angle)
-{
-    Matrix rotation = IDENTITY_MATRIX;
-    float sine = (float)sin(angle);
-    float cosine = (float)cos(angle);
-    
-    rotation.m[0] = cosine;
-    rotation.m[8] = sine;
-    rotation.m[2] = -sine;
-    rotation.m[10] = cosine;
-
-    memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
-}
-
-void
-rotateZ(Matrix* m, float angle)
-{
-    Matrix rotation = IDENTITY_MATRIX;
-    float sine = (float)sin(angle);
-    float cosine = (float)cos(angle);
-    
-    rotation.m[0] = cosine;
-    rotation.m[1] = -sine;
-    rotation.m[4] = sine;
-    rotation.m[5] = cosine;
-
-    memcpy(m->m, multiplymat4(m, &rotation).m, sizeof(m->m));
-}
-*/
-
 Matrix
 rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
 {
@@ -179,7 +139,6 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
     rotate.m[2*4 + 1] = 0 + temp.m[2] * axis.m[1] - s * axis.m[0];
     rotate.m[2*4 + 2] = c + temp.m[2] * axis.m[2];
 
-    // TODO: try to optimize
     Vector r[4], m[4];
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++)
