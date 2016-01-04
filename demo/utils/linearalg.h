@@ -37,9 +37,7 @@ Vector matrixMulVec(const Matrix* m, const Vector* v);
 Matrix matrixMulMat(const Matrix* m1, const Matrix* m2);
 Matrix matrixRotate(const Matrix* m, float angle,
 	float axis_x, float axis_y, float axis_z);
-
-// TODO: rename to ...Inplace
-void scale(Matrix* m, float x, float y, float z);
+void matrixScaleInplace(Matrix* m, float x, float y, float z);
 
 // TODO: rename to ...Inplace
 void translate(Matrix* m, float x, float y, float z);

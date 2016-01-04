@@ -228,14 +228,13 @@ matrixRotate(const Matrix* in, float angle,
 }
 
 void
-scale(Matrix* m, float x, float y, float z)
+matrixScaleInplace(Matrix* m, float x, float y, float z)
 {
     Matrix scale = matrixIdentity();
 
-    // TODO: use 4*i + j
-    scale.m[0] = x;
-    scale.m[5] = y;
-    scale.m[10] = z;
+    scale.m[0*4 + 0] = x;
+    scale.m[1*4 + 1] = y;
+    scale.m[2*4 + 2] = z;
 
     memcpy(m->m, matrixMulMat(m, &scale).m, sizeof(m->m));
 }

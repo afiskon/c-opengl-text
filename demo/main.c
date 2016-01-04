@@ -540,7 +540,7 @@ mainInternal(CommonResources* resources)
 		Matrix skyboxM = matrixIdentity();
 		translate(&skyboxM,
 			cameraPos.m[0], cameraPos.m[1], cameraPos.m[2]);
-		scale(&tempSkyboxM, 100.0f, 100.0f, 100.0f);
+		matrixScaleInplace(&tempSkyboxM, 100.0f, 100.0f, 100.0f);
 		skyboxM = matrixMulMat(&tempSkyboxM, &skyboxM);
 
 		Matrix skyboxMVP = matrixMulMat(&skyboxM, &vp);
