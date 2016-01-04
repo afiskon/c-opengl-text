@@ -1,10 +1,6 @@
 #include <GLXW/glxw.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-
-// keep this, required by glxw header files on windows (it's probably a bug)
-// #include <stdlib.h>
-
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
