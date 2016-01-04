@@ -322,7 +322,7 @@ mainInternal(CommonResources* resources)
 		&sphereIndicesNumber, &sphereIndexType))
 		return -1;
 
-	Matrix projection = perspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
+	Matrix projection = matrixPerspective(70.0f, 4.0f / 3.0f, 0.3f, 250.0f);
 
 	GLint uniformMVP = getUniformLocation(resources->programId, "MVP");
 	GLint uniformM = getUniformLocation(resources->programId, "M");

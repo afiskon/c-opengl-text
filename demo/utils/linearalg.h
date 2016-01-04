@@ -28,7 +28,9 @@ float vectorDot(Vector v1, Vector v2);
 Vector vectorCross(Vector v1, Vector v2);
 
 Matrix matrixIdentity();
-Matrix perspective(float fovy, float aspect, float zNear, float zFar);
+Matrix matrixPerspective(float fovy, float aspect, float zNear, float zFar);
+
+
 Matrix orthogonal(float left, float right, float bottom, float top);
 Matrix lookAt(Vector eye, Vector center, Vector up);
 

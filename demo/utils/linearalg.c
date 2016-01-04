@@ -76,6 +76,27 @@ matrixIdentity()
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f,
     }};
+
+    return out;
+}
+
+Matrix
+matrixPerspective(float fovy, float aspect, float zNear, float zFar)
+{
+    Matrix out = {{ 0 }};
+
+    // range = tan(radians(fovy / 2)) * zNear;
+    float range = tan(M_PI * (fovy / (2.0f * 180.f))) * zNear;    
+    float left = -range * aspect;
+    float right = range * aspect;
+    float bottom = -range;
+    float top = range;
+
+    out.m[0*4 + 0] = (2.0f * zNear) / (right - left);
+    out.m[1*4 + 1] = (2.0f * zNear) / (top - bottom);
+    out.m[2*4 + 2] = - (zFar + zNear) / (zFar - zNear);
+    out.m[2*4 + 3] = - 1.0f;
+    out.m[3*4 + 2] = - (2.0f * zFar * zNear) / (zFar - zNear);
     
     return out;
 }
@@ -184,28 +205,6 @@ translate(Matrix* m, float x, float y, float z)
     translation.m[14] = z;
 
     memcpy(m->m, multiplymat4(m, &translation).m, sizeof(m->m));
-}
-
-Matrix
-perspective(float fovy, float aspect, float zNear, float zFar)
-{
-    Matrix out = {{ 0 }};
-
-    // range = tan(radians(fovy / 2)) * zNear;
-    float range = tan(M_PI * (fovy / (2.0f * 180.f))) * zNear;    
-    float left = -range * aspect;
-    float right = range * aspect;
-    float bottom = -range;
-    float top = range;
-
-    // TODO: use 4*i + j
-    out.m[0] = (2.0f * zNear) / (right - left);
-    out.m[5] = (2.0f * zNear) / (top - bottom);
-    out.m[10] = - (zFar + zNear) / (zFar - zNear);
-    out.m[11] = - 1.0f;
-    out.m[14] = - (2.0f * zFar * zNear) / (zFar - zNear);
-    
-    return out;
 }
 
 Matrix
