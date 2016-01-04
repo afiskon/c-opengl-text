@@ -97,7 +97,7 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
             0.0f
         }};
 
-    Vector up = crossvec4(right, direction);
+    Vector up = vectorCross(right, direction);
     float delta = deltaTimeSec * CAMERA_SPEED;
 
     if(glfwGetKey(cam->window, GLFW_KEY_W) == GLFW_PRESS)

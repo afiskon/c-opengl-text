@@ -63,6 +63,18 @@ vectorDot(Vector v1, Vector v2)
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 }
 
+Vector
+vectorCross(Vector v1, Vector v2)
+{
+    Vector out = {{
+        v1.y*v2.z - v1.z*v2.y,
+        v1.z*v2.x - v1.x*v2.z,
+        v1.x*v2.y - v1.y*v2.x,
+        0.0f
+    }};
+    return out;
+}
+
 Matrix
 identitymat()
 {
@@ -101,17 +113,6 @@ mulmatvec4(const Matrix* m, const Vector* v)
             (v->m[3] * m->m[i + 12]);
     }
 
-    return out;
-}
-
-Vector
-crossvec4(Vector v1, Vector v2)
-{
-    // TODO: use .x, .y, .z
-    Vector out = {{ 0 }};
-    out.m[0] = v1.m[1]*v2.m[2] - v1.m[2]*v2.m[1];
-    out.m[1] = v1.m[2]*v2.m[0] - v1.m[0]*v2.m[2];
-    out.m[2] = v1.m[0]*v2.m[1] - v1.m[1]*v2.m[0];
     return out;
 }
 
@@ -232,9 +233,9 @@ lookAt(Vector eye, Vector center, Vector up)
     Vector u = up;
     vectorNormalizeInplace(&u);
 
-    Vector s = crossvec4(f, u);
+    Vector s = vectorCross(f, u);
     vectorNormalizeInplace(&s);
-    u = crossvec4(s, f);
+    u = vectorCross(s, f);
 
     Matrix out = IDENTITY_MATRIX;
 
