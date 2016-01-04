@@ -33,7 +33,7 @@ typedef struct
 	bool windowInitialized;
 	bool cameraInitialized;
 	bool programIdInitialized;
-	bool textProgramIdInitialized;
+	bool fontProgramIdInitialized;
 	bool textureArrayInitialized;
 	bool vaoArrayInitialized;
 	bool vboArrayInitialized;
@@ -41,7 +41,7 @@ typedef struct
 	GLFWwindow* window;
 	Camera* camera;
 	GLuint programId;
-	GLuint textProgramId;
+	GLuint fontProgramId;
 	GLuint textureArray[TEXTURES_NUM];
 	GLuint vaoArray[VAOS_NUM];
 	GLuint vboArray[VBOS_NUM];
@@ -161,9 +161,9 @@ commonResourcesCreate(CommonResources* resources)
 
 	resources->programIdInitialized = true;
 
-	// initialize textProgramId
+	// initialize fontProgramId
 
-	shaders[0] = loadShader("shaders/textVertexShader.glsl",
+	shaders[0] = loadShader("shaders/fontVertexShader.glsl",
 		GL_VERTEX_SHADER,
 		&errorFlag);
 	if(errorFlag) {
@@ -172,7 +172,7 @@ commonResourcesCreate(CommonResources* resources)
 		return -1;
 	}
 
-	shaders[1] = loadShader("shaders/textFragmentShader.glsl",
+	shaders[1] = loadShader("shaders/fontFragmentShader.glsl",
 		GL_FRAGMENT_SHADER,
 		&errorFlag);
 	if(errorFlag) {
@@ -182,7 +182,7 @@ commonResourcesCreate(CommonResources* resources)
 		return -1;
 	}
 
-	resources->textProgramId = prepareProgram(
+	resources->fontProgramId = prepareProgram(
 		shaders, sizeof(shaders)/sizeof(shaders[0]), &errorFlag);
 
 	glDeleteShader(shaders[1]);
@@ -193,7 +193,7 @@ commonResourcesCreate(CommonResources* resources)
 		return -1;
 	}
 
-	resources->textProgramIdInitialized = true;
+	resources->fontProgramIdInitialized = true;
 
 	// initialize textureArray
 	glGenTextures(TEXTURES_NUM, resources->textureArray);
@@ -222,8 +222,8 @@ commonResourcesDestroy(CommonResources* resources)
 	if(resources->programIdInitialized)
 		glDeleteProgram(resources->programId);
 
-	if(resources->textProgramIdInitialized)
-		glDeleteProgram(resources->textProgramId);
+	if(resources->fontProgramIdInitialized)
+		glDeleteProgram(resources->fontProgramId);
 
 	if(resources->textureArrayInitialized)
 		glDeleteTextures(TEXTURES_NUM, resources->textureArray);
@@ -292,50 +292,45 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 }
 
 
-// TODO: rename text.dds, textTexture, etc to font.dds, fontTexture, ...
 #define FONT_TEXTURE_LETTER_WIDTH_PX 32
 #define FONT_TEXTURE_LETTER_HEIGHT_PX 65
 #define FONT_TEXTURE_LETTER_NUM_IN_ROW 16
 #define FONT_TEXTURE_SIZE_PX (FONT_TEXTURE_LETTER_WIDTH_PX * \
 								FONT_TEXTURE_LETTER_NUM_IN_ROW)
 
-inline float
-FONT_TEXTURE_CHAR_COORD_U_LEFT(char c)
+inline static float
+fontTextureCoordULeft(char c)
 {
 	int colNum = ((int)(c - ' ')) % FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)colNum * FONT_TEXTURE_LETTER_WIDTH_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	// printf("char = %c, left colNum = %d, coord = %f\n", c, colNum, coord);
 	return coord;
 }
 
-inline float 
-FONT_TEXTURE_CHAR_COORD_U_RIGHT(char c)
+inline static float 
+fontTextureCoordURight(char c)
 {
 	int colNum = 1 + ((int)(c - ' ')) % FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)colNum * FONT_TEXTURE_LETTER_WIDTH_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	// printf("char = %c, right colNum = %d, coord = %f\n", c, colNum, coord);
 	return coord;
 }
 
-inline float 
-FONT_TEXTURE_CHAR_COORD_V_TOP(char c)
+inline static float 
+fontTextureCoordVTop(char c)
 {
 	int rowNum = ((int)(c - ' ')) / FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)rowNum * FONT_TEXTURE_LETTER_HEIGHT_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	// printf("char = %c, top rowNum = %d, coord = %f\n", c, rowNum, coord);
 	return coord; // no correction for V coordinate required
 }
 
-inline float 
-FONT_TEXTURE_CHAR_COORD_V_BOTTOM(char c)
+inline static float 
+fontTextureCoordVBottom(char c)
 {
 	int rowNum = 1 + ((int)(c - ' ')) / FONT_TEXTURE_LETTER_NUM_IN_ROW;
 	float coord = (float)rowNum * FONT_TEXTURE_LETTER_HEIGHT_PX
 					/ FONT_TEXTURE_SIZE_PX;
-	// printf("char = %c, bottom rowNum = %d, coord = %f\n", c, rowNum, coord);
 	return coord; // no correction for V coordinate required
 }
 
@@ -344,7 +339,7 @@ mainInternal(CommonResources* resources)
 {
 	// load textures
 
-	GLuint textTexture      = resources->textureArray[0];
+	GLuint fontTexture      = resources->textureArray[0];
 	GLuint grassTexture     = resources->textureArray[1];
 	GLuint skyboxTexture    = resources->textureArray[2];
 	GLuint towerTexture     = resources->textureArray[3];
@@ -352,7 +347,7 @@ mainInternal(CommonResources* resources)
 	GLuint redTexture       = resources->textureArray[5];
 	GLuint blueTexture      = resources->textureArray[6];
 
-	if(!loadDDSTexture("textures/text.dds", textTexture))
+	if(!loadDDSTexture("textures/font.dds", fontTexture))
 		return -1;
 
 	if(!loadDDSTexture("textures/grass.dds", grassTexture))
@@ -393,24 +388,12 @@ mainInternal(CommonResources* resources)
 	// prepare text
 
 	const GLfloat globVertexBufferData[] = {
-    //     X       Y          U          V
-	    0.0f,   0.0f,   FONT_TEXTURE_CHAR_COORD_U_LEFT('A'),   FONT_TEXTURE_CHAR_COORD_V_BOTTOM('A'),
-	    0.2f,   0.0f,   FONT_TEXTURE_CHAR_COORD_U_RIGHT('A'),   FONT_TEXTURE_CHAR_COORD_V_BOTTOM('A'),
-	    0.2f,   0.2f,   FONT_TEXTURE_CHAR_COORD_U_RIGHT('A'),   FONT_TEXTURE_CHAR_COORD_V_TOP('A'),
+    //  X     Y     U                            V
+	    0.0f, 0.0f, fontTextureCoordULeft('A'),  fontTextureCoordVBottom('A'),
+	    0.2f, 0.0f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
+	    0.2f, 0.2f, fontTextureCoordURight('A'), fontTextureCoordVTop('A'),
 	};
 
-/*
-	printf("--------------------------------\n");
-	for(char c = 'M'; c <= 'R'; c++)
-	{
-		FONT_TEXTURE_CHAR_COORD_U_LEFT(c);
-		FONT_TEXTURE_CHAR_COORD_U_RIGHT(c);
-		FONT_TEXTURE_CHAR_COORD_V_BOTTOM(c);
-		FONT_TEXTURE_CHAR_COORD_V_TOP(c);
-	}
-	printf("--------------------------------\n");
-*/
-	
 	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
     	globVertexBufferData, GL_DYNAMIC_DRAW);
@@ -422,7 +405,7 @@ mainInternal(CommonResources* resources)
 		(const void*)(2*sizeof(GLfloat)));
 
 	GLint uniformTextTextureSample = getUniformLocation(
-			resources->textProgramId, 
+			resources->fontProgramId, 
 			"textureSampler"
 		);
 
@@ -734,9 +717,9 @@ mainInternal(CommonResources* resources)
 				sphereIndexType, NULL);
 		}
 
-		glUseProgram(resources->textProgramId);
+		glUseProgram(resources->fontProgramId);
 
-		glBindTexture(GL_TEXTURE_2D, textTexture);
+		glBindTexture(GL_TEXTURE_2D, fontTexture);
 	    glBindVertexArray(textVAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
