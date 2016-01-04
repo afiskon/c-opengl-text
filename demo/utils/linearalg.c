@@ -57,6 +57,12 @@ vectorNormalizeInplace(Vector* v)
     v->m[2] *= invrt;
 }
 
+float
+vectorDot(Vector v1, Vector v2)
+{
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+}
+
 Matrix
 identitymat()
 {
@@ -96,15 +102,6 @@ mulmatvec4(const Matrix* m, const Vector* v)
     }
 
     return out;
-}
-
-
-float
-dotvec4(Vector v1, Vector v2)
-{
-    // TODO: use .x, .y, .z
-    return v1.m[0] * v2.m[0] + v1.m[1] * v2.m[1] + v1.m[2] * v2.m[2] +
-        v1.m[3] * v2.m[3];
 }
 
 Vector
@@ -254,8 +251,8 @@ lookAt(Vector eye, Vector center, Vector up)
     out.m[6] = -f.y;
     out.m[10] = -f.z;
 
-    out.m[12] = -dotvec4(s, eye);
-    out.m[13] = -dotvec4(u, eye);
-    out.m[14] =  dotvec4(f, eye);
+    out.m[12] = -vectorDot(s, eye);
+    out.m[13] = -vectorDot(u, eye);
+    out.m[14] =  vectorDot(f, eye);
     return out;
 }

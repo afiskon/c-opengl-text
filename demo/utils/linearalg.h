@@ -24,8 +24,8 @@ Vector vectorNull();
 Vector vectorAdd(Vector v1, Vector v2);
 Vector vectorMul(Vector v, float n);
 void vectorNormalizeInplace(Vector* v);
+float vectorDot(Vector v1, Vector v2);
 
-float dotvec4(Vector v1, Vector v2);
 Vector crossvec4(Vector v1, Vector v2);
 
 Matrix identitymat();
