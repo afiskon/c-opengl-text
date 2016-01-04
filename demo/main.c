@@ -13,7 +13,12 @@
 #include "utils/models.h"
 
 // usually about 53 chars is enough, using 128 to be safe
-static char STATUS_LINE_BUFF[128]; 
+static char globStatusLineBuff[128];
+
+// X, Y, U and V for each character in globStatusLineBuff except trailing \0
+// static GLfloat globStatusLineBufferData[(sizeof(globStatusLineBuff)-1)*4];
+
+static unsigned int globStatusLineVerticesNumber = 6*2;
 
 static const Vector POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
 static const Vector SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
@@ -385,29 +390,9 @@ mainInternal(CommonResources* resources)
 	GLuint sphereVBO        = resources->vboArray[ 9];
 	GLuint sphereIndicesVBO = resources->vboArray[10];
 
-	// prepare text
-
-	const GLfloat globVertexBufferData[] = {
- 	//   X       Y                           U                             V
-	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
-	0.014f, 0.000f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
-	0.014f, 0.025f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
-	0.014f, 0.025f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
-	0.000f, 0.025f, fontTextureCoordULeft( 'A'), fontTextureCoordVTop(   'A'),
-	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
-
-	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
-	0.028f, 0.000f, fontTextureCoordURight('B'), fontTextureCoordVBottom('B'),
-	0.028f, 0.025f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
-	0.028f, 0.025f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
-	0.014f, 0.025f, fontTextureCoordULeft( 'B'), fontTextureCoordVTop(   'B'),
-	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
-	};
+	// prepare font
 
 	glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
-    	globVertexBufferData, GL_DYNAMIC_DRAW);
-
     glBindVertexArray(fontVAO);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
 		NULL);
@@ -500,7 +485,7 @@ mainInternal(CommonResources* resources)
 	uint64_t startTimeMs = getCurrentTimeMs();
 	uint64_t currentTimeMs = startTimeMs;
 	uint64_t prevTimeMs = startTimeMs;
-	uint64_t lastFpsCounterFlushTimeMs = startTimeMs;
+	uint64_t lastFpsCounterFlushTimeMs = 0;
 	uint64_t lastKeyPressCheckMs = 0;
 	float fps = 0.0;
 
@@ -531,17 +516,38 @@ mainInternal(CommonResources* resources)
 		Vector cameraPos;
 		cameraGetPosition(resources->camera, &cameraPos);
 
-		// don't update fps to often or no one can read it
+		// don't update status line to often or no one can read it
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
-			snprintf(STATUS_LINE_BUFF, sizeof(STATUS_LINE_BUFF),
+			snprintf(globStatusLineBuff, sizeof(globStatusLineBuff),
 					"FPS: %.1f, T: %u%09u, X: %.1f, Y: %.1f, Z: %.1f\n",
 					fps,
 					(uint32_t)(currentTimeMs / 1000000000),
 					(uint32_t)(currentTimeMs % 1000000000),
 					cameraPos.x, cameraPos.y, cameraPos.z
 				);
-			printf("%s", STATUS_LINE_BUFF);
+			printf("%s", globStatusLineBuff);
+
+				const GLfloat globVertexBufferData[] = {
+ 	//   X       Y                           U                             V
+	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
+	0.014f, 0.000f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
+	0.014f, 0.025f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
+	0.014f, 0.025f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
+	0.000f, 0.025f, fontTextureCoordULeft( 'A'), fontTextureCoordVTop(   'A'),
+	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
+
+	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
+	0.028f, 0.000f, fontTextureCoordURight('B'), fontTextureCoordVBottom('B'),
+	0.028f, 0.025f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
+	0.028f, 0.025f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
+	0.014f, 0.025f, fontTextureCoordULeft( 'B'), fontTextureCoordVTop(   'B'),
+	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
+	};
+
+	glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
+    	globVertexBufferData, GL_DYNAMIC_DRAW);
 
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
@@ -733,7 +739,7 @@ mainInternal(CommonResources* resources)
 	    glBindVertexArray(fontVAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(globVertexBufferData) / sizeof(globVertexBufferData[0]));
+		glDrawArrays(GL_TRIANGLES, 0, globStatusLineVerticesNumber);
 
 		glfwSwapBuffers(resources->window);
 		glfwPollEvents();
