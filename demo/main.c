@@ -472,7 +472,7 @@ mainInternal(CommonResources* resources)
 
 		// tower
 
-		Matrix tempTowerM = identitymat();
+		Matrix tempTowerM = matrixIdentity();
 		Matrix towerM = rotate(&tempTowerM, islandAngle, 0.0f, 1.0f, 0.0f);
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerM = multiplymat4(&tempTowerM, &towerM);
@@ -493,7 +493,7 @@ mainInternal(CommonResources* resources)
 
 		// torus
 
-		Matrix tempTorusM = identitymat();
+		Matrix tempTorusM = matrixIdentity();
 		Matrix torusM = rotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
 							0.0f, 1.0f, 0.0f);
 		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
@@ -514,7 +514,7 @@ mainInternal(CommonResources* resources)
 
 		// grass
 
-		Matrix tempGrassM = identitymat();
+		Matrix tempGrassM = matrixIdentity();
 		Matrix grassM = rotate(&tempGrassM, islandAngle, 0.0f, 1.0f, 0.0f);
 		translate(&tempGrassM, 0.0f, -1.0f, 0.0f);
 		grassM = multiplymat4(&tempGrassM, &grassM);
@@ -534,8 +534,8 @@ mainInternal(CommonResources* resources)
 
 		// skybox
 
-		Matrix tempSkyboxM = identitymat();
-		Matrix skyboxM = identitymat();
+		Matrix tempSkyboxM = matrixIdentity();
+		Matrix skyboxM = matrixIdentity();
 		translate(&skyboxM,
 			cameraPos.m[0], cameraPos.m[1], cameraPos.m[2]);
 		scale(&tempSkyboxM, 100.0f, 100.0f, 100.0f);
@@ -556,7 +556,7 @@ mainInternal(CommonResources* resources)
 
 		// point light source
 		if(pointLightEnabled) {
-			Matrix pointLightM = identitymat();
+			Matrix pointLightM = matrixIdentity();
 			translate(&pointLightM, POINT_LIGHT_POS.m[0], POINT_LIGHT_POS.m[1], POINT_LIGHT_POS.m[2]);
 			Matrix pointLightMVP = multiplymat4(&pointLightM, &vp);
 
@@ -574,7 +574,7 @@ mainInternal(CommonResources* resources)
 
 		// spot light source
 		if(spotLightEnabled) {
-			Matrix spotLightM = identitymat();
+			Matrix spotLightM = matrixIdentity();
 			translate(&spotLightM, SPOT_LIGHT_POS.m[0], SPOT_LIGHT_POS.m[1], SPOT_LIGHT_POS.m[2]);
 			Matrix spotLightMVP = multiplymat4(&spotLightM, &vp);
 

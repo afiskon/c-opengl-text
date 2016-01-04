@@ -3,14 +3,6 @@
 #include <string.h>
 #include <math.h>
 
-static const Matrix IDENTITY_MATRIX =
-{{
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 0.0f, 1.0f,
-}};
-
 Vector
 vectorNull()
 {
@@ -76,9 +68,15 @@ vectorCross(Vector v1, Vector v2)
 }
 
 Matrix
-identitymat()
+matrixIdentity()
 {
-    Matrix out = IDENTITY_MATRIX;
+    Matrix out = {{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f,
+    }};
+    
     return out;
 }
 
@@ -86,7 +84,7 @@ identitymat()
 Matrix
 multiplymat4(const Matrix* m1, const Matrix* m2)
 {
-    Matrix out = IDENTITY_MATRIX;
+    Matrix out = matrixIdentity();
     unsigned int row, column, row_offset;
 
     for (row = 0, row_offset = row * 4; row < 4; ++row, row_offset = row * 4)
@@ -165,7 +163,7 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
 void
 scale(Matrix* m, float x, float y, float z)
 {
-    Matrix scale = IDENTITY_MATRIX;
+    Matrix scale = matrixIdentity();
 
     // TODO: use 4*i + j
     scale.m[0] = x;
@@ -178,7 +176,7 @@ scale(Matrix* m, float x, float y, float z)
 void
 translate(Matrix* m, float x, float y, float z)
 {
-    Matrix translation = IDENTITY_MATRIX;
+    Matrix translation = matrixIdentity();
     
     // TODO: use 4*i + j
     translation.m[12] = x;
@@ -214,7 +212,7 @@ Matrix
 orthogonal(float left, float right, float bottom, float top)
 {
     // TODO: use 4*i + j
-    Matrix out = IDENTITY_MATRIX;
+    Matrix out = matrixIdentity();
     out.m[0] = 2 / (right - left);
     out.m[5] = 2 / (top - bottom);
     out.m[10] = -1;
@@ -237,7 +235,7 @@ lookAt(Vector eye, Vector center, Vector up)
     vectorNormalizeInplace(&s);
     u = vectorCross(s, f);
 
-    Matrix out = IDENTITY_MATRIX;
+    Matrix out = matrixIdentity();
 
     // TODO: use 4*i + j
     out.m[0] = s.x;
