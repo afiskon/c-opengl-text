@@ -473,7 +473,8 @@ mainInternal(CommonResources* resources)
 		// tower
 
 		Matrix tempTowerM = matrixIdentity();
-		Matrix towerM = rotate(&tempTowerM, islandAngle, 0.0f, 1.0f, 0.0f);
+		Matrix towerM = matrixRotate(&tempTowerM, islandAngle,
+							0.0f, 1.0f, 0.0f);
 		translate(&tempTowerM, -1.5f, -1.0f, -1.5f);
 		towerM = matrixMulMat(&tempTowerM, &towerM);
 
@@ -494,7 +495,7 @@ mainInternal(CommonResources* resources)
 		// torus
 
 		Matrix tempTorusM = matrixIdentity();
-		Matrix torusM = rotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
+		Matrix torusM = matrixRotate(&tempTorusM, (60.0f - 3.0f*islandAngle),
 							0.0f, 1.0f, 0.0f);
 		translate(&tempTorusM, 0.0f, 1.0f, 0.0f);
 		torusM = matrixMulMat(&tempTorusM, &torusM);
@@ -515,7 +516,8 @@ mainInternal(CommonResources* resources)
 		// grass
 
 		Matrix tempGrassM = matrixIdentity();
-		Matrix grassM = rotate(&tempGrassM, islandAngle, 0.0f, 1.0f, 0.0f);
+		Matrix grassM = matrixRotate(&tempGrassM, islandAngle,
+							0.0f, 1.0f, 0.0f);
 		translate(&tempGrassM, 0.0f, -1.0f, 0.0f);
 		grassM = matrixMulMat(&tempGrassM, &grassM);
 

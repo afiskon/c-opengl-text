@@ -35,7 +35,7 @@ Matrix matrixLookAt(Vector eye, Vector center, Vector up);
 
 Vector matrixMulVec(const Matrix* m, const Vector* v);
 Matrix matrixMulMat(const Matrix* m1, const Matrix* m2);
-Matrix rotate(const Matrix* m, float angle,
+Matrix matrixRotate(const Matrix* m, float angle,
 	float axis_x, float axis_y, float axis_z);
 
 // TODO: rename to ...Inplace

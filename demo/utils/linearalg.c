@@ -181,7 +181,8 @@ matrixMulMat(const Matrix* m1, const Matrix* m2)
 }
 
 Matrix
-rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
+matrixRotate(const Matrix* in, float angle,
+    float axis_x, float axis_y, float axis_z)
 {
     float a = M_PI * (angle / 180.0f);
     float c = cos(a);
