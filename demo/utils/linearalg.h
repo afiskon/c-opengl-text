@@ -1,7 +1,7 @@
 #ifndef AFISKON_LINEARALG_H
 #define AFISKON_LINEARALG_H
 
-// based on https://github.com/shua/jams/tree/master/ld26 and partially GLM
+// based on https://github.com/shua/jams/tree/master/ld26 and GLM
 
 typedef struct Matrix
 {
@@ -10,23 +10,23 @@ typedef struct Matrix
 
 // TODO: refactor interface: always return Vector/Matrix or never return
 
-// TODO: rename to Vector + corresponding procedures refactorings
-typedef union Vector4
+// TODO: procedures refactorings
+typedef union Vector
 {
     float m[4];
     struct {
         float x, y, z, w;
     };
-} Vector4;
+} Vector;
 
-Vector4 addvec4(Vector4 v1, Vector4 v2);
-Vector4 mulvec4(Vector4 v, float n);
+Vector addvec4(Vector v1, Vector v2);
+Vector mulvec4(Vector v, float n);
 Matrix identitymat();
 Matrix multiplymat4(const Matrix* m1, const Matrix* m2);
-Vector4 mulmatvec4(const Matrix* m, const Vector4* v);
-void normalizevec4(Vector4* v);
-float dotvec4(Vector4 v1, Vector4 v2);
-Vector4 crossvec4(Vector4 v1, Vector4 v2);
+Vector mulmatvec4(const Matrix* m, const Vector* v);
+void normalizevec4(Vector* v);
+float dotvec4(Vector v1, Vector v2);
+Vector crossvec4(Vector v1, Vector v2);
 //void rotateX(Matrix* m, float angle);
 //void rotateY(Matrix* m, float angle);
 //void rotateZ(Matrix* m, float angle);
@@ -38,6 +38,6 @@ void translate(Matrix* m, float x, float y, float z);
 Matrix perspective(float fovy, float aspect, float zNear, float zFar);
 Matrix orthogonal(float left, float right, float bottom, float top);
 
-Matrix lookAt(Vector4 eye, Vector4 center, Vector4 up);
+Matrix lookAt(Vector eye, Vector center, Vector up);
 
 #endif // AFISKON_LINEARALG_H

@@ -10,14 +10,14 @@ static const float MOUSE_SPEED_RAD = 0.0005f;
 struct Camera
 {
     GLFWwindow* window;
-    Vector4 position;
+    Vector position;
     float horizontalAngleRad;
     float verticalAngleRad;
     bool mouseInterceptionEnabled;
 };
 
 Camera*
-cameraCreate(GLFWwindow* window, const Vector4 startPosition,
+cameraCreate(GLFWwindow* window, const Vector startPosition,
     float startHorizontalAngleRad, float startVerticalAngleRad)
 {
     Camera* cam = (Camera*)malloc(sizeof(Camera));
@@ -43,7 +43,7 @@ cameraDestroy(Camera* cam)
 }
 
 void
-cameraGetPosition(Camera* cam, Vector4* pOutVec)
+cameraGetPosition(Camera* cam, Vector* pOutVec)
 {
     *pOutVec = cam->position;
 }
@@ -83,21 +83,21 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
         glfwSetCursorPos(cam->window, windowWidth/2, windowHeight/2);
     }
 
-    Vector4 direction = {{
+    Vector direction = {{
             (float)(cos(cam->verticalAngleRad) * sin(cam->horizontalAngleRad)),
             (float)(sin(cam->verticalAngleRad)),
             (float)(cos(cam->verticalAngleRad) * cos(cam->horizontalAngleRad)),
             0.0f
         }};
 
-    Vector4 right = {{
+    Vector right = {{
             (float)(sin(cam->horizontalAngleRad - 3.14f/2.0f)),
             0.0f,
             (float)(cos(cam->horizontalAngleRad - 3.14f/2.0f)),
             0.0f
         }};
 
-    Vector4 up = crossvec4(right, direction);
+    Vector up = crossvec4(right, direction);
     float delta = deltaTimeSec * CAMERA_SPEED;
 
     if(glfwGetKey(cam->window, GLFW_KEY_W) == GLFW_PRESS)

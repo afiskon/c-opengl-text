@@ -11,10 +11,10 @@ static const Matrix IDENTITY_MATRIX =
     0.0f, 0.0f, 0.0f, 1.0f,
 }};
 
-Vector4
-addvec4(Vector4 v1, Vector4 v2)
+Vector
+addvec4(Vector v1, Vector v2)
 {
-    Vector4 res;
+    Vector res;
 
     res.x = v1.x + v2.x;
     res.y = v1.y + v2.y;
@@ -24,10 +24,10 @@ addvec4(Vector4 v1, Vector4 v2)
     return res;
 }
 
-Vector4
-mulvec4(Vector4 v, float n)
+Vector
+mulvec4(Vector v, float n)
 {
-    Vector4 res = v;
+    Vector res = v;
 
     res.x *= n;
     res.y *= n;
@@ -62,10 +62,10 @@ multiplymat4(const Matrix* m1, const Matrix* m2)
     return out;
 }
 
-Vector4
-mulmatvec4(const Matrix* m, const Vector4* v)
+Vector
+mulmatvec4(const Matrix* m, const Vector* v)
 {
-    Vector4 out;
+    Vector out;
     for(int i = 0; i < 4; ++i) {
         out.m[i] =
             (v->m[0] * m->m[i + 0]) +
@@ -78,7 +78,7 @@ mulmatvec4(const Matrix* m, const Vector4* v)
 }
 
 void
-normalizevec4(Vector4* v)
+normalizevec4(Vector* v)
 {
     float sqr = v->m[0] * v->m[0] + v->m[1] * v->m[1] + v->m[2] * v->m[2];
     if(sqr == 1 || sqr == 0)
@@ -91,16 +91,16 @@ normalizevec4(Vector4* v)
 }
 
 float
-dotvec4(Vector4 v1, Vector4 v2)
+dotvec4(Vector v1, Vector v2)
 {
     return v1.m[0] * v2.m[0] + v1.m[1] * v2.m[1] + v1.m[2] * v2.m[2] +
         v1.m[3] * v2.m[3];
 }
 
-Vector4
-crossvec4(Vector4 v1, Vector4 v2)
+Vector
+crossvec4(Vector v1, Vector v2)
 {
-    Vector4 out = {{ 0 }};
+    Vector out = {{ 0 }};
     out.m[0] = v1.m[1]*v2.m[2] - v1.m[2]*v2.m[1];
     out.m[1] = v1.m[2]*v2.m[0] - v1.m[0]*v2.m[2];
     out.m[2] = v1.m[0]*v2.m[1] - v1.m[1]*v2.m[0];
@@ -161,10 +161,10 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
     float c = cos(a);
     float s = sin(a);
 
-    Vector4 axis = {{ axis_x, axis_y, axis_z, 0.0f }};
+    Vector axis = {{ axis_x, axis_y, axis_z, 0.0f }};
     normalizevec4(&axis);
 
-    Vector4 temp = mulvec4(axis, (1.0f - c));
+    Vector temp = mulvec4(axis, (1.0f - c));
     Matrix rotate = {{ 0 }};
 
     rotate.m[0*4 + 0] = c + temp.m[0] * axis.m[0];
@@ -180,7 +180,7 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
     rotate.m[2*4 + 2] = c + temp.m[2] * axis.m[2];
 
     // TODO: try to optimize
-    Vector4 r[4], m[4];
+    Vector r[4], m[4];
     for(int i = 0; i < 4; i++)
         for(int j = 0; j < 4; j++)
             m[i].m[j] = in->m[i*4 + j];
@@ -259,15 +259,15 @@ orthogonal(float left, float right, float bottom, float top)
 }
 
 Matrix
-lookAt(Vector4 eye, Vector4 center, Vector4 up)
+lookAt(Vector eye, Vector center, Vector up)
 {
-    Vector4 f = addvec4(center, mulvec4(eye, -1.0f));
+    Vector f = addvec4(center, mulvec4(eye, -1.0f));
     normalizevec4(&f);
 
-    Vector4 u = up;
+    Vector u = up;
     normalizevec4(&u);
 
-    Vector4 s = crossvec4(f, u);
+    Vector s = crossvec4(f, u);
     normalizevec4(&s);
     u = crossvec4(s, f);
 

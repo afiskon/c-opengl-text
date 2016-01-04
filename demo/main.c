@@ -15,9 +15,9 @@
 // usually about 53 chars is enough, using 128 to be safe
 static char STATUS_LINE_BUFF[128]; 
 
-static const Vector4 POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
-static const Vector4 SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
-static const Vector4 CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
+static const Vector POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
+static const Vector SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
+static const Vector CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 
 #define KEY_PRESS_CHECK_INTERVAL 250 // ms
 
@@ -201,7 +201,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	bool pointLightEnabled, bool spotLightEnabled)
 {
 	{
-		Vector4 direction = {{ 0.0f, -1.0f, 1.0f, 0.0f }};
+		Vector direction = {{ 0.0f, -1.0f, 1.0f, 0.0f }};
 		normalizevec4(&direction);
 
 		setUniform3f(programId, "directionalLight.direction",
@@ -230,7 +230,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 
 	{
-		Vector4 direction = {{ -0.5f, -1.0f, 0.0f, 0.0f }};
+		Vector direction = {{ -0.5f, -1.0f, 0.0f, 0.0f }};
 		normalizevec4(&direction);
 
 		setUniform3f(programId, "spotLight.direction",
@@ -395,7 +395,7 @@ mainInternal(CommonResources* resources)
 			fps = fps*FPS_SMOOTHING + (1.0f - FPS_SMOOTHING) *
 				(1000.0f / (float)prevDeltaTimeMs);
 
-		Vector4 cameraPos;
+		Vector cameraPos;
 		cameraGetPosition(resources->camera, &cameraPos);
 
 		// don't update fps to often or no one can read it
@@ -406,9 +406,7 @@ mainInternal(CommonResources* resources)
 					fps,
 					(uint32_t)(currentTimeMs / 1000000000),
 					(uint32_t)(currentTimeMs % 1000000000),
-					cameraPos.m[0],
-					cameraPos.m[1],
-					cameraPos.m[2]
+					cameraPos.x, cameraPos.y, cameraPos.z
 				);
 			printf("%s", STATUS_LINE_BUFF);
 

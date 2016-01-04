@@ -7,9 +7,9 @@
 struct Camera;
 typedef struct Camera Camera;
 
-Camera* cameraCreate(GLFWwindow* window, const Vector4 startPosition,
+Camera* cameraCreate(GLFWwindow* window, const Vector startPosition,
 	float startHorizontalAngleRad, float startVerticalAngleRad);
-void cameraGetPosition(Camera* cam, Vector4* pOutVec);
+void cameraGetPosition(Camera* cam, Vector* pOutVec);
 bool cameraGetMouseInterceptionEnabled(Camera* cam);
 void cameraSetMouseInterceptionEnabled(Camera* cam, bool enabled);
 void cameraGetViewMatrix(Camera* cam, float deltaTimeMs,
