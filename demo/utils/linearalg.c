@@ -147,7 +147,22 @@ matrixLookAt(Vector eye, Vector center, Vector up)
     return out;
 }
 
-// WARNING! What in GLM is m1 * m2 is multiplymat4(m2, m1)
+Vector
+matrixMulVec(const Matrix* m, const Vector* v)
+{
+    Vector out;
+    for(int i = 0; i < 4; ++i) {
+        out.m[i] =
+            (v->x * m->m[i + 0]) +
+            (v->y * m->m[i + 4]) +
+            (v->z * m->m[i + 8]) +
+            (v->w * m->m[i + 12]);
+    }
+
+    return out;
+}
+
+// NOTE: What in GLM is m1 * m2 is multiplymat4(m2, m1)
 Matrix
 multiplymat4(const Matrix* m1, const Matrix* m2)
 {
@@ -161,22 +176,6 @@ multiplymat4(const Matrix* m1, const Matrix* m2)
                 (m1->m[row_offset + 1] * m2->m[column + 4]) +
                 (m1->m[row_offset + 2] * m2->m[column + 8]) +
                 (m1->m[row_offset + 3] * m2->m[column + 12]);
-
-    return out;
-}
-
-Vector
-mulmatvec4(const Matrix* m, const Vector* v)
-{
-    // TODO: use .x, .y, .z
-    Vector out;
-    for(int i = 0; i < 4; ++i) {
-        out.m[i] =
-            (v->m[0] * m->m[i + 0]) +
-            (v->m[1] * m->m[i + 4]) +
-            (v->m[2] * m->m[i + 8]) +
-            (v->m[3] * m->m[i + 12]);
-    }
 
     return out;
 }

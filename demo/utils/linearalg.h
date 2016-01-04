@@ -21,6 +21,7 @@ typedef union Vector
 } Vector;
 
 Vector vectorNull();
+
 Vector vectorAdd(Vector v1, Vector v2);
 Vector vectorMul(Vector v, float n);
 void vectorNormalizeInplace(Vector* v);
@@ -32,9 +33,8 @@ Matrix matrixPerspective(float fovy, float aspect, float zNear, float zFar);
 Matrix matrixOrthogonal(float left, float right, float bottom, float top);
 Matrix matrixLookAt(Vector eye, Vector center, Vector up);
 
-Vector mulmatvec4(const Matrix* m, const Vector* v);
+Vector matrixMulVec(const Matrix* m, const Vector* v);
 Matrix multiplymat4(const Matrix* m1, const Matrix* m2);
-
 Matrix rotate(const Matrix* m, float angle,
 	float axis_x, float axis_y, float axis_z);
 
