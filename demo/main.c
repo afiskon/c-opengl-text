@@ -29,6 +29,13 @@ static const Vector CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 // [0.0, 1.0], larger - more smoothing
 #define FPS_SMOOTHING 0.95f 
 
+#define FONT_RENDER_SIZE 0.025
+#define FONT_TEXTURE_LETTER_WIDTH_PX 32
+#define FONT_TEXTURE_LETTER_HEIGHT_PX 65
+#define FONT_TEXTURE_LETTER_NUM_IN_ROW 16
+#define FONT_TEXTURE_SIZE_PX (FONT_TEXTURE_LETTER_WIDTH_PX * \
+								FONT_TEXTURE_LETTER_NUM_IN_ROW)
+
 #define TEXTURES_NUM 7
 #define VAOS_NUM 6
 #define VBOS_NUM 11
@@ -296,14 +303,6 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 	}
 }
 
-
-#define FONT_RENDER_SIZE 0.025
-#define FONT_TEXTURE_LETTER_WIDTH_PX 32
-#define FONT_TEXTURE_LETTER_HEIGHT_PX 65
-#define FONT_TEXTURE_LETTER_NUM_IN_ROW 16
-#define FONT_TEXTURE_SIZE_PX (FONT_TEXTURE_LETTER_WIDTH_PX * \
-								FONT_TEXTURE_LETTER_NUM_IN_ROW)
-
 inline static float
 fontTextureCoordULeft(char c)
 {
@@ -340,15 +339,14 @@ fontTextureCoordVBottom(char c)
 	return coord; // no correction for V coordinate required
 }
 
-// TODO: pass string as an argument
 static void
-prepareTextBufferData(GLuint fontVBO)
+calculateStatusLineBufferData(const char* text, GLuint fontVBO)
 {
 	unsigned int pos = 0;
 	char c;
 	for(;;)
 	{
-		c = globStatusLineBuff[pos];
+		c = text[pos];
 		if(c == '\0')
 			break;
 
@@ -403,8 +401,6 @@ prepareTextBufferData(GLuint fontVBO)
     	globStatusLineBufferData, GL_DYNAMIC_DRAW);
 }
 
-// TODO: static void renderText()
-
 static int
 mainInternal(CommonResources* resources)
 {
@@ -456,14 +452,14 @@ mainInternal(CommonResources* resources)
 	GLuint sphereVBO        = resources->vboArray[ 9];
 	GLuint sphereIndicesVBO = resources->vboArray[10];
 
-	// prepare font
+	// prepare text rendering
 
 	glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
     glBindVertexArray(fontVAO);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
-		NULL);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat),
-		(const void*)(2*sizeof(GLfloat)));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+		4*sizeof(GLfloat), NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+		4*sizeof(GLfloat), (const void*)(2*sizeof(GLfloat)));
 
 	GLint uniformTextTextureSample = getUniformLocation(
 			resources->fontProgramId, 
@@ -593,7 +589,7 @@ mainInternal(CommonResources* resources)
 					cameraPos.x, cameraPos.y, cameraPos.z
 				);
 
-			prepareTextBufferData(fontVBO);
+			calculateStatusLineBufferData(globStatusLineBuff, fontVBO);
 
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
@@ -742,6 +738,7 @@ mainInternal(CommonResources* resources)
 			skyboxIndexType, NULL);
 
 		// point light source
+
 		if(pointLightEnabled) {
 			Matrix pointLightM = matrixIdentity();
 			matrixTranslateInplace(&pointLightM,
@@ -761,6 +758,7 @@ mainInternal(CommonResources* resources)
 		}
 
 		// spot light source
+
 		if(spotLightEnabled) {
 			Matrix spotLightM = matrixIdentity();
 			matrixTranslateInplace(&spotLightM,
@@ -779,8 +777,9 @@ mainInternal(CommonResources* resources)
 				sphereIndexType, NULL);
 		}
 
-		glUseProgram(resources->fontProgramId);
+		// render text
 
+		glUseProgram(resources->fontProgramId);
 		glBindTexture(GL_TEXTURE_2D, fontTexture);
 	    glBindVertexArray(fontVAO);
 		glEnableVertexAttribArray(0);
