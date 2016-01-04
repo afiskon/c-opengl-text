@@ -12,9 +12,9 @@ out vec3 fragmentNormal;
 out vec3 fragmentPos;
 
 void main() {
-  fragmentUV = vertexUV;
-  fragmentNormal = (M * vec4(vertexNorm, 0)).xyz;
-  fragmentPos = (M * vec4(vertexPos, 1)).xyz;
+    fragmentUV = vertexUV;
+    fragmentNormal = (M * vec4(vertexNorm, 0)).xyz;
+    fragmentPos = (M * vec4(vertexPos, 1)).xyz;
 
-  gl_Position = MVP * vec4(vertexPos, 1);
+    gl_Position = MVP * vec4(vertexPos, 1);
 }
