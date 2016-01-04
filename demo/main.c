@@ -5,7 +5,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "utils/constants.h"
+#include "utils/definitions.h"
 #include "utils/linearalg.h"
 
 #include "utils/utils.h"

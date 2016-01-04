@@ -1,12 +1,6 @@
 #ifndef AFISKON_LINEARALG_H
 #define AFISKON_LINEARALG_H
 
-/*
-More algorithms could be found here:
-- https://github.com/Groovounet/glm
-- https://github.com/shua/jams/tree/master/ld26
-*/
-
 typedef struct Matrix
 {
     float m[16];

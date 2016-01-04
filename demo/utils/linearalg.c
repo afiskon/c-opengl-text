@@ -1,5 +1,5 @@
 #include "linearalg.h"
-#include "constants.h"
+#include "definitions.h"
 #include <string.h>
 #include <math.h>
 
