@@ -22,7 +22,7 @@ static const Vector CAMERA_START_POS = {{ 0.0f, 0.0f, 5.0f, 0.0f }};
 #define KEY_PRESS_CHECK_INTERVAL 250 // ms
 
 // [0.0, 1.0], larger - more smoothing
-#define FPS_SMOOTHING 0.9f 
+#define FPS_SMOOTHING 0.95f 
 
 #define TEXTURES_NUM 6
 #define VAOS_NUM 5
