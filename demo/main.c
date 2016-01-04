@@ -202,7 +202,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 {
 	{
 		Vector direction = {{ 0.0f, -1.0f, 1.0f, 0.0f }};
-		normalizevec4(&direction);
+		vectorNormalizeInplace(&direction);
 
 		setUniform3f(programId, "directionalLight.direction",
 			direction.x, direction.y, direction.z);
@@ -231,7 +231,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 
 	{
 		Vector direction = {{ -0.5f, -1.0f, 0.0f, 0.0f }};
-		normalizevec4(&direction);
+		vectorNormalizeInplace(&direction);
 
 		setUniform3f(programId, "spotLight.direction",
 			direction.x, direction.y, direction.z);

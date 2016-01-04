@@ -44,6 +44,19 @@ vectorMul(Vector v, float n)
     return res;
 }
 
+void
+vectorNormalizeInplace(Vector* v)
+{
+    float sqr = v->m[0] * v->m[0] + v->m[1] * v->m[1] + v->m[2] * v->m[2];
+    if(sqr == 1 || sqr == 0)
+        return;
+
+    float invrt = 1.f/sqrt(sqr);
+    v->m[0] *= invrt;
+    v->m[1] *= invrt;
+    v->m[2] *= invrt;
+}
+
 Matrix
 identitymat()
 {
@@ -72,6 +85,7 @@ multiplymat4(const Matrix* m1, const Matrix* m2)
 Vector
 mulmatvec4(const Matrix* m, const Vector* v)
 {
+    // TODO: use .x, .y, .z
     Vector out;
     for(int i = 0; i < 4; ++i) {
         out.m[i] =
@@ -84,22 +98,11 @@ mulmatvec4(const Matrix* m, const Vector* v)
     return out;
 }
 
-void
-normalizevec4(Vector* v)
-{
-    float sqr = v->m[0] * v->m[0] + v->m[1] * v->m[1] + v->m[2] * v->m[2];
-    if(sqr == 1 || sqr == 0)
-        return;
-
-    float invrt = 1.f/sqrt(sqr);
-    v->m[0] *= invrt;
-    v->m[1] *= invrt;
-    v->m[2] *= invrt;
-}
 
 float
 dotvec4(Vector v1, Vector v2)
 {
+    // TODO: use .x, .y, .z
     return v1.m[0] * v2.m[0] + v1.m[1] * v2.m[1] + v1.m[2] * v2.m[2] +
         v1.m[3] * v2.m[3];
 }
@@ -107,6 +110,7 @@ dotvec4(Vector v1, Vector v2)
 Vector
 crossvec4(Vector v1, Vector v2)
 {
+    // TODO: use .x, .y, .z
     Vector out = {{ 0 }};
     out.m[0] = v1.m[1]*v2.m[2] - v1.m[2]*v2.m[1];
     out.m[1] = v1.m[2]*v2.m[0] - v1.m[0]*v2.m[2];
@@ -122,11 +126,12 @@ rotate(const Matrix* in, float angle, float axis_x, float axis_y, float axis_z)
     float s = sin(a);
 
     Vector axis = {{ axis_x, axis_y, axis_z, 0.0f }};
-    normalizevec4(&axis);
+    vectorNormalizeInplace(&axis);
 
     Vector temp = vectorMul(axis, (1.0f - c));
     Matrix rotate = {{ 0 }};
 
+    // TODO: use .x, .y, .z
     rotate.m[0*4 + 0] = c + temp.m[0] * axis.m[0];
     rotate.m[0*4 + 1] = 0 + temp.m[0] * axis.m[1] + s * axis.m[2];
     rotate.m[0*4 + 2] = 0 + temp.m[0] * axis.m[2] - s * axis.m[1];
@@ -164,6 +169,7 @@ scale(Matrix* m, float x, float y, float z)
 {
     Matrix scale = IDENTITY_MATRIX;
 
+    // TODO: use 4*i + j
     scale.m[0] = x;
     scale.m[5] = y;
     scale.m[10] = z;
@@ -176,6 +182,7 @@ translate(Matrix* m, float x, float y, float z)
 {
     Matrix translation = IDENTITY_MATRIX;
     
+    // TODO: use 4*i + j
     translation.m[12] = x;
     translation.m[13] = y;
     translation.m[14] = z;
@@ -195,6 +202,7 @@ perspective(float fovy, float aspect, float zNear, float zFar)
     float bottom = -range;
     float top = range;
 
+    // TODO: use 4*i + j
     out.m[0] = (2.0f * zNear) / (right - left);
     out.m[5] = (2.0f * zNear) / (top - bottom);
     out.m[10] = - (zFar + zNear) / (zFar - zNear);
@@ -207,6 +215,7 @@ perspective(float fovy, float aspect, float zNear, float zFar)
 Matrix
 orthogonal(float left, float right, float bottom, float top)
 {
+    // TODO: use 4*i + j
     Matrix out = IDENTITY_MATRIX;
     out.m[0] = 2 / (right - left);
     out.m[5] = 2 / (top - bottom);
@@ -221,16 +230,18 @@ Matrix
 lookAt(Vector eye, Vector center, Vector up)
 {
     Vector f = vectorAdd(center, vectorMul(eye, -1.0f));
-    normalizevec4(&f);
+    vectorNormalizeInplace(&f);
 
     Vector u = up;
-    normalizevec4(&u);
+    vectorNormalizeInplace(&u);
 
     Vector s = crossvec4(f, u);
-    normalizevec4(&s);
+    vectorNormalizeInplace(&s);
     u = crossvec4(s, f);
 
     Matrix out = IDENTITY_MATRIX;
+
+    // TODO: use 4*i + j
     out.m[0] = s.x;
     out.m[4] = s.y;
     out.m[8] = s.z;
