@@ -15,10 +15,10 @@
 // usually about 53 chars is enough, using 128 to be safe
 static char globStatusLineBuff[128];
 
-// X, Y, U and V for each character in globStatusLineBuff except trailing \0
-// static GLfloat globStatusLineBufferData[(sizeof(globStatusLineBuff)-1)*4];
+// Two triangles * (X, Y, U, V) for each character in globStatusLineBuff
+static GLfloat globStatusLineBufferData[(sizeof(globStatusLineBuff)-1)*6*4];
 
-static unsigned int globStatusLineVerticesNumber = 6*2;
+static unsigned int globStatusLineVerticesNumber = 0;
 
 static const Vector POINT_LIGHT_POS = {{ -2.0f, 3.0f, 0.0f, 0.0f }};
 static const Vector SPOT_LIGHT_POS = {{ 4.0f, 5.0f, 0.0f, 0.0f }};
@@ -297,6 +297,7 @@ setupLights(GLuint programId, bool directionalLightEnabled,
 }
 
 
+#define FONT_RENDER_SIZE 0.025
 #define FONT_TEXTURE_LETTER_WIDTH_PX 32
 #define FONT_TEXTURE_LETTER_HEIGHT_PX 65
 #define FONT_TEXTURE_LETTER_NUM_IN_ROW 16
@@ -338,6 +339,71 @@ fontTextureCoordVBottom(char c)
 					/ FONT_TEXTURE_SIZE_PX;
 	return coord; // no correction for V coordinate required
 }
+
+// TODO: pass string as an argument
+static void
+prepareTextBufferData(GLuint fontVBO)
+{
+	unsigned int pos = 0;
+	char c;
+	for(;;)
+	{
+		c = globStatusLineBuff[pos];
+		if(c == '\0')
+			break;
+
+		float uLeft = fontTextureCoordULeft(c);
+		float uRight = fontTextureCoordURight(c);
+		float vTop = fontTextureCoordVTop(c);
+		float vBottom = fontTextureCoordVBottom(c);
+		float x1 = (FONT_RENDER_SIZE/2)*pos;
+		float x2 = (FONT_RENDER_SIZE/2)*pos + (FONT_RENDER_SIZE/2);
+
+		// Triangle 1: 3 * X, Y, U, V
+
+		globStatusLineBufferData[pos*6*4 + 0*4 + 0] = x1;               // X
+		globStatusLineBufferData[pos*6*4 + 0*4 + 1] = 0.0f;             // Y
+		globStatusLineBufferData[pos*6*4 + 0*4 + 2] = uLeft;            // U
+		globStatusLineBufferData[pos*6*4 + 0*4 + 3] = vBottom;          // V
+
+		globStatusLineBufferData[pos*6*4 + 1*4 + 0] = x2;               // X
+		globStatusLineBufferData[pos*6*4 + 1*4 + 1] = 0.0f;             // Y
+		globStatusLineBufferData[pos*6*4 + 1*4 + 2] = uRight;           // U
+		globStatusLineBufferData[pos*6*4 + 1*4 + 3] = vBottom;          // V
+
+		globStatusLineBufferData[pos*6*4 + 2*4 + 0] = x2;               // X
+		globStatusLineBufferData[pos*6*4 + 2*4 + 1] = FONT_RENDER_SIZE; // Y
+		globStatusLineBufferData[pos*6*4 + 2*4 + 2] = uRight;           // U
+		globStatusLineBufferData[pos*6*4 + 2*4 + 3] = vTop;             // V
+
+		// Triangle 2: 3 * X, Y, U, V
+
+		globStatusLineBufferData[pos*6*4 + 3*4 + 0] = x2;               // X
+		globStatusLineBufferData[pos*6*4 + 3*4 + 1] = FONT_RENDER_SIZE; // Y
+		globStatusLineBufferData[pos*6*4 + 3*4 + 2] = uRight;           // U
+		globStatusLineBufferData[pos*6*4 + 3*4 + 3] = vTop;             // V
+
+		globStatusLineBufferData[pos*6*4 + 4*4 + 0] = x1;               // X
+		globStatusLineBufferData[pos*6*4 + 4*4 + 1] = FONT_RENDER_SIZE; // Y
+		globStatusLineBufferData[pos*6*4 + 4*4 + 2] = uLeft;            // U
+		globStatusLineBufferData[pos*6*4 + 4*4 + 3] = vTop;             // V
+
+		globStatusLineBufferData[pos*6*4 + 5*4 + 0] = x1;               // X
+		globStatusLineBufferData[pos*6*4 + 5*4 + 1] = 0.0f;             // Y
+		globStatusLineBufferData[pos*6*4 + 5*4 + 2] = uLeft;            // U
+		globStatusLineBufferData[pos*6*4 + 5*4 + 3] = vBottom;          // V
+
+		pos++;
+	}
+
+	globStatusLineVerticesNumber = pos*6;
+
+	glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*6*4*pos,
+    	globStatusLineBufferData, GL_DYNAMIC_DRAW);
+}
+
+// TODO: static void renderText()
 
 static int
 mainInternal(CommonResources* resources)
@@ -520,34 +586,14 @@ mainInternal(CommonResources* resources)
 		if(currentTimeMs - lastFpsCounterFlushTimeMs > 200)
 		{
 			snprintf(globStatusLineBuff, sizeof(globStatusLineBuff),
-					"FPS: %.1f, T: %u%09u, X: %.1f, Y: %.1f, Z: %.1f\n",
+					"FPS: %.1f, T: %u%09u, X: %.1f, Y: %.1f, Z: %.1f",
 					fps,
 					(uint32_t)(currentTimeMs / 1000000000),
 					(uint32_t)(currentTimeMs % 1000000000),
 					cameraPos.x, cameraPos.y, cameraPos.z
 				);
-			printf("%s", globStatusLineBuff);
 
-				const GLfloat globVertexBufferData[] = {
- 	//   X       Y                           U                             V
-	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
-	0.014f, 0.000f, fontTextureCoordURight('A'), fontTextureCoordVBottom('A'),
-	0.014f, 0.025f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
-	0.014f, 0.025f, fontTextureCoordURight('A'), fontTextureCoordVTop(   'A'),
-	0.000f, 0.025f, fontTextureCoordULeft( 'A'), fontTextureCoordVTop(   'A'),
-	0.000f, 0.000f, fontTextureCoordULeft( 'A'), fontTextureCoordVBottom('A'),
-
-	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
-	0.028f, 0.000f, fontTextureCoordURight('B'), fontTextureCoordVBottom('B'),
-	0.028f, 0.025f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
-	0.028f, 0.025f, fontTextureCoordURight('B'), fontTextureCoordVTop(   'B'),
-	0.014f, 0.025f, fontTextureCoordULeft( 'B'), fontTextureCoordVTop(   'B'),
-	0.014f, 0.000f, fontTextureCoordULeft( 'B'), fontTextureCoordVBottom('B'),
-	};
-
-	glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(globVertexBufferData),
-    	globVertexBufferData, GL_DYNAMIC_DRAW);
+			prepareTextBufferData(fontVBO);
 
 			lastFpsCounterFlushTimeMs = currentTimeMs;
 		}
