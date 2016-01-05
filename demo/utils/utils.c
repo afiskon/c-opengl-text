@@ -24,13 +24,12 @@ getCurrentTimeMs()
     FILETIME filetime;
     GetSystemTimeAsFileTime(&filetime);
 
-    unsigned long long nowWindows = (unsigned long long)filetime.dwLowDateTime
-        + ((unsigned long long)(filetime.dwHighDateTime) << 32ULL);
+    uint64_t nowWindows = (uint64_t)filetime.dwLowDateTime
+        + ((uint64_t)(filetime.dwHighDateTime) << 32ULL);
 
-    unsigned long long nowUnix = nowWindows - 116444736000000000ULL;
-    unsigned long long nowUnixMs = nowUnix / 10000ULL;
+    uint64_t nowUnix = nowWindows - 116444736000000000ULL;
 
-    return (uint64_t)nowUnixMs;
+    return nowUnix / 10000ULL;
 }
 
 #else // Linux, MacOS, etc
