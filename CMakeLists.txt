@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
+
 project(opengl-demo)
 
 find_package(OpenGL REQUIRED)
 
 add_subdirectory(glfw)
-add_subdirectory(glxw)
 add_subdirectory(assimp)
+
+add_library(glxw STATIC glxw/src/glxw.c)
 
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(glxw/include)
