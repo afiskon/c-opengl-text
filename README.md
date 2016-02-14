@@ -15,9 +15,13 @@ Usage:
     mkdir build
     cd build
 
-    # on *nix:
+    # on Linux and MacOS:
     cmake ..
     make -j4 demo emdconv
+
+    # on FreeBSD:
+    cmake -DCMAKE_C_COMPILER=`which gcc` -DCMAKE_CXX_COMPILER=`which g++` ..
+    make -j4 demo
 
     # on Windows:
     cmake -DASSIMP_BUILD_ASSIMP_TOOLS=OFF -G "MinGW Makefiles" ..
@@ -36,4 +40,4 @@ Usage:
 * 3 - enable/disable blue spot light
 * Q - quit
 
-Tested on Linux, MacOS and Windows.
+Tested on Linux, FreeBSD, MacOS and Windows.
