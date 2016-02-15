@@ -1,10 +1,6 @@
 #include "utils.h"
 
-#ifdef __APPLE__
-#include <OpenGL/glext.h>
-#else
-#include <GL/glext.h>
-#endif
+#include "../../glfw/deps/GL/glext.h"
 
 #include "filemapping.h"
 
