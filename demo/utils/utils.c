@@ -1,7 +1,10 @@
 #include "utils.h"
 
-// <GL/glext.h> on Linux, <OpenGL/glext.h> on MacOS :(
-#include "../../glfw/deps/GL/glext.h"
+#ifdef __APPLE__
+#include <OpenGL/glext.h>
+#else
+#include <GL/glext.h>
+#endif
 
 #include "filemapping.h"
 

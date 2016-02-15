@@ -15,12 +15,8 @@ Usage:
     mkdir build
     cd build
 
-    # on Linux and MacOS:
+    # on *nix:
     cmake ..
-    make -j4 demo emdconv
-
-    # on FreeBSD:
-    cmake -DCMAKE_C_COMPILER=`which gcc` -DCMAKE_CXX_COMPILER=`which g++` ..
     make -j4 demo emdconv
 
     # on Windows:

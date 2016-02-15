@@ -9,10 +9,11 @@ add_subdirectory(assimp)
 
 add_library(glxw STATIC glxw/src/glxw.c)
 
-include_directories(${OPENGL_INCLUDE_DIR})
+# keep this order or build will fail when using clang
 include_directories(glxw/include)
 include_directories(glfw/include)
 include_directories(assimp/include)
+include_directories(${OPENGL_INCLUDE_DIR})
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fgnu89-inline -O2 -Wall -Wextra -Werror")
 
