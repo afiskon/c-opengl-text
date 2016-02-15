@@ -21,7 +21,7 @@ Usage:
 
     # on FreeBSD:
     cmake -DCMAKE_C_COMPILER=`which gcc` -DCMAKE_CXX_COMPILER=`which g++` ..
-    make -j4 demo
+    make -j4 demo emdconv
 
     # on Windows:
     cmake -DASSIMP_BUILD_ASSIMP_TOOLS=OFF -G "MinGW Makefiles" ..
