@@ -42,7 +42,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
     if(scene->mNumMeshes <= meshNumber)
     {
         fprintf(stderr,
-                "There is no mesh #%u in model (%d only), fname = %s\n",
+                "There is no mesh #%u in model (%u only), fname = %s\n",
                 meshNumber, scene->mNumMeshes, fname
             );
         aiReleaseImport(scene);
@@ -76,7 +76,7 @@ importedModelCreate(const char* fname, unsigned int meshNumber,
         if(mesh->mFaces[i].mNumIndices != verticesPerFace)
         {
             fprintf(stderr,
-                    "mesh->mFaces[i].numIndices = %d (3 expected),"
+                    "mesh->mFaces[i].numIndices = %u (3 expected),"
                     " i = %u, fname = %s\n",
                     mesh->mFaces[i].mNumIndices, i, fname
                 );

@@ -77,8 +77,8 @@ cameraGetViewMatrix(Camera* cam, float deltaTimeMs, Matrix* pOutViewMatrix)
         double mouseX, mouseY;
         glfwGetCursorPos(cam->window, &mouseX, &mouseY);
 
-        cam->horizontalAngleRad += MOUSE_SPEED_RAD * (windowWidth/2 - mouseX);
-        cam->verticalAngleRad += MOUSE_SPEED_RAD * (windowHeight/2 - mouseY);
+        cam->horizontalAngleRad += MOUSE_SPEED_RAD * ((float)windowWidth/2 - mouseX);
+        cam->verticalAngleRad += MOUSE_SPEED_RAD * ((float)windowHeight/2 - mouseY);
 
         glfwSetCursorPos(cam->window, windowWidth/2, windowHeight/2);
     }

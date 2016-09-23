@@ -3,6 +3,8 @@
 #include <string.h>
 #include <math.h>
 
+#define REAL_NUM_EQ(x, y) (fabs((x) - (y)) < 0.000001)
+
 Vector
 vectorNull()
 {
@@ -40,7 +42,7 @@ void
 vectorNormalizeInplace(Vector* v)
 {
     float sqr = v->x * v->x + v->y * v->y + v->z * v->z;
-    if(sqr == 1 || sqr == 0)
+    if(REAL_NUM_EQ(sqr, 1) || REAL_NUM_EQ(sqr, 0))
         return;
 
     float invrt = 1.0f/sqrt(sqr);
