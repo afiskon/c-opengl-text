@@ -3,4 +3,5 @@ build
 *.swp
 *.blend1
 *.blend2
+*.emd
 dna.txt
