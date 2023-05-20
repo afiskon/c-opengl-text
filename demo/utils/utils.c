@@ -1,7 +1,4 @@
 #include "utils.h"
-
-#include "../../glfw/deps/GL/glext.h"
-
 #include "filemapping.h"
 
 #include <stdio.h>
@@ -12,6 +9,12 @@
 #define FORMAT_CODE_DXT1 0x31545844 // "DXT1"
 #define FORMAT_CODE_DXT3 0x33545844 // "DXT3"
 #define FORMAT_CODE_DXT5 0x35545844 // "DXT5"
+
+// these used to be defined in glfw/deps/GL/glext.h
+// until GLFW commit 1b1ef31228412cc0509240a52ac181b863bba87a
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT 0x8C4D
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT 0x8C4E
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT 0x8C4F
 
 #ifdef _WIN32
 
